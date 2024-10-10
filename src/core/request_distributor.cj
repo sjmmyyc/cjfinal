@@ -3,10 +3,12 @@
  */
 package cjfinal.core
 
-import net.http.HttpRequestDistributor
-import net.http.HttpRequestHandler
-import net.http.HttpContext
-import net.http.FuncHandler
+import net.http.{
+    HttpRequestDistributor,
+    HttpRequestHandler,
+    HttpContext,
+    FuncHandler
+}
 
 /**
  * Http请求分发器

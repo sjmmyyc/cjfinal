@@ -3,10 +3,11 @@
  */
 package cjfinal.core
 
-import net.http.Server
-import net.http.ServerBuilder
-import net.http.HttpContext
-
+import net.http.{
+    Server,
+    ServerBuilder,
+    HttpContext
+}
 import log.LogLevel
 
 /**
