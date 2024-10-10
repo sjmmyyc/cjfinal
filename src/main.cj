@@ -1,6 +1,8 @@
 package cjfinal
 
+import cjfinal.core.CJFinal
+
 main(): Int64 {
-    println("hello world")
+    CJFinal(80).start()
     return 0
 }
