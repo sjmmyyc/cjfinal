@@ -3,17 +3,10 @@
  */
 package cjfinal.core
 
-import net.http.{
-    Server,
-    ServerBuilder,
-    HttpContext
-}
+import net.http.{Server, ServerBuilder, HttpContext}
 import log.LogLevel
 import std.time.MonoTime
-import cjfinal.config.{
-    CJFinalConfig,
-    Constants
-}
+import cjfinal.config.{CJFinalConfig, Constants}
 
 /**
  * CJFinal服务器类
@@ -25,11 +18,11 @@ public class CJFinal{
     private static let me: CJFinal = CJFinal()
 
     private var _config: ?CJFinalConfig = None
-    private let _constants: Constants = Constants()
+    private var _constants: Constants = Constants()
 
     private var server: ?Server = None
 
-    public init(){}
+    private init(){}
 
     /**
      * 启动服务器
