@@ -3,8 +3,7 @@
  */
 package cjfinal.test
 
-import cjfinal.config.{CJFinalConfig, Constants, Routes}
-
+import cjfinal.core.{CJFinalConfig, Constants, Routes}
 
 public class TestConfig <: CJFinalConfig{
 
@@ -13,6 +12,7 @@ public class TestConfig <: CJFinalConfig{
     }
 
     public func configRoutes(me: Routes): Unit{
-        
+        me.add("/", RootController())
+        me.add("/user", UserController())
     }
 }

@@ -6,7 +6,6 @@ package cjfinal.core
 import net.http.{Server, ServerBuilder, HttpContext}
 import log.LogLevel
 import std.time.MonoTime
-import cjfinal.config.{CJFinalConfig, Constants}
 
 /**
  * CJFinal服务器类
@@ -15,10 +14,11 @@ public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
     public static let version = "0.0.1"
 
-    private static let me: CJFinal = CJFinal()
+    public static let me: CJFinal = CJFinal()
 
     private var _config: ?CJFinalConfig = None
-    private var _constants: Constants = Constants()
+    private var _constants = Constants()
+    private var _routes = Routes()
 
     private var server: ?Server = None
 
@@ -32,7 +32,7 @@ public class CJFinal{
         println("Welcom to use CJFinal Framework, current version is: ${version}")
         me.config = config
         me.config.configConstants(me.constants)
-        
+        me.config.configRoutes(me.routes)
         me.create(port)
         let endTime = MonoTime.now()
         println("Total cost: ${(endTime - startTime).toNanoseconds() / 1000}ms")
@@ -61,7 +61,7 @@ public class CJFinal{
         ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
     }
 
-     // CJFinal配置
+    // CJFinal配置
     public mut prop config: CJFinalConfig{
         set(value){
             this._config = value
@@ -75,6 +75,13 @@ public class CJFinal{
     public prop constants: Constants{
         get(){
             return this._constants
+        }
+    }
+
+    // 路由
+    public prop routes: Routes{
+        get(){
+            return this._routes
         }
     }
 }

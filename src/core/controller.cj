@@ -8,4 +8,7 @@ package cjfinal.core
  */
 public abstract class Controller{
 
+    public func renderText(text: String): Unit{
+        println("renderText(${text})...")
+    }
 }
