@@ -1,16 +1,18 @@
 /*
- * Copyright (c) 杨云超 2024-2024. All rights reserved.
+ * Copyright (c) 杨云超(yyc1030@qq.com) 2024-2024. All rights reserved.
  */
 package cjfinal.test
 
-import cjfinal.config.{
-    CJFinalConfig,
-    Constants
-}
+import cjfinal.config.{CJFinalConfig, Constants, Routes}
 
 
 public class TestConfig <: CJFinalConfig{
+
     public func configConstants(me: Constants): Unit{
         me.devMode = true
+    }
+
+    public func configRoutes(me: Routes): Unit{
+        
     }
 }

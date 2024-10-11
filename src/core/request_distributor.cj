@@ -1,14 +1,9 @@
 /*
- * Copyright (c) 杨云超 2024-2024. All rights reserved.
+ * Copyright (c) 杨云超(yyc1030@qq.com) 2024-2024. All rights reserved.
  */
 package cjfinal.core
 
-import net.http.{
-    HttpRequestDistributor,
-    HttpRequestHandler,
-    HttpContext,
-    FuncHandler
-}
+import net.http.{HttpRequestDistributor, HttpRequestHandler, HttpContext, FuncHandler}
 
 /**
  * Http请求分发器

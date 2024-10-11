@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 杨云超 2024-2024. All rights reserved.
+ * Copyright (c) 杨云超(yyc1030@qq.com) 2024-2024. All rights reserved.
  */
 package cjfinal.config
 
@@ -14,7 +14,7 @@ public class Constants{
     public mut prop devMode: Bool{
         set(value){
             this._devMode = value
-            println("set devMode = ${this._devMode}")
+            println("Set devMode = ${this._devMode}")
         }
         get(){
             return _devMode

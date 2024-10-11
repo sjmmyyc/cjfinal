@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 杨云超 2024-2024. All rights reserved.
+ * Copyright (c) 杨云超(yyc1030@qq.com) 2024-2024. All rights reserved.
  */
 package cjfinal.core
 
@@ -29,12 +29,13 @@ public class CJFinal{
      */
     public static func start(config: CJFinalConfig, port: Int64){
         let startTime = MonoTime.now()
+        println("Welcom to use CJFinal Framework, current version is: ${version}")
         me.config = config
         me.config.configConstants(me.constants)
         
         me.create(port)
         let endTime = MonoTime.now()
-        println("Total cost: ${endTime - startTime}")
+        println("Total cost: ${(endTime - startTime).toNanoseconds() / 1000}ms")
         me.server?.serve()
     }
 
@@ -42,7 +43,6 @@ public class CJFinal{
      * 创建服务并将所有请求归一处理
      */
     private func create(port: Int64): Unit{
-        println("Welcom to use CJFinal Framework, current version is: ${version}")
         this.server = ServerBuilder()
             .addr("127.0.0.1")
             .port(UInt16(port))

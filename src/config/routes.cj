@@ -1,11 +1,10 @@
 /*
  * Copyright (c) 杨云超(yyc1030@qq.com) 2024-2024. All rights reserved.
  */
-package cjfinal.core
-
+package cjfinal.config
 /**
- * 控制器基类
+ * 路由
  */
-public abstract class Controller{
+public abstract class Routes{
 
 }
