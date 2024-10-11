@@ -4,8 +4,9 @@
 package cjfinal
 
 import cjfinal.core.CJFinal
+import cjfinal.test.TestConfig
 
 main(): Int64 {
-    CJFinal(80).start()
+    CJFinal.start(TestConfig(), 80)
     return 0
 }

@@ -3,8 +3,14 @@
  */
 package cjfinal.test
 
-import cjfinal.config.CJFinalConfig
+import cjfinal.config.{
+    CJFinalConfig,
+    Constants
+}
+
 
 public class TestConfig <: CJFinalConfig{
-
+    public func configConstants(me: Constants): Unit{
+        me.devMode = true
+    }
 }
