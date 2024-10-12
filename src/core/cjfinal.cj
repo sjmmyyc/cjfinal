@@ -6,6 +6,7 @@ package cjfinal.core
 import net.http.{Server, ServerBuilder, HttpContext}
 import log.LogLevel
 import std.time.MonoTime
+import std.reflect.TypeInfo
 
 /**
  * CJFinal服务器类
@@ -35,7 +36,7 @@ public class CJFinal{
         me.config.configRoutes(me.routes)
         me.create(port)
         let endTime = MonoTime.now()
-        println("Total cost: ${(endTime - startTime).toNanoseconds() / 1000}ms")
+        println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
         me.server?.serve()
     }
 
@@ -57,8 +58,24 @@ public class CJFinal{
      * http请求的全局处理器
      */
     private func globalHandler(ctx: HttpContext): Unit{
-        println("${ctx.request.url}")
-        ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
+        let url = ctx.request.url
+        if(me.constants.devMode){
+            println("------------------------------ Request Info ------------------------------")
+            println("URL: ${url}")
+        }
+        // 记录匹配到的path
+        var path = ""
+        // 记录匹配到的controller
+        var controller: ?Controller = None
+        (path, controller) = this.routes.get(url)
+        if(me.constants.devMode){
+            let info = TypeInfo.of(controller.getOrThrow())
+            println("Controller: ${info}")
+        }
+        // ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
+        if(me.constants.devMode){
+            println("----------------------------------- End ----------------------------------\n")
+        }
     }
 
     // CJFinal配置

@@ -6,7 +6,7 @@ package cjfinal.test
 import cjfinal.core.Controller
 
 public class UserController <: Controller{
-    public func info(){
-        this.renderText("user info...")
+    public func index(){
+        this.renderText("user index...")
     }
 }
