@@ -3,7 +3,7 @@
  */
 package cjfinal.core
 
-import net.http.{Server, ServerBuilder, HttpContext}
+import net.http.{Server, ServerBuilder, HttpContext, HttpStatusCode}
 import log.LogLevel
 import std.time.MonoTime
 import std.reflect.TypeInfo
@@ -59,7 +59,7 @@ public class CJFinal{
      */
     private func globalHandler(ctx: HttpContext): Unit{
         let url = ctx.request.url
-        if(me.constants.devMode){
+        if(Config.DEV_MODE){
             println("------------------------------ Request Info ------------------------------")
             println("URL: ${url}")
         }
@@ -68,12 +68,24 @@ public class CJFinal{
         // 记录匹配到的controller
         var controller: ?Controller = None
         (path, controller) = this.routes.get(url)
-        if(me.constants.devMode){
-            let info = TypeInfo.of(controller.getOrThrow())
-            println("Controller: ${info}")
+        match(controller){
+            case None =>
+                // 当没有匹配到Controller时，返回404状态
+                ctx.responseBuilder.status(HttpStatusCode.STATUS_NOT_FOUND)
+                ctx.responseBuilder.body("404 - Not Found")
+                if(Config.DEV_MODE){
+                    println("Controller: None")
+                }
+            case Some(con) =>
+                // 当匹配到Controller时
+                if(Config.DEV_MODE){
+                    let info = TypeInfo.of(controller.getOrThrow())
+                    println("Controller: ${info}")
+                }
         }
-        // ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
-        if(me.constants.devMode){
+        
+        ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
+        if(Config.DEV_MODE){
             println("----------------------------------- End ----------------------------------\n")
         }
     }

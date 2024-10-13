@@ -8,16 +8,14 @@ package cjfinal.core
  */
 public class Constants{
 
-    // 开发模式默认为false
-    private var _devMode = false
     // 是否开发模式
     public mut prop devMode: Bool{
         set(value){
-            this._devMode = value
-            println("Set devMode = ${this._devMode}")
+            Config.DEV_MODE = value
+            println("Set devMode = ${Config.DEV_MODE}")
         }
         get(){
-            return _devMode
+            return Config.DEV_MODE
         }
     }
 }
