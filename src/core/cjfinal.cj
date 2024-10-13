@@ -59,34 +59,35 @@ public class CJFinal{
      */
     private func globalHandler(ctx: HttpContext): Unit{
         let url = ctx.request.url
-        if(Config.DEV_MODE){
-            println("------------------------------ Request Info ------------------------------")
-            println("URL: ${url}")
-        }
+        devPrintln("------------------------------ Request Info ------------------------------")
+        devPrintln("URL: ${url}")
         // 记录匹配到的path
         var path = ""
         // 记录匹配到的controller
         var controller: ?Controller = None
         (path, controller) = this.routes.get(url)
+        // 判断controller是否为None
         match(controller){
             case None =>
                 // 当没有匹配到Controller时，返回404状态
                 ctx.responseBuilder.status(HttpStatusCode.STATUS_NOT_FOUND)
                 ctx.responseBuilder.body("404 - Not Found")
-                if(Config.DEV_MODE){
-                    println("Controller: None")
-                }
+                devPrintln("Controller: None")
             case Some(con) =>
                 // 当匹配到Controller时
-                if(Config.DEV_MODE){
-                    let info = TypeInfo.of(controller.getOrThrow())
-                    println("Controller: ${info}")
-                }
+                devPrintln("Controller: ${TypeInfo.of(controller.getOrThrow())}")
+                println("matched path: ${path}")
+                ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
         }
-        
-        ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
+        devPrintln("----------------------------------- End ----------------------------------\n")
+    }
+
+    /**
+     * 开发模式下才打印的信息
+     */
+    public static func devPrintln(msg: String){
         if(Config.DEV_MODE){
-            println("----------------------------------- End ----------------------------------\n")
+            println(msg)
         }
     }
 
