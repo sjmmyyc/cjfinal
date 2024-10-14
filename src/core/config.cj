@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 杨云超(yyc1030@qq.com) 2024-2024. All rights reserved.
+/**
+ * Copyright (c) 2024-2024, Kevin Yang 杨云超 (yyc1030@qq.com).
  */
 package cjfinal.core
 
