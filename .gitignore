@@ -2,3 +2,4 @@
 .vscode
 target
 cjpm.lock
+build-script-cache
