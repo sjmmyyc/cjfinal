@@ -9,4 +9,8 @@ public class UserController <: Controller{
     public func index(){
         this.renderText("user index...")
     }
+
+    public func list(){
+        this.renderText("user list...")
+    }
 }

@@ -3,12 +3,24 @@
  */
 package cjfinal.core
 
+import net.http.HttpContext
+
 /**
  * 控制器基类
  */
 public abstract class Controller{
+    private var _ctx: ?HttpContext = None
 
     public func renderText(text: String): Unit{
-        println("renderText(${text})...")
+        this.ctx.responseBuilder.body(text)
+    }
+
+    public mut prop ctx: HttpContext{
+        set(value){
+            this._ctx = value
+        }
+        get(){
+            return this._ctx.getOrThrow()
+        }
     }
 }
