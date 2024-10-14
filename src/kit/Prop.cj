@@ -49,7 +49,6 @@ public class Prop{
     private func read(path: String){
         // try-with-resource块，结束时自动释放文件
         try(file = File.openRead(path)){
-            // let bytes = file.readToEnd()
             let reader = StringReader(file)
             while(let Some(line) <- reader.readln()){
                 // 只有当不是以“//”开始的行，才进行处理
