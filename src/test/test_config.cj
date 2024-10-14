@@ -9,7 +9,7 @@ import cjfinal.kit.PropKit
 public class TestConfig <: CJFinalConfig{
 
     public func configConstants(me: Constants): Unit{
-        PropKit.use("./config/config.txt").appendIfExist("./config/config-pro.txt")
+        PropKit.use("./config/config").appendIfExist("./config/config-pro")
         me.devMode = PropKit.getBoolByDefault("devMode", false)
     }
 

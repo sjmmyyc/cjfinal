@@ -24,24 +24,30 @@ public class PropKit{
      */
     public static func use(path: String): Prop{
         let props = Prop(path)
-        try{
-            PropKit.props.getOrThrow()
-        }catch(e: Exception){
+        if(let None <- PropKit.props){
             PropKit.props = props
         }
         return props
     }
 
     public static func getBool(key: String): ?Bool{
-        let value = props?.get(key)
-        if(let Some(v) <- value){
-            return Bool.parse(v.getOrThrow())
+        if(let Some(p) <- PropKit.props){
+            if(let Some(v) <- p.get(key)){
+                return Bool.parse(v)
+            }else{
+                return None
+            }
         }else{
             return None
         }
     }
 
     public static func getBoolByDefault(key: String, default: Bool): Bool{
-        return false
+        let value = getBool(key)
+        if(let Some(v) <- value){
+            return Bool.parse(v.toString())
+        }else{
+            return default
+        }
     }
 }
