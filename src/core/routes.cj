@@ -3,6 +3,8 @@
  */
 package cjfinal.core
 
+import cjfinal.exception.AlreadyExistException
+
 import std.collection.HashMap
 import std.reflect.TypeInfo
 import encoding.url.URL

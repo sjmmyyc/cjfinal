@@ -3,9 +3,62 @@
  */
 package cjfinal.kit
 
+import cjfinal.exception.NotFoundException
+
+import std.collection.HashMap
+import std.io.StringReader
+import std.fs.File
+
 /**
- * Prop用于描述配置文件
+ * Prop用于读取配置文件
  */
 public class Prop{
 
+    // 从配置文件中读取的信息都以键值对儿的形式保存在此
+    private let kv = HashMap<String, String>()
+
+    /**
+     * 构造器
+     * @param path 配置文件的相对路径，相对于当前运行目录
+     */
+    public init(path: String){
+        if(File.exists(path)){
+            read(path)
+        }else{
+            throw NotFoundException('File "${path}" not found!')
+        }
+    }
+
+    /**
+     * 追加配置文件，方便在开发模式和生产模式中使用不同的配置文件
+     */
+    public func appendIfExist(path: String): Prop{
+        if(File.exists(path)){
+            read(path)
+        }
+        return this
+    }
+
+    public func get(key: String): ?String{
+        return this.kv.get(key)
+    }
+
+    /**
+     * 读取配置文件，并将信息存储起来
+     */
+    private func read(path: String){
+        // try-with-resource块，结束时自动释放文件
+        try(file = File.openRead(path)){
+            // let bytes = file.readToEnd()
+            let reader = StringReader(file)
+            while(let Some(line) <- reader.readln()){
+                // 只有当不是以“//”开始的行，才进行处理
+                if(!line.startsWith("//")){
+                    // 将line以“=”分割
+                    let list = line.split("=")
+                    this.kv.put(list[0].trimAscii(), list[1].trimAscii())
+                }
+            }
+        }
+    }
 }
