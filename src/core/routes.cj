@@ -44,8 +44,8 @@ public class Routes{
      * @param url URL
      * @return (String, Option<Controller>) 匹配到的path和controller对象
      */
-    public func get(url: URL): (String, ?Controller){
-        let pathList = this.calPossiblePath(url)
+    public static func get(url: URL): (?String, ?Controller){
+        let pathList = calPossiblePath(url)
         var controller: ?Controller = None
 
         for(path in pathList){
@@ -55,14 +55,14 @@ public class Routes{
                 case Some(con) => return (path, con)
             }
         } 
-        return ("", None)
+        return (None, None)
     }
 
     /**
      * 根据url计算出所有path的可能性，返回的是个列表，排列顺序根据path包含的节点数从高到低排列
      */
-    private func calPossiblePath(url: URL): ArrayList<String>{
-        let nodeList = this.getRouteNodeList(url)
+    private static func calPossiblePath(url: URL): ArrayList<String>{
+        let nodeList = getRouteNodeList(url)
         let pathList = ArrayList<String>()
         var tempPath = ""
         for(node in nodeList){
@@ -83,7 +83,7 @@ public class Routes{
     /**
      * 根据URL获取节点列表(以“/”分割的字符串被看做是一个节点)，节点index和其后的部分将被丢弃
      */
-    private func getRouteNodeList(url: URL): ArrayList<String>{
+    private static func getRouteNodeList(url: URL): ArrayList<String>{
         let tempList = url.path.split("/")
         let pathList = ArrayList<String>();
         for(name in tempList){

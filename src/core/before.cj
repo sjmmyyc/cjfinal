@@ -1,0 +1,17 @@
+/**
+ * Copyright (c) 2024-2024, Kevin Yang 杨云超 (yyc1030@qq.com).
+ */
+package cjfinal.core
+
+/**
+ * 用于为Controller和其public方法配置拦截器
+ */
+@Annotation[target: [Type, MemberFunction]]
+public class Before{
+    
+    let interceptorStr: String
+    
+    public const init(interceptorStr: String){
+        this.interceptorStr = interceptorStr
+    }
+}

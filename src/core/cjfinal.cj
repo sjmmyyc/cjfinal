@@ -59,50 +59,22 @@ public class CJFinal{
      * http请求的全局处理器
      */
     private func globalHandler(ctx: HttpContext): Unit{
-        let url = ctx.request.url
-        devPrintln("------------------------------ Request Info ------------------------------")
-        devPrintln("URL:\t\t${url}")
-        // 记录匹配到的path
-        var path = ""
-        // 记录匹配到的Action
-        var action = ""
-        // 记录匹配到的Param
-        var param = ""
-        // 记录匹配到的controller
-        var controller: ?Controller = None
-        (path, controller) = this.routes.get(url)
-        // 判断controller是否为None
-        match(controller){
-            case None =>
-                // 当没有匹配到Controller时，返回404状态
-                ctx.responseBuilder.status(HttpStatusCode.STATUS_NOT_FOUND)
-                ctx.responseBuilder.body("404 - Not Found")
-                devPrintln("Controller: None")
-            case Some(con) =>
-                // 当匹配到Controller时
-                con.ctx = ctx
-                let conInfo = TypeInfo.of(con)
-                devPrintln("Controller:\t${path} ${conInfo}")
-                action = getActionName(url, path)
-                // 此时的action还不一定真是Action，得调用一下试试
-                try{
-                    // 假设action表示的正是Action
-                    let funcInfo = conInfo.getInstanceFunction(action)
-                    funcInfo.apply(con)
-                }catch(e: Exception){
-                    // 调用后发现action不是Action，则此Action将作为Param
-                    action = "index"
-                    let funcInfo = conInfo.getInstanceFunction(action)
-                    funcInfo.apply(con)
-                }
-                devPrintln("Action:\t\t${action}")
-                param = getParam(url, path, action)
-                if(param != ""){
-                    devPrintln("Param:\t\t${param}")
-                }
-                // ctx.responseBuilder.body("欢迎使用CJFinal ${version} ^_^")
+        let action = Action(ctx)
+        if(action.isValid){
+            devPrintln("------------------------------ Request Info ------------------------------")
+            devPrintln("URL:\t\t${ctx.request.url}")
+            devPrintln("Controller:\t[${action.path}] ${action.controllerName}")
+            devPrintln("Action:\t\t${action.method}")
+            if(action.params.size != 0){
+                devPrintln("Param:\t\t${action.params}")
+            }
+            devPrintln("----------------------------------- End ----------------------------------\n")
+        }else{
+            println("request: ${ctx.request.url} is not found.")
+            let responst = ctx.responseBuilder
+            responst.status(HttpStatusCode.STATUS_NOT_FOUND)
+            responst.body("404 - Not Found")
         }
-        devPrintln("----------------------------------- End ----------------------------------\n")
     }
 
     /**
@@ -112,56 +84,6 @@ public class CJFinal{
         if(Config.DEV_MODE){
             println(msg)
         }
-    }
-
-    /**
-     * 根据URL和ControllerPath，获取Action名称
-     */
-    private func getActionName(url: URL, controllerPath: String): String{
-        let fullPath = url.path
-        // 将controllerPath部分移除
-        var action = fullPath[controllerPath.size..]
-        // 如果是以“/”打头，把这个打头的“/”也去掉
-        if(action.startsWith("/")){
-            action = action[1..]
-        }
-        let nodes = action.split("/")
-        if(nodes.size == 0){
-            // 表示URL中无后续参数了，直接将Action定向到index
-            action = "index"
-        }else{
-            // 表示URL中有后续参数，将node[1]做为Action
-            action = nodes[0]
-        }
-        return action
-    }
-
-    /**
-     * 根据URL、controllerPath、action获取Param
-     */
-    private func getParam(url: URL, controllerPath: String, action: String): String{
-        var param = ""
-        var path = url.path
-         // 将controllerPath部分移除
-        path = path[controllerPath.size..]
-        // 如果是以“/”打头，把这个打头的“/”也去掉
-        if(path.startsWith("/")){
-            path = path[1..]
-        }
-        // 如果是以“/”结尾，把这个结尾处的“/”去掉
-        if(path.endsWith("/")){
-            path = path[0..(path.size - 1)]
-        }
-        let nodes = path.split("/")
-        if(nodes.size > 0){
-            param = nodes[nodes.size - 1]
-            if(param == action){
-                param = ""
-            }
-        }else{
-            param = ""
-        }
-        return param
     }
 
     // CJFinal配置
