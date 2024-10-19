@@ -12,7 +12,7 @@ public class Constants{
     public mut prop devMode: Bool{
         set(value){
             Config.DEV_MODE = value
-            println("Set devMode = ${Config.DEV_MODE}")
+            println("Set \u{1b}[32mdevMode\u{1b}[0m = \u{1b}[32m${Config.DEV_MODE}\u{1b}[0m")
         }
         get(){
             return Config.DEV_MODE

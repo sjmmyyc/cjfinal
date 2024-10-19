@@ -15,8 +15,12 @@ public class ObjectKit{
      * let a: classA = ObjectKit.new("packagename.className") as ClassA
      */
     public static func new(typeName: String, parameterTypes: Array<TypeInfo>): Any{
-        let classInfo = (TypeInfo.get(typeName) as ClassTypeInfo).getOrThrow()
-        let aConstruct = classInfo.getConstructor(parameterTypes)
-        return aConstruct.apply()
+        try{
+            let classInfo = (TypeInfo.get(typeName) as ClassTypeInfo).getOrThrow()
+            let aConstruct = classInfo.getConstructor(parameterTypes)
+            return aConstruct.apply()
+        }catch(e: Exception){
+            println("\u{1b}[31m${typeName} is not correct type.\u{1b}[0m")
+        }
     }
 }

@@ -16,4 +16,9 @@ public abstract class CJFinalConfig{
      * 配置路由
      */
     public func configRoutes(me: Routes): Unit
+
+    /**
+     * 配置拦截器
+     */
+    public func configInterceptor(me: Interceptors): Unit
 }

@@ -21,6 +21,8 @@ public class CJFinal{
     private var _config: ?CJFinalConfig = None
     private var _constants = Constants()
     private var _routes = Routes()
+    // 全局拦截器工具
+    private var _interceptors = Interceptors()
 
     private var server: ?Server = None
 
@@ -31,10 +33,11 @@ public class CJFinal{
      */
     public static func start(config: CJFinalConfig, port: Int64){
         let startTime = MonoTime.now()
-        println("Welcom to use CJFinal Framework, current version is: ${version}")
+        println("Welcom to use \u{1b}[32mCJFinal\u{1b}[0m Framework, current version is: \u{1b}[32m${version}\u{1b}[0m")
         me.config = config
         me.config.configConstants(me.constants)
         me.config.configRoutes(me.routes)
+        me.config.configInterceptor(me._interceptors)
         me.create(port)
         let endTime = MonoTime.now()
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
@@ -64,6 +67,19 @@ public class CJFinal{
             devPrintln("URL:\t\t${ctx.request.url}")
             devPrintln("Controller:\t[${action.path}] ${action.controllerName}")
             devPrintln("Action:\t\t${action.method}")
+            if(action.interceptors.size > 0){
+                devPrint("Interceptors:\t")
+                var index = 0
+                for(interceptor in action.interceptors){
+                    let info = TypeInfo.of(interceptor)
+                    if(index == 0){
+                        devPrintln("${info}")
+                    }else{
+                        devPrintln("\t\t${info}")
+                    }
+                    index++
+                }
+            }
             if(action.params.size != 0){
                 devPrintln("Param:\t\t${action.params}")
             }
@@ -83,6 +99,12 @@ public class CJFinal{
     public static func devPrintln(msg: String){
         if(Config.DEV_MODE){
             println(msg)
+        }
+    }
+
+    public static func devPrint(msg: String){
+        if(Config.DEV_MODE){
+            print(msg)
         }
     }
 
@@ -107,6 +129,12 @@ public class CJFinal{
     public prop routes: Routes{
         get(){
             return this._routes
+        }
+    }
+
+    public prop interceptors: Interceptors{
+        get(){
+            return this._interceptors
         }
     }
 }

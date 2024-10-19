@@ -19,15 +19,17 @@ public class Action{
     private let _controllerName: String
     // 表示controller中的哪个方法
     private let _method: InstanceFunctionInfo
-    // 参数
+    // 参数，非请求中?打头的参数
     private let _params: Array<String>
+    private let _interceptors: Array<Interceptor>
 
-    private init(path: String, controller: Controller, controllerName: String, method: InstanceFunctionInfo, params: Array<String>){
+    private init(path: String, controller: Controller, controllerName: String, method: InstanceFunctionInfo, params: Array<String>, interceptors: Array<Interceptor>){
         this._path = path
         this._controller = controller
         this._controllerName = controllerName
         this._method = method
         this._params = params
+        this._interceptors = interceptors
     }
 
     /**
@@ -46,7 +48,19 @@ public class Action{
             var params: Array<String>
             (methodOpt, params) = getMethodAndParams(path.getOrThrow(), con, conInfo)
             if(let Some(method) <- methodOpt){
-                return Action(path.getOrThrow(), con, controllerName, method, params)
+                var interceptors: Array<Interceptor> = []
+                // 获取全局拦截器
+                interceptors = interceptors.concat(CJFinal.me.interceptors.interceptors)
+                // 获取controller级的拦截器
+                if(let Some(anno) <- conInfo.findAnnotation<Before>()){
+                    interceptors = interceptors.concat(anno.getInterceptors())
+                }
+                // 获取method级拦截器
+                if(let Some(anno) <- method.findAnnotation<Before>()){
+                    interceptors = interceptors.concat(anno.getInterceptors())
+                }
+                
+                return Action(path.getOrThrow(), con, controllerName, method, params, interceptors)
             }else{
                 return None
             }
@@ -147,6 +161,12 @@ public class Action{
     public prop params: Array<String>{
         get(){
             this._params
+        }
+    }
+
+    public prop interceptors: Array<Interceptor>{
+        get(){
+            this._interceptors
         }
     }
 }

@@ -30,7 +30,7 @@ public class Routes{
             case None =>
                 // path不存在，添加到routesMap中
                 if(CJFinal.me.constants.devMode){
-                    println("Add route: ${path} -> ${TypeInfo.of(controller).name}")
+                    println("\u{1b}[35mAdd route: ${path} -> ${TypeInfo.of(controller).name}\u{1b}[0m")
                 }
                 routesMap.put(path, controller)
             case _ => 

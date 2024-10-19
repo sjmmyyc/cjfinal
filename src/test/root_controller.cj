@@ -7,6 +7,8 @@ import cjfinal.core.{Controller, Before}
 
 @Before["cjfinal.test.ControllerInterceptor"]
 public class RootController <: Controller{
+
+    @Before["cjfinal.test.MethodInterceptor"]
     public func index(){
         this.renderText("index")
     }

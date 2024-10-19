@@ -3,7 +3,7 @@
  */
 package cjfinal.test
 
-import cjfinal.core.{CJFinalConfig, Constants, Routes}
+import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors}
 import cjfinal.kit.PropKit
 
 public class TestConfig <: CJFinalConfig{
@@ -16,5 +16,9 @@ public class TestConfig <: CJFinalConfig{
     public func configRoutes(me: Routes): Unit{
         me.add("/", RootController())
         me.add("/user", UserController())
+    }
+
+    public func configInterceptor(me: Interceptors): Unit{
+        me.add(GlobalInterceptor())
     }
 }
