@@ -42,17 +42,14 @@ public class Routes{
     /**
      * 根据请求获取匹配到的(path和controller)
      * @param url URL
-     * @return (String, Option<Controller>) 匹配到的path和controller对象
+     * @return 匹配到的path和controller对象
      */
     public static func get(url: URL): (?String, ?Controller){
         let pathList = calPossiblePath(url)
-        var controller: ?Controller = None
 
         for(path in pathList){
-            controller = routesMap.get(path)
-            match(controller){
-                case None => continue
-                case Some(con) => return (path, con)
+            if(let Some(con) <- routesMap.get(path)){
+                return (path, con)
             }
         } 
         return (None, None)

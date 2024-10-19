@@ -14,35 +14,62 @@ import std.reflect.{TypeInfo, InstanceFunctionInfo}
 public class Action{
 
     // 表示绑定到controller的目录
-    private var _path: ?String = None
-    private var _controller: ?Controller = None
-    private var _controllerName: ?String = None
+    private let _path: String
+    private let _controller: Controller
+    private let _controllerName: String
     // 表示controller中的哪个方法
-    private var _method: ?InstanceFunctionInfo = None
+    private let _method: InstanceFunctionInfo
     // 参数
-    private var _param: Array<String> = []
+    private let _params: Array<String>
+
+    private init(path: String, controller: Controller, controllerName: String, method: InstanceFunctionInfo, params: Array<String>){
+        this._path = path
+        this._controller = controller
+        this._controllerName = controllerName
+        this._method = method
+        this._params = params
+    }
 
     /**
-     * 将url解析为Action类，解析失败抛出NotFoundException
+     * 将url解析为Action类，解析失败返回Option<Action>.None
      */
-    public init(ctx: HttpContext){
+    public static func get(ctx: HttpContext): ?Action{
         let url = ctx.request.url
-        (this._path, _controller) = Routes.get(url)
-        if(let Some(path) <- this._controller){
-            this._controller?.ctx = ctx
-            let conInfo = TypeInfo.of(this._controller.getOrThrow())
-            this._controllerName = conInfo.qualifiedName
-            this._method = getMethodAndParams(conInfo)
+        var path: ?String
+        var controller : ?Controller
+        (path, controller) = Routes.get(url)
+        if(let Some(con) <- controller){
+            con.ctx = ctx
+            let conInfo = TypeInfo.of(con)
+            let controllerName = conInfo.qualifiedName
+            var methodOpt: ?InstanceFunctionInfo
+            var params: Array<String>
+            (methodOpt, params) = getMethodAndParams(path.getOrThrow(), con, conInfo)
+            if(let Some(method) <- methodOpt){
+                return Action(path.getOrThrow(), con, controllerName, method, params)
+            }else{
+                return None
+            }
+        }else{
+            return None
         }
+    }
+
+    /**
+     * 调用
+     */
+    public func invoke(): Unit{
+        this._method.apply(this._controller)
     }
 
     /**
      * 解析将要调用Controller的方法的名称和传入参数
      */
-    private func getMethodAndParams(conInfo: TypeInfo): ?InstanceFunctionInfo{
-        let fullPath = this._controller.getOrThrow().ctx.request.url.path
+    private static func getMethodAndParams(path: String, controller: Controller, conInfo: TypeInfo): (?InstanceFunctionInfo, Array<String>){
+        let fullPath = controller.ctx.request.url.path
+        var params: Array<String> = []
         // 将controllerPath部分移除
-        var action = fullPath[this._path.getOrThrow().size..]
+        var action = fullPath[path.size..]
         // 如果是以“/”打头，把这个打头的“/”也去掉
         if(action.startsWith("/")){
             action = action[1..]
@@ -55,9 +82,9 @@ public class Action{
             for(fun in conInfo.instanceFunctions){
                 if(fun.name == action){
                     if(nodes.size > 1 && nodes[1] != ""){
-                        getParam(nodes[1])
+                        params = getParam(nodes[1])
                     }
-                    return fun
+                    return (fun, params)
                 }
             }
         }
@@ -66,18 +93,18 @@ public class Action{
         for(fun in conInfo.instanceFunctions){
             if(fun.name == action){
                 if(nodes.size > 0){
-                    getParam(nodes[0])
+                    params = getParam(nodes[0])
                 }
-                return fun
+                return (fun, params)
             }
         }
-        return None
+        return (None, params)
     }
 
     /**
      * 解析传入的参数
      */
-    private func getParam(params: String): Unit{
+    private static func getParam(params: String): Array<String>{
         var temp = params
         // 去掉头尾的“-”
         while(temp.startsWith("-")){
@@ -87,39 +114,24 @@ public class Action{
             temp = temp[..temp.size - 1]
         }
         let paramList = temp.split("-")
-        this._param = paramList
-    }
-
-    /**
-     * 是否是有效的Action
-     */
-    public prop isValid: Bool{
-        get(){
-            if(let None <- this._path){
-                return false
-            }else if(let None <- this._method){
-                return false
-            }else{
-                return true
-            }
-        }
+        return paramList
     }
 
     public prop controller: Controller{
         get(){
-            this._controller.getOrThrow()
+            this._controller
         }
     }
 
     public prop path: String{
         get(){
-            this._path.getOrThrow()
+            this._path
         }
     }
 
     public prop controllerName: String{
         get(){
-            this._controllerName.getOrThrow()
+            this._controllerName
         }
     }
 
@@ -128,13 +140,13 @@ public class Action{
      */
     public prop method: String{
         get(){
-            this._method.getOrThrow().name
+            this._method.name
         }
     }
 
     public prop params: Array<String>{
         get(){
-            this._param
+            this._params
         }
     }
 }

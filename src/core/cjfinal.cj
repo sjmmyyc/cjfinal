@@ -59,8 +59,7 @@ public class CJFinal{
      * http请求的全局处理器
      */
     private func globalHandler(ctx: HttpContext): Unit{
-        let action = Action(ctx)
-        if(action.isValid){
+        if(let Some(action) <- Action.get(ctx)){
             devPrintln("------------------------------ Request Info ------------------------------")
             devPrintln("URL:\t\t${ctx.request.url}")
             devPrintln("Controller:\t[${action.path}] ${action.controllerName}")
@@ -69,6 +68,7 @@ public class CJFinal{
                 devPrintln("Param:\t\t${action.params}")
             }
             devPrintln("----------------------------------- End ----------------------------------\n")
+            action.invoke()
         }else{
             println("request: ${ctx.request.url} is not found.")
             let responst = ctx.responseBuilder
