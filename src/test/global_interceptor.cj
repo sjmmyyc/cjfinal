@@ -12,8 +12,4 @@ public class GlobalInterceptor <: Interceptor{
         inv.invoke()
         println("Global Level After")
     }
-
-    public func say(){
-        println("我是全局级的拦截器")
-    }
 }

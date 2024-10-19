@@ -7,10 +7,6 @@ import cjfinal.core.{Interceptor, Controller, Invocation}
 
 public class ControllerInterceptor <: Interceptor{
 
-    public func say(){
-        println("我是控制器级的拦截器")
-    }
-
     public func intercept(inv: Invocation): Unit{
         println("Controller Level Before")
         inv.invoke()

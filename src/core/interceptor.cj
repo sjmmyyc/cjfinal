@@ -9,6 +9,4 @@ package cjfinal.core
 public interface Interceptor{
     
     func intercept(inv: Invocation): Unit
-
-    func say(): Unit
 }

@@ -5,7 +5,7 @@ package cjfinal.core
 
 import std.reflect.InstanceFunctionInfo
 
-import std.reflect.*
+import std.reflect.TypeInfo
 
 /**
  * Invocation用来调用目标方法上的拦截器和目标方法

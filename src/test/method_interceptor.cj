@@ -12,8 +12,4 @@ public class MethodInterceptor <: Interceptor{
         inv.invoke()
         println("Method Level After")
     }
-
-    public func say(){
-        println("我是方法级的拦截器")
-    }
 }
