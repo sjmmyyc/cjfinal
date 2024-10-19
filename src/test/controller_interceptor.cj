@@ -3,18 +3,17 @@
  */
 package cjfinal.test
 
-import cjfinal.core.Interceptor
-import cjfinal.core.Controller
+import cjfinal.core.{Interceptor, Controller, Invocation}
 
 public class ControllerInterceptor <: Interceptor{
 
-    public func before(_: Controller): Bool{
-        println("Controller level Before")
-        return true
+    public func say(){
+        println("我是控制器级的拦截器")
     }
 
-    public func after(_: Controller): Bool{
-        println("Controller level After")
-        return true
+    public func intercept(inv: Invocation): Unit{
+        println("Controller Level Before")
+        inv.invoke()
+        println("Controller Level After")
     }
 }

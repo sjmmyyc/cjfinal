@@ -3,18 +3,17 @@
  */
 package cjfinal.test
 
-import cjfinal.core.Interceptor
-import cjfinal.core.Controller
+import cjfinal.core.{Interceptor, Controller, Invocation}
 
 public class GlobalInterceptor <: Interceptor{
 
-    public func before(_: Controller): Bool{
-        println("Global level Before")
-        return true
+    public func intercept(inv: Invocation): Unit{
+        println("Global Level Before")
+        inv.invoke()
+        println("Global Level After")
     }
 
-    public func after(_: Controller): Bool{
-        println("Global level After")
-        return true
+    public func say(){
+        println("我是全局级的拦截器")
     }
 }

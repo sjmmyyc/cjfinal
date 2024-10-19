@@ -70,9 +70,16 @@ public class Action{
     }
 
     /**
-     * 调用
+     * 调用Action，拦截器将生效
      */
     public func invoke(): Unit{
+        Invocation(this).invoke()
+    }
+
+    /**
+     * 调用Action方法，拦截器不生效
+     */
+    public func call(): Unit{
         this._method.apply(this._controller)
     }
 

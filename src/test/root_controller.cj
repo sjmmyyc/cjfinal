@@ -10,6 +10,7 @@ public class RootController <: Controller{
 
     @Before["cjfinal.test.MethodInterceptor"]
     public func index(){
+        println("root index...")
         this.renderText("index")
     }
 }

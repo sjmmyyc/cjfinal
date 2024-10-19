@@ -3,7 +3,7 @@
  */
 package cjfinal.kit
 
-import std.reflect.{TypeInfo, ClassTypeInfo}
+import std.reflect.{TypeInfo, ClassTypeInfo, InfoNotFoundException}
 /**
  * 对象工具
  */
@@ -14,13 +14,12 @@ public class ObjectKit{
      * eg:
      * let a: classA = ObjectKit.new("packagename.className") as ClassA
      */
-    public static func new(typeName: String, parameterTypes: Array<TypeInfo>): Any{
+    public static func new(typeName: String): Any{
         try{
             let classInfo = (TypeInfo.get(typeName) as ClassTypeInfo).getOrThrow()
-            let aConstruct = classInfo.getConstructor(parameterTypes)
-            return aConstruct.apply()
-        }catch(e: Exception){
-            println("\u{1b}[31m${typeName} is not correct type.\u{1b}[0m")
+            return classInfo.construct()
+        }catch(e: InfoNotFoundException){
+            println(e)
         }
     }
 }

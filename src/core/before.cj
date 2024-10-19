@@ -5,6 +5,7 @@ package cjfinal.core
 
 import std.collection.ArrayList
 import cjfinal.kit.ObjectKit
+import std.reflect.*
 
 /**
  * 用于为Controller和其public方法配置拦截器
