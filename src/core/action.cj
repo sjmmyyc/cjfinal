@@ -6,7 +6,10 @@ package cjfinal.core
 import net.http.HttpContext
 import encoding.url.URL
 import cjfinal.exception.NotFoundException
+import cjfinal.aop.{Before, Clear}
+import cjfinal.kit.ObjectKit
 import std.reflect.{TypeInfo, InstanceFunctionInfo}
+import std.collection.ArrayList
 
 /**
  * Action
@@ -48,19 +51,45 @@ public class Action{
             var params: Array<String>
             (methodOpt, params) = getMethodAndParams(path.getOrThrow(), con, conInfo)
             if(let Some(method) <- methodOpt){
-                var interceptors: Array<Interceptor> = []
+                var interceptors = ArrayList<Interceptor>()
                 // 获取全局拦截器
-                interceptors = interceptors.concat(CJFinal.me.interceptors.interceptors)
+                interceptors.appendAll(CJFinal.me.interceptors.interceptors)
                 // 获取controller级的拦截器
                 if(let Some(anno) <- conInfo.findAnnotation<Before>()){
-                    interceptors = interceptors.concat(anno.getInterceptors())
+                    for(str in anno.get()){
+                        if(let Some(intcept) <- ObjectKit.new(str) as Interceptor){
+                            interceptors.append(intcept)
+                        }
+                    }
                 }
+                // 获取并清除Controller级的拦截器
+                if(let Some(anno) <- conInfo.findAnnotation<Clear>()){
+                    for(str in anno.get()){
+                        interceptors.removeIf({intcept =>
+                            return TypeInfo.of(intcept).qualifiedName == str
+                        })
+                    }
+                }
+
                 // 获取method级拦截器
                 if(let Some(anno) <- method.findAnnotation<Before>()){
-                    interceptors = interceptors.concat(anno.getInterceptors())
+                    for(str in anno.get()){
+                        if(let Some(intcept) <- ObjectKit.new(str) as Interceptor){
+                            interceptors.append(intcept)
+                        }
+                    }
+                }
+
+                // 获取并清除Method级的拦截器
+                if(let Some(anno) <- method.findAnnotation<Clear>()){
+                    for(str in anno.get()){
+                        interceptors.removeIf({intcept =>
+                            return TypeInfo.of(intcept).qualifiedName == str
+                        })
+                    }
                 }
                 
-                return Action(path.getOrThrow(), con, controllerName, method, params, interceptors)
+                return Action(path.getOrThrow(), con, controllerName, method, params, interceptors.toArray())
             }else{
                 return None
             }

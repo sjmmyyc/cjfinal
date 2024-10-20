@@ -1,10 +1,7 @@
 /**
  * Copyright (c) 2024-2024, Kevin Yang 杨云超 (yyc1030@qq.com).
  */
-package cjfinal.core
-
-import std.collection.ArrayList
-import cjfinal.kit.ObjectKit
+package cjfinal.aop
 
 /**
  * 用于为Controller和其public方法配置拦截器
@@ -18,17 +15,9 @@ public class Before{
         this.interceptorStr = interceptorStr
     }
 
-    public func getInterceptors(): Array<Interceptor>{
-        let array = ArrayList<Interceptor>()
+    public func get(): Array<String>{
         var _interceptors = this.interceptorStr.replace(" ", "")
         _interceptors = _interceptors.replace("\n", "")
-        let strArray = _interceptors.split(",")
-        for(str in strArray){
-            let interceptor = ObjectKit.new(str) as Interceptor
-            if(let Some(intcept) <- interceptor){
-                array.append(intcept)
-            }
-        }
-        return array.toArray()
+        return _interceptors.split(",")
     }
 }

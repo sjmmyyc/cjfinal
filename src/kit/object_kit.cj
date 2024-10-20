@@ -12,7 +12,7 @@ public class ObjectKit{
     /**
      * 通过(字符串表示的)类名称来创建类对象
      * eg:
-     * let a: classA = ObjectKit.new("packagename.className") as ClassA
+     * let a: ClassA = ObjectKit.new("packagename.className") as ClassA
      */
     public static func new(typeName: String): Any{
         try{

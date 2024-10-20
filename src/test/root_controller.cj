@@ -3,7 +3,8 @@
  */
 package cjfinal.test
 
-import cjfinal.core.{Controller, Before}
+import cjfinal.core.Controller
+import cjfinal.aop.{Before, Clear}
 
 @Before["cjfinal.test.ControllerInterceptor"]
 public class RootController <: Controller{
