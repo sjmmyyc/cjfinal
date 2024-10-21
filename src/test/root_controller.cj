@@ -17,13 +17,15 @@ package cjfinal.test
 
 import cjfinal.core.Controller
 import cjfinal.aop.{Before, Clear}
+import std.collection.{Set, HashSet, HashMap, ArrayList}
+import encoding.json.*
 
 @Before["cjfinal.test.ControllerInterceptor"]
 public class RootController <: Controller{
 
     @Before["cjfinal.test.MethodInterceptor"]
     public func index(){
-        println("root index...")
-        this.renderText("index")
+        let obj = User()
+        this.renderJson(obj)
     }
 }

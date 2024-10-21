@@ -15,7 +15,9 @@
  */
 package cjfinal.core
 
-import net.http.HttpContext
+import net.http.{HttpContext}
+import encoding.json.ToJson
+import serialization.serialization.Serializable
 
 /**
  * 控制器基类
@@ -23,8 +25,20 @@ import net.http.HttpContext
 public abstract class Controller{
     private var _ctx: ?HttpContext = None
 
-    public func renderText(text: String): Unit{
+    protected func renderText(text: String): Unit{
         this.ctx.responseBuilder.body(text)
+    }
+
+    protected func renderHtml(str: String): Unit{
+        this.ctx.responseBuilder
+            .header("content-type", "text/html; charset=utf8")
+            .body(str)
+    }
+
+    protected func renderJson<T>(obj: Serializable<T>): Unit{
+        this.ctx.responseBuilder
+            .header("content-type", "text/json; charset=utf8")
+            .body(obj.serialize().toJson().asObject().toJsonString())
     }
 
     public mut prop ctx: HttpContext{

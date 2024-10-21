@@ -30,7 +30,7 @@ public class TestConfig <: CJFinalConfig{
         me.add("/user", UserController())
     }
 
-    public func configInterceptor(me: Interceptors): Unit{
-        me.add(GlobalInterceptor())
+    public func configInterceptor(_: Interceptors): Unit{
+        // me.add(GlobalInterceptor())
     }
 }
