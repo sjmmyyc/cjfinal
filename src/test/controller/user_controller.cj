@@ -19,7 +19,9 @@ import cjfinal.core.Controller
 
 public class UserController <: Controller{
     public func index(){
-        this.renderText("user index...")
+        let name = this.get("name")
+        let age = this.get("age")
+        this.renderText("${name}, ${age}")
     }
 
     public func list(){

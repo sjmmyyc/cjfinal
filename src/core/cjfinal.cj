@@ -15,10 +15,11 @@
  */
 package cjfinal.core
 
-import encoding.url.URL
+import encoding.url.{URL, Form}
 import net.http.{Server, ServerBuilder, HttpContext, HttpStatusCode}
 import log.LogLevel
 import std.time.MonoTime
+import std.collection.{Map, HashMap, HashSet}
 import std.reflect.TypeInfo
 
 /**
@@ -93,7 +94,10 @@ public class CJFinal{
                 }
             }
             if(action.params.size != 0){
-                devPrintln("Param:\t\t${action.params}")
+                devPrintln("Param(Request):\t${action.params}")
+            }
+            if(!action.form.isEmpty()){
+                devPrintln("Param(Form):\t${getFormString(ctx.request.url)}")
             }
             devPrintln("----------------------------------- End ----------------------------------\n")
             action.invoke()
@@ -103,6 +107,43 @@ public class CJFinal{
             responst.status(HttpStatusCode.STATUS_NOT_FOUND)
             responst.body("404 - Not Found")
         }
+    }
+
+    /**
+     * 将请求中的Form参数以字符串形式展现
+     */
+    private func getFormString(url: URL): String{
+        var str = ""
+        // 从url中获取参数的Key数组
+        for((key, count) in getFormKeys(url)){
+            if(count == 1){
+                str += key + "=" + (url.queryForm.get(key).getOrDefault({=>""})) + " "
+            }else{
+                str += key + "=" + (url.queryForm.getAll(key).toString()) + " "
+            }
+        }
+        return str
+    }
+
+    /**
+     * 解析请求参数
+     * @return Map<String, Int64> String表示Key，Int64表示Key出现的次数
+     */
+    private func getFormKeys(url: URL): Map<String, Int64>{
+        let set = HashSet<String>()
+        let paramStr = url.toString().split("?")[1]
+        let params = paramStr.split("&")
+        var keyStr = ""
+        for(p in params){
+            let key = p.split("=")[0]
+            set.put(key)
+            keyStr += key
+        }
+        let map = HashMap<String, Int64>()
+        for(key in set){
+            map.put(key, keyStr.count(key))
+        }
+        return map
     }
 
     /**

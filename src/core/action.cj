@@ -16,7 +16,7 @@
 package cjfinal.core
 
 import net.http.HttpContext
-import encoding.url.URL
+import encoding.url.{URL, Form}
 import cjfinal.exception.NotFoundException
 import cjfinal.aop.{Before, Clear}
 import cjfinal.kit.ObjectKit
@@ -36,14 +36,17 @@ public class Action{
     private let _method: InstanceFunctionInfo
     // 参数，非请求中?打头的参数
     private let _params: Array<String>
+    // 参数，请求中？打头的参数
+    private let _form: Form
     private let _interceptors: Array<Interceptor>
 
-    private init(path: String, controller: Controller, controllerName: String, method: InstanceFunctionInfo, params: Array<String>, interceptors: Array<Interceptor>){
+    private init(path: String, controller: Controller, controllerName: String, method: InstanceFunctionInfo, params: Array<String>, form: Form, interceptors: Array<Interceptor>){
         this._path = path
         this._controller = controller
         this._controllerName = controllerName
         this._method = method
         this._params = params
+        this._form = form
         this._interceptors = interceptors
     }
 
@@ -57,6 +60,8 @@ public class Action{
         (path, controller) = Routes.get(url)
         if(let Some(con) <- controller){
             con.ctx = ctx
+            con.form = url.queryForm
+            
             let conInfo = TypeInfo.of(con)
             let controllerName = conInfo.qualifiedName
             var methodOpt: ?InstanceFunctionInfo
@@ -101,7 +106,7 @@ public class Action{
                     }
                 }
                 
-                return Action(path.getOrThrow(), con, controllerName, method, params, interceptors.toArray())
+                return Action(path.getOrThrow(), con, controllerName, method, params, url.queryForm, interceptors.toArray())
             }else{
                 return None
             }
@@ -215,6 +220,12 @@ public class Action{
     public prop interceptors: Array<Interceptor>{
         get(){
             this._interceptors
+        }
+    }
+
+    public prop form: Form{
+        get(){
+            this._form
         }
     }
 }

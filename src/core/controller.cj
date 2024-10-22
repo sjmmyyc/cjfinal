@@ -17,6 +17,7 @@ package cjfinal.core
 
 import net.http.{HttpContext}
 import encoding.json.ToJson
+import encoding.url.{URL, Form}
 import serialization.serialization.Serializable
 
 /**
@@ -24,6 +25,7 @@ import serialization.serialization.Serializable
  */
 public abstract class Controller{
     private var _ctx: ?HttpContext = None
+    private var _form: ?Form = None
 
     protected func renderText(text: String): Unit{
         this.ctx.responseBuilder.body(text)
@@ -41,12 +43,28 @@ public abstract class Controller{
             .body(obj.serialize().toJson().asObject().toJsonString())
     }
 
+    /**
+     * 获取URL中的请求参数，没找到返回空字符串
+     */
+    protected func get(key: String): String{
+        return this.form.get(key) ?? ""
+    }
+
     public mut prop ctx: HttpContext{
         set(value){
             this._ctx = value
         }
         get(){
             return this._ctx.getOrThrow()
+        }
+    }
+
+    public mut prop form: Form{
+        set(value){
+            this._form = value
+        }
+        get(){
+           return this._form.getOrThrow()
         }
     }
 }
