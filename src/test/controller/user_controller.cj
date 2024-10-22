@@ -13,15 +13,16 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.test.controller
 
-import cjfinal.core.{Interceptor, Controller, Invocation}
+import cjfinal.core.Controller
 
-public class ControllerInterceptor <: Interceptor{
+public class UserController <: Controller{
+    public func index(){
+        this.renderText("user index...")
+    }
 
-    public func intercept(inv: Invocation): Unit{
-        println("Controller Level Before")
-        inv.invoke()
-        println("Controller Level After")
+    public func list(){
+        this.renderText("user list...")
     }
 }

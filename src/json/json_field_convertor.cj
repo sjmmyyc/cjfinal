@@ -13,15 +13,36 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.json
 
-import cjfinal.core.{Interceptor, Controller, Invocation}
+import std.ast.*
 
-public class GlobalInterceptor <: Interceptor{
+/**
+ * JsonFieldConvertor
+ */
+public class JsonFieldConvertor{
 
-    public func intercept(inv: Invocation): Unit{
-        println("Global Level Before")
-        inv.invoke()
-        println("Global Level After")
+    protected let id: Token
+    protected let idType: TypeNode
+
+    public init(varDecl: VarDecl){
+        this.id = varDecl.identifier
+        this.idType = varDecl.declType
+    }
+
+    /**
+     * 生成serialize()方法
+     */
+    public func generateSerialize(): Tokens{
+        return quote(
+            dms.add(field<$(idType)>($(id.value), $(id))))
+    }
+
+    /**
+     * 生成deserialize()方法
+     */
+    public func generateDeserialize(): Tokens{
+        return quote(
+            obj.$(id) = $(idType).deserialize(dms.get($(id.value))))
     }
 }

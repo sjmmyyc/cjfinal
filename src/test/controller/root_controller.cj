@@ -13,16 +13,18 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.test.controller
 
 import cjfinal.core.Controller
+import cjfinal.aop.{Before, Clear}
+import cjfinal.test.model.User
 
-public class UserController <: Controller{
+@Before["cjfinal.test.interceptor.ControllerInterceptor"]
+public class RootController <: Controller{
+
+    @Before["cjfinal.test.interceptor.MethodInterceptor"]
     public func index(){
-        this.renderText("user index...")
-    }
-
-    public func list(){
-        this.renderText("user list...")
+        let obj = User()
+        this.renderJson(obj)
     }
 }

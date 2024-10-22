@@ -13,7 +13,7 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.test.interceptor
 
 import cjfinal.core.{Interceptor, Controller, Invocation}
 

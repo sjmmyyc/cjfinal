@@ -13,26 +13,17 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.test.model
 
-import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors}
-import cjfinal.kit.PropKit
-import cjfinal.test.controller.{RootController, UserController}
-import cjfinal.test.interceptor.GlobalInterceptor
+import serialization.serialization.*
+import encoding.json.*
+import cjfinal.macros.Json
 
-public class TestConfig <: CJFinalConfig{
-
-    public func configConstants(me: Constants): Unit{
-        PropKit.use("./config/config").appendIfExist("./config/config-pro")
-        me.devMode = PropKit.getBoolByDefault("devMode", false)
-    }
-
-    public func configRoutes(me: Routes): Unit{
-        me.add("/", RootController())
-        me.add("/user", UserController())
-    }
-
-    public func configInterceptor(me: Interceptors): Unit{
-        me.add(GlobalInterceptor())
-    }
+@Json
+public class User{
+    public var name: String = "张三"
+    public var age: Int64 = 33
+    public var total: Float64 = 10000.0
+    public var isStudent: Bool = false
+    public var auths: Array<String> = ["a", "b", "c"]
 }

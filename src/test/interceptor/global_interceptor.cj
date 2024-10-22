@@ -13,26 +13,15 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.test.interceptor
 
-import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors}
-import cjfinal.kit.PropKit
-import cjfinal.test.controller.{RootController, UserController}
-import cjfinal.test.interceptor.GlobalInterceptor
+import cjfinal.core.{Interceptor, Controller, Invocation}
 
-public class TestConfig <: CJFinalConfig{
+public class GlobalInterceptor <: Interceptor{
 
-    public func configConstants(me: Constants): Unit{
-        PropKit.use("./config/config").appendIfExist("./config/config-pro")
-        me.devMode = PropKit.getBoolByDefault("devMode", false)
-    }
-
-    public func configRoutes(me: Routes): Unit{
-        me.add("/", RootController())
-        me.add("/user", UserController())
-    }
-
-    public func configInterceptor(me: Interceptors): Unit{
-        me.add(GlobalInterceptor())
+    public func intercept(inv: Invocation): Unit{
+        println("Global Level Before")
+        inv.invoke()
+        println("Global Level After")
     }
 }

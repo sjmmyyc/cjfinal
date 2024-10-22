@@ -13,26 +13,26 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.json
 
-import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors}
-import cjfinal.kit.PropKit
-import cjfinal.test.controller.{RootController, UserController}
-import cjfinal.test.interceptor.GlobalInterceptor
+import std.collection.ArrayList
+import std.ast.{Visitor, VarDecl}
 
-public class TestConfig <: CJFinalConfig{
+/**
+ * VarDeclVisitor
+ */
+public class VarDeclVisitor <: Visitor{
 
-    public func configConstants(me: Constants): Unit{
-        PropKit.use("./config/config").appendIfExist("./config/config-pro")
-        me.devMode = PropKit.getBoolByDefault("devMode", false)
+    private let _varDecls = ArrayList<VarDecl>()
+
+    public func visit(varDecl: VarDecl): Unit{
+        this._varDecls.append(varDecl)
+        breakTraverse()
     }
 
-    public func configRoutes(me: Routes): Unit{
-        me.add("/", RootController())
-        me.add("/user", UserController())
-    }
-
-    public func configInterceptor(me: Interceptors): Unit{
-        me.add(GlobalInterceptor())
+    public prop varDecls: Array<VarDecl>{
+        get(){
+            return this._varDecls.toArray()
+        }
     }
 }

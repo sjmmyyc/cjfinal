@@ -13,19 +13,15 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test
+package cjfinal.test.interceptor
 
-import cjfinal.core.Controller
-import cjfinal.aop.{Before, Clear}
-import std.collection.{Set, HashSet, HashMap, ArrayList}
-import encoding.json.*
+import cjfinal.core.{Interceptor, Controller, Invocation}
 
-@Before["cjfinal.test.ControllerInterceptor"]
-public class RootController <: Controller{
+public class ControllerInterceptor <: Interceptor{
 
-    @Before["cjfinal.test.MethodInterceptor"]
-    public func index(){
-        let obj = User()
-        this.renderJson(obj)
+    public func intercept(inv: Invocation): Unit{
+        println("Controller Level Before")
+        inv.invoke()
+        println("Controller Level After")
     }
 }
