@@ -40,13 +40,13 @@ public class Action{
     private let _form: Form
     private let _interceptors: Array<Interceptor>
 
-    private init(path: String, controller: Controller, controllerName: String, method: InstanceFunctionInfo, params: Array<String>, form: Form, interceptors: Array<Interceptor>){
+    private init(path: String, con: Controller, controllerName: String, method: InstanceFunctionInfo, interceptors: Array<Interceptor>){
         this._path = path
-        this._controller = controller
+        this._controller = con
         this._controllerName = controllerName
         this._method = method
-        this._params = params
-        this._form = form
+        this._params = con.param
+        this._form = con.form
         this._interceptors = interceptors
     }
 
@@ -61,7 +61,7 @@ public class Action{
         (path, controller) = Routes.get(url)
         if(let Some(con) <- controller){
             con.ctx = ctx
-            con.form = url.queryForm
+            con.form = ctx.request.form
             
             let conInfo = TypeInfo.of(con)
             let controllerName = conInfo.qualifiedName
@@ -108,12 +108,7 @@ public class Action{
                     }
                 }
                 
-                var form: Form = url.queryForm
-                if(form.isEmpty()){
-                    form = ctx.request.form
-                }
-                con.form = form
-                result = Action(path.getOrThrow(), con, controllerName, method, params, form, interceptors.toArray())
+                result = Action(path.getOrThrow(), con, controllerName, method, interceptors.toArray())
             }
         }
         return result

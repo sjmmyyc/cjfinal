@@ -29,7 +29,7 @@ import std.reflect.TypeInfo
 public abstract class Controller{
     private var _ctx: ?HttpContext = None
     private var _form: ?Form = None
-    private var _param: Array<String> = []
+    private var _params: Array<String> = []
 
     protected func renderText(text: String): Unit{
         this.ctx.responseBuilder
@@ -95,7 +95,7 @@ public abstract class Controller{
     }
 
     protected func getParam(index: Int64): String{
-        return this._param.get(index) ?? ""
+        return this._params.get(index) ?? ""
     }
 
     protected func getParamTo<T>(index: Int64): T where T <: Parsable<T>{
@@ -138,10 +138,10 @@ public abstract class Controller{
 
     public mut prop param: Array<String>{
         set(value){
-            this._param = value
+            this._params = value
         }
         get(){
-            return this._param
+            return this._params
         }
     }
 }
