@@ -20,6 +20,7 @@ import cjfinal.aop.{Before, Clear}
 import cjfinal.test.model.User
 
 @Before["cjfinal.test.interceptor.ControllerInterceptor"]
+@Clear[""]
 public class RootController <: Controller{
 
     @Before["cjfinal.test.interceptor.MethodInterceptor"]

@@ -73,40 +73,14 @@ public class Action{
                 var interceptors = ArrayList<Interceptor>()
                 // 获取全局拦截器
                 interceptors.appendAll(CJFinal.me.interceptors.interceptors)
+                // 清除拦截器
+                removeInterceptors(interceptors, conInfo)
                 // 获取controller级的拦截器
-                if(let Some(anno) <- conInfo.findAnnotation<Before>()){
-                    for(str in anno.get()){
-                        if(let Some(intcept) <- (ObjectKit.new(str) as Interceptor)){
-                            interceptors.append(intcept)
-                        }
-                    }
-                }
-                // 获取并清除Controller级的拦截器
-                if(let Some(anno) <- conInfo.findAnnotation<Clear>()){
-                    for(str in anno.get()){
-                        interceptors.removeIf({intcept =>
-                            return TypeInfo.of(intcept).qualifiedName == str
-                        })
-                    }
-                }
-
+                interceptors.appendAll(findInterceptors(conInfo))
+                // 清除上层拦截器
+                removeInterceptors(interceptors, method)
                 // 获取method级拦截器
-                if(let Some(anno) <- method.findAnnotation<Before>()){
-                    for(str in anno.get()){
-                        if(let Some(intcept) <- (ObjectKit.new(str) as Interceptor)){
-                            interceptors.append(intcept)
-                        }
-                    }
-                }
-
-                // 获取并清除Method级的拦截器
-                if(let Some(anno) <- method.findAnnotation<Clear>()){
-                    for(str in anno.get()){
-                        interceptors.removeIf({intcept =>
-                            return TypeInfo.of(intcept).qualifiedName == str
-                        })
-                    }
-                }
+                interceptors.appendAll(findInterceptors(method))
                 
                 result = Action(path.getOrThrow(), con, controllerName, method, interceptors.toArray())
             }
@@ -126,6 +100,73 @@ public class Action{
      */
     public func call(): Unit{
         this._method.apply(this._controller)
+    }
+
+    /**
+     * 根据传入的typeInfo获取套在其上的拦截器列表
+     */
+    private static func findInterceptors(typeInfo: TypeInfo): Array<Interceptor>{
+        let list = ArrayList<Interceptor>()
+        if(let Some(anno) <- typeInfo.findAnnotation<Before>()){
+            for(str in anno.get()){
+                if(let Some(intcept) <- (ObjectKit.new(str) as Interceptor)){
+                    list.append(intcept)
+                }
+            }
+        }
+        return list.toArray()
+    }
+
+    /**
+     * 控制器级：移除拦截器
+     */
+    private static func removeInterceptors(interceptors: ArrayList<Interceptor>, conInfo: TypeInfo): Unit{
+        if(let Some(anno) <- conInfo.findAnnotation<Clear>()){
+            let its = anno.get()
+            if(its.size == 0){
+                interceptors.clear()
+            }else {
+                for(str in anno.get()){
+                    interceptors.removeIf({intcept =>
+                        return TypeInfo.of(intcept).qualifiedName == str
+                    })
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据传入的InstanceFunctionInfo获取套在其上的拦截器列表
+     */
+    private static func findInterceptors(funcInfo: InstanceFunctionInfo): Array<Interceptor>{
+        let list = ArrayList<Interceptor>()
+        if(let Some(anno) <- funcInfo.findAnnotation<Before>()){
+            for(str in anno.get()){
+                if(let Some(intcept) <- (ObjectKit.new(str) as Interceptor)){
+                    list.append(intcept)
+                }
+            }
+        }
+        return list.toArray()
+    }
+
+    /**
+     * 方法级：移除拦截器
+     */
+    private static func removeInterceptors(interceptors: ArrayList<Interceptor>, funcInfo: InstanceFunctionInfo): Unit{
+        if(let Some(anno) <- funcInfo.findAnnotation<Clear>()){
+            let its = anno.get()
+            if(its.size == 0){
+                // 移除全部
+                interceptors.clear()
+            }else{
+                for(str in its){
+                    interceptors.removeIf({intcept =>
+                        return TypeInfo.of(intcept).qualifiedName == str
+                    })
+                }
+            }
+        }
     }
 
     /**
