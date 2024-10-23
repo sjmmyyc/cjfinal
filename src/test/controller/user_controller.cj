@@ -19,7 +19,7 @@ import cjfinal.core.Controller
 
 public class UserController <: Controller{
     public func index(){
-        let name = this.getTo<Bool>("auth")
+        let name = this.getParamTo<Int64>(0)
         this.renderText("${name}")
     }
 

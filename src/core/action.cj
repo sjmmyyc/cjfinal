@@ -68,6 +68,7 @@ public class Action{
             var params: Array<String>
             (methodOpt, params) = getMethodAndParams(path.getOrThrow(), con, conInfo)
             if(let Some(method) <- methodOpt){
+                con.param = params
                 var interceptors = ArrayList<Interceptor>()
                 // 获取全局拦截器
                 interceptors.appendAll(CJFinal.me.interceptors.interceptors)

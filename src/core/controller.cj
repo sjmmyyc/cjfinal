@@ -21,6 +21,7 @@ import encoding.url.{URL, Form}
 import serialization.serialization.Serializable
 import std.convert.Parsable
 import std.collection.ArrayList
+import std.reflect.TypeInfo
 
 /**
  * 控制器基类
@@ -28,6 +29,7 @@ import std.collection.ArrayList
 public abstract class Controller{
     private var _ctx: ?HttpContext = None
     private var _form: ?Form = None
+    private var _param: Array<String> = []
 
     protected func renderText(text: String): Unit{
         this.ctx.responseBuilder.body(text)
@@ -53,7 +55,15 @@ public abstract class Controller{
     }
 
     protected func getTo<T>(key: String): T where T <: Parsable<T>{
-        return T.parse(this.get(key))
+        let str = this.get(key)
+        try{
+            return T.parse(str)
+        }catch(e: IllegalArgumentException){
+            // 无法转换
+            let typeInfo = TypeInfo.of<T>()
+            println('\u{1b}[33m"${str}" can not parse to ${typeInfo}\u{1b}[0m')
+            throw IllegalArgumentException('"${str}" can not parse to ${typeInfo}')
+        }
     }
 
     protected func getArray(key: String): Array<String>{
@@ -68,9 +78,32 @@ public abstract class Controller{
     protected func getArrayTo<T>(key: String): Array<T> where T <: Parsable<T>{
         let result = ArrayList<T>()
         for(str in this.getArray(key)){
-            result.append(T.parse(str))
+            try{
+                result.append(T.parse(str))
+            }catch(e: IllegalArgumentException){
+                // 无法转换
+                let typeInfo = TypeInfo.of<T>()
+                println('\u{1b}[33m"${str}" can not parse to ${typeInfo}\u{1b}[0m')
+                throw IllegalArgumentException('"${str}" can not parse to ${typeInfo}')
+            }
         }
         return result.toArray()
+    }
+
+    protected func getParam(index: Int64): String{
+        return this._param.get(index) ?? ""
+    }
+
+    protected func getParamTo<T>(index: Int64): T where T <: Parsable<T>{
+        var str: String = this.getParam(index)
+        try{
+            return T.parse(str)
+        }catch(e: IllegalArgumentException){
+            // 无法转换
+            let typeInfo = TypeInfo.of<T>()
+            println('\u{1b}[33m"${str}" can not parse to ${typeInfo}\u{1b}[0m')
+            throw IllegalArgumentException('"${str}" can not parse to ${typeInfo}')
+        }
     }
 
     public mut prop ctx: HttpContext{
@@ -88,6 +121,15 @@ public abstract class Controller{
         }
         get(){
            return this._form.getOrThrow()
+        }
+    }
+
+    public mut prop param: Array<String>{
+        set(value){
+            this._param = value
+        }
+        get(){
+            return this._param
         }
     }
 }
