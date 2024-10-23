@@ -44,4 +44,8 @@ public class Invocation{
             this._action.call()
         }
     }
+
+    public func getController(): Controller{
+        return this._action.controller
+    }
 }
