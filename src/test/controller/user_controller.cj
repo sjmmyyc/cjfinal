@@ -19,8 +19,7 @@ import cjfinal.core.Controller
 
 public class UserController <: Controller{
     public func index(){
-        let name = this.getParamTo<Int64>(0)
-        this.renderText("${name}")
+        this.renderText("user index...")
     }
 
     public func list(){

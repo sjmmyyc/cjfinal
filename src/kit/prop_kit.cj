@@ -43,15 +43,13 @@ public class PropKit{
     }
 
     public static func getBool(key: String): ?Bool{
-        if(let Some(p) <- PropKit.props){
+        var result: ?Bool = None
+        if(let Some(p) <- (PropKit.props)){
             if(let Some(v) <- p.get(key)){
-                return Bool.parse(v)
-            }else{
-                return None
+                result = Bool.parse(v)
             }
-        }else{
-            return None
         }
+        return result
     }
 
     public static func getBoolByDefault(key: String, default: Bool): Bool{

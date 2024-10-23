@@ -54,6 +54,7 @@ public class Action{
      * 将url解析为Action类，解析失败返回Option<Action>.None
      */
     public static func get(ctx: HttpContext): ?Action{
+        var result: ?Action = None
         let url = ctx.request.url
         var path: ?String
         var controller : ?Controller
@@ -75,7 +76,7 @@ public class Action{
                 // 获取controller级的拦截器
                 if(let Some(anno) <- conInfo.findAnnotation<Before>()){
                     for(str in anno.get()){
-                        if(let Some(intcept) <- ObjectKit.new(str) as Interceptor){
+                        if(let Some(intcept) <- (ObjectKit.new(str) as Interceptor)){
                             interceptors.append(intcept)
                         }
                     }
@@ -92,7 +93,7 @@ public class Action{
                 // 获取method级拦截器
                 if(let Some(anno) <- method.findAnnotation<Before>()){
                     for(str in anno.get()){
-                        if(let Some(intcept) <- ObjectKit.new(str) as Interceptor){
+                        if(let Some(intcept) <- (ObjectKit.new(str) as Interceptor)){
                             interceptors.append(intcept)
                         }
                     }
@@ -107,13 +108,10 @@ public class Action{
                     }
                 }
                 
-                return Action(path.getOrThrow(), con, controllerName, method, params, url.queryForm, interceptors.toArray())
-            }else{
-                return None
+                result = Action(path.getOrThrow(), con, controllerName, method, params, url.queryForm, interceptors.toArray())
             }
-        }else{
-            return None
         }
+        return result
     }
 
     /**
