@@ -15,7 +15,7 @@
  */
 package cjfinal.core
 
-import net.http.{HttpContext}
+import net.http.{HttpContext, HttpStatusCode, HttpResponseBuilder}
 import encoding.json.ToJson
 import encoding.url.{URL, Form}
 import serialization.serialization.Serializable
@@ -32,18 +32,22 @@ public abstract class Controller{
     private var _param: Array<String> = []
 
     protected func renderText(text: String): Unit{
-        this.ctx.responseBuilder.body(text)
+        this.ctx.responseBuilder
+            .status(HttpStatusCode.STATUS_OK)
+            .body(text)
     }
 
     protected func renderHtml(str: String): Unit{
         this.ctx.responseBuilder
             .header("content-type", "text/html; charset=utf8")
+            .status(HttpStatusCode.STATUS_OK)
             .body(str)
     }
 
     protected func renderJson<T>(obj: Serializable<T>): Unit{
         this.ctx.responseBuilder
             .header("content-type", "text/json; charset=utf8")
+            .status(HttpStatusCode.STATUS_OK)
             .body(obj.serialize().toJson().asObject().toJsonString())
     }
 
@@ -104,6 +108,14 @@ public abstract class Controller{
             println('\u{1b}[33m"${str}" can not parse to ${typeInfo}\u{1b}[0m')
             throw IllegalArgumentException('"${str}" can not parse to ${typeInfo}')
         }
+    }
+
+    /**
+     * 向response中添加header
+     */
+    protected func setHeader(key: String, value: String): Controller{
+        this.ctx.responseBuilder.header(key, value)
+        return this
     }
 
     public mut prop ctx: HttpContext{

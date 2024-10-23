@@ -97,7 +97,7 @@ public class CJFinal{
                 devPrintln("Param(Request):\t${action.params}")
             }
             if(!action.form.isEmpty()){
-                devPrintln("Param(Form):\t${getFormString(ctx.request.url)}")
+                devPrintln("Param(Form):\t${getFormString(action.form)}")
             }
             devPrintln("----------------------------------- End ----------------------------------\n")
             action.invoke()
@@ -112,14 +112,14 @@ public class CJFinal{
     /**
      * 将请求中的Form参数以字符串形式展现
      */
-    private func getFormString(url: URL): String{
+    private func getFormString(form: Form): String{
         var str = ""
         // 从url中获取参数的Key数组
-        for((key, count) in getFormKeys(url)){
+        for((key, count) in getFormKeys(form)){
             if(count == 1){
-                str += key + "=" + (url.queryForm.get(key).getOrDefault({=>""})) + " "
+                str += key + "=" + (form.get(key).getOrDefault({=>""})) + " "
             }else{
-                str += key + "=" + (url.queryForm.getAll(key).toString()) + " "
+                str += key + "=" + (form.getAll(key).toString()) + " "
             }
         }
         return str
@@ -129,21 +129,32 @@ public class CJFinal{
      * 解析请求参数
      * @return Map<String, Int64> String表示Key，Int64表示Key出现的次数
      */
-    private func getFormKeys(url: URL): Map<String, Int64>{
+    private func getFormKeys(form: Form): Map<String, Int64>{
         let set = HashSet<String>()
-        let paramStr = url.toString().split("?")[1]
+        let paramStr = form.toEncodeString()
         let params = paramStr.split("&")
         var keyStr = ""
         for(p in params){
             let key = p.split("=")[0]
             set.put(key)
-            keyStr += key
+            keyStr += key + ","
+        }
+        if(keyStr.endsWith(",")){
+            keyStr = keyStr[..keyStr.size-1]
         }
         let map = HashMap<String, Int64>()
         for(key in set){
-            map.put(key, keyStr.count(key))
+            map.put(key, getCount(key, keyStr))
         }
         return map
+    }
+
+    private func getCount(query: String, sourceStr: String): Int64{
+        var count = 0
+        for(str in sourceStr.split(",") where str == query){
+            count++
+        }
+        return count
     }
 
     /**

@@ -108,7 +108,12 @@ public class Action{
                     }
                 }
                 
-                result = Action(path.getOrThrow(), con, controllerName, method, params, url.queryForm, interceptors.toArray())
+                var form: Form = url.queryForm
+                if(form.isEmpty()){
+                    form = ctx.request.form
+                }
+                con.form = form
+                result = Action(path.getOrThrow(), con, controllerName, method, params, form, interceptors.toArray())
             }
         }
         return result

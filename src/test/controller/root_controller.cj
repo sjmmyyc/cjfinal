@@ -27,4 +27,10 @@ public class RootController <: Controller{
         let obj = User()
         this.renderJson(obj)
     }
+
+    public func login(){
+        println(this.get("phone"))
+        let user = User()
+        this.renderJson(user)
+    }
 }
