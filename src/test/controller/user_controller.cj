@@ -19,9 +19,8 @@ import cjfinal.core.Controller
 
 public class UserController <: Controller{
     public func index(){
-        let name = this.get("name")
-        let age = this.get("age")
-        this.renderText("${name}, ${age}")
+        let name = this.getTo<Bool>("auth")
+        this.renderText("${name}")
     }
 
     public func list(){

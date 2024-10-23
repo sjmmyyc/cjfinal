@@ -19,6 +19,8 @@ import net.http.{HttpContext}
 import encoding.json.ToJson
 import encoding.url.{URL, Form}
 import serialization.serialization.Serializable
+import std.convert.Parsable
+import std.collection.ArrayList
 
 /**
  * 控制器基类
@@ -48,6 +50,27 @@ public abstract class Controller{
      */
     protected func get(key: String): String{
         return this.form.get(key) ?? ""
+    }
+
+    protected func getTo<T>(key: String): T where T <: Parsable<T>{
+        return T.parse(this.get(key))
+    }
+
+    protected func getArray(key: String): Array<String>{
+        let result = ArrayList<String>()
+        let arr = this.form.getAll(key)
+        for(str in arr){
+            result.append(str)
+        }
+        return result.toArray()
+    }
+
+    protected func getArrayTo<T>(key: String): Array<T> where T <: Parsable<T>{
+        let result = ArrayList<T>()
+        for(str in this.getArray(key)){
+            result.append(T.parse(str))
+        }
+        return result.toArray()
     }
 
     public mut prop ctx: HttpContext{
