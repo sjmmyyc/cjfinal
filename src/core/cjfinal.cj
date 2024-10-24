@@ -24,7 +24,7 @@ import std.time.MonoTime
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.0.2"
+    public static let version = "0.0.3"
 
     public static let me: CJFinal = CJFinal()
 
