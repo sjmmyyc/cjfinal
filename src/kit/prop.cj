@@ -51,6 +51,9 @@ public class Prop{
         return this
     }
 
+    /**
+     * 获取配置项的值，如果没有相关配置项，返回None
+     */
     public func get(key: String): ?String{
         return this.kv.get(key)
     }

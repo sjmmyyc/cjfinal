@@ -26,7 +26,7 @@ public class CORSHandler <: Handler{
         response.header("Access-Control-Allow-Origin", "*");
 		response.header("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE");
         var time = 2592000;	 // 默认缓存时间设置为30天
-        if(PropKit.getBoolByDefault("devMode", false)) {
+        if(PropKit.getByDefaultTo<Bool>("devMode", false)) {
 			// 如果是开发模式，设置为10秒
 			time = 10;
 		}

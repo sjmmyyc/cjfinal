@@ -25,7 +25,7 @@ public class TestConfig <: CJFinalConfig{
 
     public func configConstants(me: Constants): Unit{
         PropKit.use("./config/config").appendIfExist("./config/config-pro")
-        me.devMode = PropKit.getBoolByDefault("devMode", false)
+        me.devMode = PropKit.getByDefaultTo<Bool>("devMode", false)
     }
 
     public func configRoute(me: Routes): Unit{

@@ -17,6 +17,8 @@ package cjfinal.kit
 
 import std.convert.Parsable
 
+import cjfinal.exception.NotFoundException
+
 /**
  * 配置文件读取工具
  */
@@ -35,29 +37,56 @@ public class PropKit{
      * var password = PropKit.get("password")
      */
     public static func use(path: String): Prop{
-        let props = Prop(path)
-        if(let None <- PropKit.props){
-            PropKit.props = props
-        }
-        return props
+        let p = Prop(path)
+        props = p
+        return p
     }
 
-    public static func getBool(key: String): ?Bool{
-        var result: ?Bool = None
-        if(let Some(p) <- (PropKit.props)){
+    /**
+     * 获取配置项的值，返回String类型的值
+     * @throw NotFoundException 当没有设置要读取的配置文件，或没找到相关配置项时招聘该异常
+     */
+    public static func get(key: String): String{
+        var result = ""
+        if(let Some(p) <- props){
             if(let Some(v) <- p.get(key)){
-                result = Bool.parse(v)
+                result = v
+            }else{
+                throw NotFoundException('Configuration item "${key}" was not found.')
             }
+        }else{
+            throw NotFoundException("You have not loaded any configuration information yet, please use PropKit.user(file) to load configuration file")
         }
         return result
     }
 
-    public static func getBoolByDefault(key: String, default: Bool): Bool{
-        let value = getBool(key)
-        if(let Some(v) <- value){
-            return Bool.parse(v.toString())
-        }else{
-            return default
-        }
+    /**
+     * 获取配置项的值，并将其转换成Bool类型返回
+     * @throw NotFoundException 当没有设置要读取的配置文件，或没找到相关配置项时招聘该异常
+     */
+    public static func getTo<T>(key: String): T where T <: Parsable<T>{
+        return T.parse(get(key))
+    }
+
+    /**
+     * 获取配置项的值，返回String类型，发生任何异常，将返回传入的default值
+     */
+    public static func getByDefault(key: String, default: String): String{
+        var result = default
+        try{
+            result = get(key)
+        }catch(e: Exception){}
+        return result
+    }
+
+    /**
+     * 获取配置项的值，并将其转换成T类型返回，发生任何异常，将返回传入的default值
+     */
+    public static func getByDefaultTo<T>(key: String, default: T): T where T <: Parsable<T>{
+        var result = default
+        try{
+            result = T.parse(get(key))
+        }catch(e: Exception){}
+        return result
     }
 }
