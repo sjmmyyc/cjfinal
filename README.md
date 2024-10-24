@@ -4,7 +4,7 @@
 # 模块划分及进度
 
 | 模块名称| 完成度 | 描述 |
-|:-:|:-|:-|
+|:-:|:-:|:-|
 | CJFinalConfig |  [x] <font color=green>已完成</font>  | 基于CJFinal的web项目需要创建一个继承自CJFinalConfig类的子类，该类用于对整个Web项目进行配置 |
 | Handler | [x] <font color=green>已完成</font> | CJFinal接收到的所有请求，都先交由Handler来处理。CJFinal自身也是基于Handler的子类ActionHander来完成框架主要功能的 |
 | Controller | [x] <font color=green>已完成</font> | CJFinal通过继承Controller类，并在其中编写public方法，这些方法将通过URL请求直接驱动，完成业务逻辑 |
