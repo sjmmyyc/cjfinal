@@ -14,30 +14,27 @@
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
 package cjfinal.core
-/**
- * 服务器配置
- * 配置顺序：configConstant(), configInterceptor(), configRoute(), configPlugin(), configHandler()
- */
-public abstract class CJFinalConfig{
-    /**
-     * 配置运行时常量
-     */
-    public func configConstants(me: Constants): Unit
+
+import net.http.HttpContext
+
+public abstract class Handler{
 
     /**
-     * 配置拦截器
+     * 记录下一个Handler
      */
-    public func configInterceptor(me: Interceptors): Unit
+    protected var _next: ?Handler = None
 
     /**
-     * 配置路由
+     * Handler要处理的业务逻辑
      */
-    public func configRoute(me: Routes): Unit
+    public func handle(ctx: HttpContext): Unit
 
-    // configPlugin()
-
-    /**
-     * 配置Handler
-     */
-    public func configHandler(me: Handlers): Unit
+    protected mut prop next: Handler{
+        set(value){
+            this._next = value
+        }
+        get(){
+            this._next.getOrThrow()
+        }
+    }
 }

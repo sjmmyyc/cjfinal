@@ -15,12 +15,9 @@
  */
 package cjfinal.core
 
-import encoding.url.{URL, Form}
-import net.http.{Server, ServerBuilder, HttpContext, HttpStatusCode}
+import net.http.{Server, ServerBuilder, HttpContext}
 import log.LogLevel
 import std.time.MonoTime
-import std.collection.{Map, HashMap, HashSet}
-import std.reflect.TypeInfo
 
 /**
  * CJFinal服务器类
@@ -34,6 +31,7 @@ public class CJFinal{
     private var _config: ?CJFinalConfig = None
     private var _constants = Constants()
     private var _routes = Routes()
+    private var _handlers = Handlers()
     // 全局拦截器工具
     private var _interceptors = Interceptors()
 
@@ -49,8 +47,10 @@ public class CJFinal{
         println("Welcom to use \u{1b}[32mCJFinal\u{1b}[0m Framework, current version is: \u{1b}[32m${version}\u{1b}[0m")
         me.config = config
         me.config.configConstants(me.constants)
-        me.config.configRoutes(me.routes)
         me.config.configInterceptor(me._interceptors)
+        me.config.configRoute(me.routes)
+        me.config.configHandler(me.handlers)
+        
         me.create(port)
         let endTime = MonoTime.now()
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
@@ -75,101 +75,7 @@ public class CJFinal{
      * http请求的全局处理器
      */
     private func globalHandler(ctx: HttpContext): Unit{
-        if(let Some(action) <- Action.get(ctx)){
-            devPrintln("------------------------------ Request Info ------------------------------")
-            devPrintln("URL:\t\t${ctx.request.url}")
-            devPrintln("Controller:\t[${action.path}] ${action.controllerName}")
-            devPrintln("Action:\t\t${action.method}")
-            if(action.interceptors.size > 0){
-                devPrint("Interceptors:\t")
-                var index = 0
-                for(interceptor in action.interceptors){
-                    let info = TypeInfo.of(interceptor)
-                    if(index == 0){
-                        devPrintln("${info}")
-                    }else{
-                        devPrintln("\t\t${info}")
-                    }
-                    index++
-                }
-            }
-            if(action.params.size != 0){
-                devPrintln("Param(Request):\t${action.params}")
-            }
-            if(!action.form.isEmpty()){
-                devPrintln("Param(Form):\t${getFormString(action.form)}")
-            }
-            devPrintln("----------------------------------- End ----------------------------------\n")
-            action.invoke()
-        }else{
-            println("request: ${ctx.request.url} is not found.")
-            let responst = ctx.responseBuilder
-            responst.status(HttpStatusCode.STATUS_NOT_FOUND)
-            responst.body("404 - Not Found")
-        }
-    }
-
-    /**
-     * 将请求中的Form参数以字符串形式展现
-     */
-    private func getFormString(form: Form): String{
-        var str = ""
-        // 从url中获取参数的Key数组
-        for((key, count) in getFormKeys(form)){
-            if(count == 1){
-                str += key + "=" + (form.get(key).getOrDefault({=>""})) + " "
-            }else{
-                str += key + "=" + (form.getAll(key).toString()) + " "
-            }
-        }
-        return str
-    }
-
-    /**
-     * 解析请求参数
-     * @return Map<String, Int64> String表示Key，Int64表示Key出现的次数
-     */
-    private func getFormKeys(form: Form): Map<String, Int64>{
-        let set = HashSet<String>()
-        let paramStr = form.toEncodeString()
-        let params = paramStr.split("&")
-        var keyStr = ""
-        for(p in params){
-            let key = p.split("=")[0]
-            set.put(key)
-            keyStr += key + ","
-        }
-        if(keyStr.endsWith(",")){
-            keyStr = keyStr[..keyStr.size-1]
-        }
-        let map = HashMap<String, Int64>()
-        for(key in set){
-            map.put(key, getCount(key, keyStr))
-        }
-        return map
-    }
-
-    private func getCount(query: String, sourceStr: String): Int64{
-        var count = 0
-        for(str in sourceStr.split(",") where str == query){
-            count++
-        }
-        return count
-    }
-
-    /**
-     * 开发模式下才打印的信息
-     */
-    public static func devPrintln(msg: String){
-        if(Config.DEV_MODE){
-            println(msg)
-        }
-    }
-
-    public static func devPrint(msg: String){
-        if(Config.DEV_MODE){
-            print(msg)
-        }
+        HandlerFactory.getHandler(this._handlers.handlerList, ActionHandler()).handle(ctx)
     }
 
     // CJFinal配置
@@ -199,6 +105,12 @@ public class CJFinal{
     public prop interceptors: Interceptors{
         get(){
             return this._interceptors
+        }
+    }
+
+    public prop handlers: Handlers{
+        get(){
+            return this._handlers
         }
     }
 }

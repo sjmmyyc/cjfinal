@@ -13,31 +13,15 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.core
-/**
- * 服务器配置
- * 配置顺序：configConstant(), configInterceptor(), configRoute(), configPlugin(), configHandler()
- */
-public abstract class CJFinalConfig{
-    /**
-     * 配置运行时常量
-     */
-    public func configConstants(me: Constants): Unit
+package cjfinal.test.handler
 
-    /**
-     * 配置拦截器
-     */
-    public func configInterceptor(me: Interceptors): Unit
+import cjfinal.core.Handler
+import net.http.HttpContext
 
-    /**
-     * 配置路由
-     */
-    public func configRoute(me: Routes): Unit
-
-    // configPlugin()
-
-    /**
-     * 配置Handler
-     */
-    public func configHandler(me: Handlers): Unit
+public class TestHandler <: Handler{
+    
+    public func handle(ctx: HttpContext): Unit{
+        println("Test Handler")
+        this.next.handle(ctx)
+    }
 }

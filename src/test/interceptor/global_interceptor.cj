@@ -20,10 +20,8 @@ import cjfinal.core.{Interceptor, Controller, Invocation}
 public class GlobalInterceptor <: Interceptor{
 
     public func intercept(inv: Invocation): Unit{
-        inv.getController()
-            .setHeader("Access-Control-Allow-Origin", "*")
-            .setHeader("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE")
-            .setHeader("Access-Control-Allow-Headers", "Accept,Origin,DNT,X-Custom-Header,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Last-Modified")
+        println("Global Level Before")
         inv.invoke()
+        println("Global Level After")
     }
 }

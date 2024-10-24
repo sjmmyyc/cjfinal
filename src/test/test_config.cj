@@ -15,10 +15,11 @@
  */
 package cjfinal.test
 
-import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors}
+import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors, Handlers}
 import cjfinal.kit.PropKit
 import cjfinal.test.controller.{RootController, UserController}
 import cjfinal.test.interceptor.GlobalInterceptor
+import cjfinal.test.handler.{CORSHandler, TestHandler}
 
 public class TestConfig <: CJFinalConfig{
 
@@ -27,12 +28,17 @@ public class TestConfig <: CJFinalConfig{
         me.devMode = PropKit.getBoolByDefault("devMode", false)
     }
 
-    public func configRoutes(me: Routes): Unit{
+    public func configRoute(me: Routes): Unit{
         me.add("/api", RootController())
         me.add("/api/user", UserController())
     }
 
     public func configInterceptor(me: Interceptors): Unit{
         me.add(GlobalInterceptor())
+    }
+
+    public func configHandler(me: Handlers): Unit{
+        me.add(CORSHandler())
+        me.add(TestHandler())
     }
 }
