@@ -120,7 +120,7 @@ public class RootController <: Controller{
 ```
 5. 有了控制器，就该到Config类中去配置一下了，打开`src/core/test_config.cj`，将 `configRoute()`方法补充一下：
 ```
-// // src/core/test_config.cj代码片段
+// src/core/test_config.cj代码片段
 /**
  * 配置路由
  */
