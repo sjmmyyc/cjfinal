@@ -6,9 +6,9 @@
   description = "nothing here"
   link-option = ""
   name = "cjfinal"
-  output-type = "executable"
+  output-type = "static"
   override-compile-option = ""
   src-dir = ""
   target-dir = ""
   version = "0.1.0"
-  package-configuration = {}
+  [package.package-configuration]
