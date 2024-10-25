@@ -21,12 +21,18 @@
 | CronPlugin | [ ] 待完成 | 将以插件的形式提供定时任务功能 |
 | RedisPlugin| [ ] 待完成 | 将以插件的形式提供对Redis的支持 |
 
-# 体验方式
+# 快速上手
+## Windows
 1. 确保已安装仓颉编译器 `cjc 0.56.4` 版本
-2. 下载源码或直接克隆仓库到本地
-3. 在控制台中，进入到源码目录，执行 `cjpm run`
+2. 创建项目目录，如 `E:/cjworks/test` （注：这里的项目名称为`test`），打开控制台，并进入到 `E:/cjworks/test` 目录下
+3. 输入 `cjpm init` 并回车，初始化项目
+4. 此时可用自己熟悉的IDE打开项目，接着打开项目中的 `cjpm.toml` 文件
+5. 在 `dependencies` 下面加入CJFinal的依赖，添加完成后， `cjpm.toml` 文件将如下所示
+  ```
+    [dependencies]
+        cjfinal = { git = "https://gitcode.com/CoderKevin/cjfinal.git", tag = "0.1.0"}
 
-`以依赖的方式使用本框架的方法，等框架再完善一些，测试一番后再来补上...（当然，熟悉仓颉的小伙伴一定知道怎么整）`
-
-# 文档
-可参考[JFinal](https://www.jfinal.com)文档，写法基本一致，个别不同的地方，可参考项目目录 `src/test/` 下的测试代码，有问题或建议，请到Issues提出
+    [package]
+        ... // 以下内容省略
+  ```
+6. 在控制台中，进入到源码目录，执行 `cjpm update`，接着执行 `cjpm run`，此时，如果看到控制台打印的 `hello world`，则表示配置正确。那么，恭喜你，CJFinal已经正式融入到你的项目中了
