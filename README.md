@@ -30,7 +30,7 @@
 5. 在 `dependencies` 下面加入CJFinal的依赖，添加完成后， `cjpm.toml` 文件将如下所示
   ```
     [dependencies]
-        cjfinal = { git = "https://gitcode.com/CoderKevin/cjfinal.git", tag = "0.1.0"}
+        cjfinal = { git = "https://gitcode.com/CoderKevin/cjfinal.git", tag = "0.1.0", output-type = "static"}
 
     [package]
         ... // 以下内容省略
