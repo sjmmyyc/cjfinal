@@ -339,7 +339,36 @@ public class RootController <: Controller{
 待实现...
 
 # 9. Json转换
-待更新...
+得益于仓颉本身的特性，CJFinal 实现了一个 `@Json` 非属性宏， 可以非常轻松的将 class 或 struct 对象转换成 Json，例如我们有个 `User` 类，除了正常声明类属性和类方法外，只需要再引入三个包和为类添加 `@Json` 宏，这个 `User` 类的对象便可轻松的被转换成 Json，或者从 Json 格式转换成 `User` 对象了。
+
+注意：`@Json` 宏只能加在 class 或 struct 前
+```
+// 以下三个包必须要导入，否则会报错
+import serialization.serialization.*
+import encoding.json.*
+import cjfinal.macros.Json
+
+@Json
+public class User{
+	// 使用 @Json 宏还有一点需要注意，就是成员方法的类型必须要是显示指定，下一行的注释中的写法是错误的
+	// public var name = "张三"		错误示例，类型为隐式String，在宏展开阶段无法推导出其真实类型
+    public var name: String = "张三"
+    public var age: Int64 = 33
+    public var total: Float64 = 10000.0
+    public var isStudent: Bool = false
+    public var auths: Array<String> = ["a", "b", "c"]
+}
+```
+随后，在 Controller 类里面，就可以使用 `this.renderJson(..)` 将 `User` 对象渲染到 response 中返回给请求调用者，示例代码如下 ：
+```
+public class RootController <: Controller{
+
+    public func index(){
+        let obj = User()		// 声明User对象
+        this.renderJson(obj)	// 返回给请求调用者
+    }
+}
+```
 
 # 10. CJFinal架构扩展
 待实现...
