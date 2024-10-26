@@ -132,7 +132,7 @@ public func configRoute(me: Routes): Unit{
 }
 ```
 访问 `http://localhost/hello` 将调用 `RootController.hello()` 方法<br/>
-访问 `http://localhost/user/info` 将调用 `UserController.info` 方法
+访问 `http://localhost/user/info` 将调用 `UserController.info()` 方法
 
 ## 2.4 configInterceptor(..)
 该方法用于配置全局拦截器
@@ -176,7 +176,47 @@ public class CorsHandler <: Handler{
 }
 ```
 # 3. Controller
-待更新...
+
+## 3.1 概述
+`Controller` 是CJFinal核心类之一，该类作为MVC模式中的控制器。基于CJFinal的Web应用的控制器需要继承该类。`Controller` 是定义 `Action` 方法的地点，是组织 `Action` 的一种方式，一个 `Controller` 可以包含多个 `Action`。`Controller` 是线程安全的。
+
+## 3.2 Action
+在 `Controller` 中定义的 `public` 方法称为 `Action`。`Action` 是请求的最小单位。`Action` 方法必须在 `Controller` 中定义，且必须是 `public` 可见性。
+```
+// 假设UserController绑定到“/user”目录下
+public class UserController <: Controller{
+
+    public func index(): Unit{
+		let user = User()
+        this.renderJson(user)
+    }
+
+	public func list(): Unit{
+		this.renderText("This is user list...")
+	}
+}
+```
+以上代码代码定义了两个 `Action`。一个 `index`， 一个 `list`。<br/>
+通过 `http://localhost/user/index` 访问 `UserController.index()` 方法，如访问 `index`，可在请求链接中省略 `index`，写成这样： `http://localhost/user` <br/>
+通过 `http://localhost/user/list` 访问 `UserController.list()` 方法
+
+## 3.3 get/getArray
+`Controller` 提供了一系列方法用于从请求中获取参数。总共分为两种类型的请求参数，一种是常规http请求中的键值对参数（请求中?号之后的参数或表单参数），一种是CJFinal提供的便捷式参数。
+
+### 1. 获取常规http请求参数
+|方法调用|返回值|
+|-|-|
+| get("title") | 获取“title”的参数值，返回值为 `String` 类型，如果没有，则返回空字符串 |
+| getTo\<T>("age") | 泛型方法，获取“age”的参数值，返回值类型为传入的泛型类型，如果没有或转换失败，抛出 `IllegalArgumentException` 异常 |
+| getArray("students") | 获取“students”的参数值，返回值为 `Array<String>` 类型 |
+| getArrayTo\<Student>("students") | 泛型方法，获取“students”的参数值，返回值类型为传入的泛型类型，如果转换失败，抛出 `IllegalArgumentException` 异常 |
+
+### 2. 获取CJFinal便捷请求参数
+如：`http://localhost/user/list/1-2-3` 中的 `1-2-3`，就指的是便捷参数，多个参数之间用 `-` 分隔，通过以下方法获取，需传入索引号，注意，索引号以 `0` 开始。
+|方法调用|返回值|
+|-|-|
+| getParam(0) | 获取第一个参数，返回值为 `String` 类型 |
+| getParamTo\<T>(1) | 泛型方法，获取第二个参数，返回值类型为传入的泛型类型 |
 
 # 4. AOP
 待更新...
