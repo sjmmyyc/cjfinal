@@ -350,7 +350,7 @@ import cjfinal.macros.Json
 
 @Json
 public class User{
-	// 使用 @Json 宏还有一点需要注意，就是成员方法的类型必须要是显示指定，下一行的注释中的写法是错误的
+	// 使用 @Json 宏还有一点需要注意，就是成员方法的类型必须要是显式指定，下面展示了一种错误写法
 	// public var name = "张三"		错误示例，类型为隐式String，在宏展开阶段无法推导出其真实类型
     public var name: String = "张三"
     public var age: Int64 = 33
