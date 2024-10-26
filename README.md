@@ -203,18 +203,18 @@ public class UserController <: Controller{
 ## 3.3 get/getArray
 `Controller` 提供了一系列方法用于从请求中获取参数。总共分为两种类型的请求参数，一种是常规http请求中的键值对参数（请求中?号之后的参数或表单参数），一种是CJFinal提供的便捷式参数。
 
-### 1. 获取常规http请求参数
+### 3.3.1. 获取常规http请求参数
 |方法调用|返回值|
-|-|-|
+|:-|:-|
 | get("title") | 获取“title”的参数值，返回值为 `String` 类型，如果没有，则返回空字符串 |
 | getTo\<T>("age") | 泛型方法，获取“age”的参数值，返回值类型为传入的泛型类型，如果没有或转换失败，抛出 `IllegalArgumentException` 异常 |
 | getArray("students") | 获取“students”的参数值，返回值为 `Array<String>` 类型 |
 | getArrayTo\<Student>("students") | 泛型方法，获取“students”的参数值，返回值类型为传入的泛型类型，如果转换失败，抛出 `IllegalArgumentException` 异常 |
 
-### 2. 获取CJFinal便捷请求参数
+### 3.3.2. 获取CJFinal便捷请求参数
 如：`http://localhost/user/list/1-2-3` 中的 `1-2-3`，就指的是便捷参数，多个参数之间用 `-` 分隔，通过以下方法获取，需传入索引号，注意，索引号以 `0` 开始。
 |方法调用|返回值|
-|-|-|
+|:-|:-|
 | getParam(0) | 获取第一个参数，返回值为 `String` 类型 |
 | getParamTo\<T>(1) | 泛型方法，获取第二个参数，返回值类型为传入的泛型类型 |
 
