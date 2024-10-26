@@ -209,7 +209,7 @@ public class UserController <: Controller{
 | get("title") | 获取“title”的参数值，返回值为 `String` 类型，如果没有，则返回空字符串 |
 | getTo\<T>("age") | 泛型方法，获取“age”的参数值，返回值类型为传入的泛型类型，如果没有或转换失败，抛出 `IllegalArgumentException` 异常 |
 | getArray("students") | 获取“students”的参数值，返回值为 `Array<String>` 类型 |
-| getArrayTo\<Float64>("cost") | 泛型方法，获取“cost”的参数值，返回值类型为传入的泛型类型，如果转换失败，抛出 `IllegalArgumentException` 异常 |
+| getArrayTo\<T>("cost") | 泛型方法，获取“cost”的参数值，返回值类型为传入的泛型类型，如果转换失败，抛出 `IllegalArgumentException` 异常 |
 
 ### 3.3.2. 获取CJFinal便捷请求参数
 如：`http://localhost/user/list/1-2-3` 中的 `1-2-3`，就指的是便捷参数，多个参数之间用 `-` 分隔，通过以下方法获取，需传入索引号，注意，索引号以 `0` 开始。
@@ -232,7 +232,99 @@ renderJson(obj)
 ```
 
 # 4. AOP
-待更新...
+## 4.1 概述
+CJFinal采用极速化的AOP设计，专注AOP最核心的目标，将概念减少到极致，仅有三个概念：Interceptor、Before、Clear，并且无需引入IOC也无需使用啰嗦的XML。
+
+## 4.2 Interceptor
+### 4.2.1 基本用法
+`Interceptor` 可以对方法进行拦截，并提供机会在方法的前后添加切面代码，实现 `AOP` 的核心目标。`Interceptor` 接口仅仅定义了一个方法 `func intercept(inv: Invocation): Unit`。以下是简单示例：
+```
+import cjfinal.core.{Interceptor, Controller, Invocation}
+
+public class MyInterceptor <: Interceptor{
+
+    public func intercept(inv: Invocation): Unit{
+		// let con = inv.getController() 可获得Controller对象
+		// let ctx = con.ctx 可获取HttpContext对象
+        println("Before")
+		// 注意：必须调用 inv.invoke() 方法，才能将当前调用传递到后续的 Interceptor 与 Action。
+        inv.invoke()
+        println("After")
+    }
+}
+```
+以上代码中的 `MyInterceptor` 将拦截目标方法，并且在目标方法调用前后向控制台输出文本。inv.invoke() 这一行代码是对目标方法的调用，在这一行代码的前后插入切面代码可以很方便地实现AOP。
+
+常见错误：有很多同学忘了调用 `inv.invoke()` 方法，造成 controller 中的 action 不会被执行。在此再次强调一次，一定要调用一次 `inv.invoke()`，除非是刻意不去调用剩下的拦截器与 action，这种情况仍然需要使用 inv.getController().render()/renderJson() 调用一下相关的 render() 方法为客户端响应数据。
+
+### 4.2.2 全局共享，注意线程安全问题
+需要注意的是，**被注册成全局拦截器**的时候，Interceptor 是**全局共享**的，因此，**全局拦截器需要保证其属性是全局安全的**，如下代码是错误的：
+```
+public class MyInterceptor <: Interceptor{
+
+	private var value = 123
+
+    public func intercept(inv: Invocation): Unit{
+		// 当该拦截器被注册成全局拦截器时
+		// 多线程将会并发访问 value 的值，造成错乱
+		// 如果非全局拦截器，将会是线程安全的
+		value++
+		inv.invoke()
+    }
+}
+```
+
+## 4.3 @Before
+`@Before` 注解用来对拦截器进行配置，该注解可配置class、method级别的拦截器，以下是代码示例：
+```
+// 配置一个Class级别的拦截器，它将拦截本类中的所有方法
+@Before["test.interceptor.ControllerInterceptor"]
+public class RootController <: Controller{
+
+	// 配置一个Method级别的拦截器，仅拦截本方法
+    @Before["test.interceptor.MethodInterceptor"]
+    public func index(){
+        let obj = User()
+        this.renderJson(obj)
+    }
+}
+```
+如上代码所示，`@Before` 可以将拦截器配置为class级别与method级别，前者将拦截本类中所有方法，后者仅拦截本方法。此外 `@Before`可以同时配置多个拦截器，由于当前仓颉语言特性所致，同时配置多个拦截器的写法如下：
+```
+// 这里仅演示Method级别的多个拦截器配置方法，class级别的多拦截器配置方法与此一致
+// 本质是在@Befor[]的方括号中配置一个字符串，字符串应该是Interceptor类的完整类名（含包名）
+@Before["""
+	test.interceptor.MethodInterceptor1,
+	test.interceptor.MethodInterceptor2,
+	test.interceptor.MethodInterceptor3
+"""]
+```
+全局拦截器的配置方法，请查阅 CJFinalConfig 章节的 configInterceptor(..) 小节
+
+## 4.4 @Clear
+拦截器从上到下依次分为global、class、method三个层次，`@Clear` 用于清除自身所处层次以上层的拦截器。`@Clear`配置在class、method 层级，因为global层级的拦截器没有清除的必要。
+
+`@Clear` 用法记忆技巧：
+
+* 一共有global、class、method 三层拦截器
+
+* 清除只针对Clear本身所处层的向上所有层，本层与下层不清除
+
+* 不带参数时清除所有拦截器，带参时清除参数指定的拦截器
+
+```
+// 清除所有上层拦截器，本层与下层不清除
+@Before[""]
+public class RootController <: Controller{
+
+	// 仅清除GlobalInterceptor拦截器
+    @Before["test.interceptor.GlobalInterceptor"]
+    public func index(){
+        let obj = User()
+        this.renderJson(obj)
+    }
+}
+```
 
 # 5. Db + Record
 待实现...
