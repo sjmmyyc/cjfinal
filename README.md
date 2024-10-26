@@ -219,7 +219,7 @@ public class UserController <: Controller{
 | getParamTo\<T>(1) | 泛型方法，获取第二个参数，返回值类型为传入的泛型类型 |
 
 ## 3.4 render方法
-`render` 系列方法用于简化向用户返回数据的方法
+`render` 系列方法是用于简化向用户返回数据的方法
 ```
 // 渲染纯文本
 renderText("Hello CJFianl")
@@ -227,8 +227,8 @@ renderText("Hello CJFianl")
 // 渲染HTML，传入的是HTML格式的字符串
 renderHtml("<p></p>")
 
-// 渲染Json，传入的是可被转化成json对象
-renderJson<T>(obj: Serializable<T>)
+// 渲染Json，传入的是可被转化成json的对象，关于Json转换的方式，请看后面的“Json转换”部分
+renderJson(obj)
 ```
 
 # 4. AOP
