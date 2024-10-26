@@ -21,23 +21,21 @@
 | CronPlugin | [ ] 待完成 | 将以插件的形式提供定时任务功能 |
 | RedisPlugin| [ ] 待完成 | 将以插件的形式提供对Redis的支持 |
 
-# 开发环境
-## Windows
-1. 确保已安装仓颉编译器 `cjc 0.56.4` 版本
-2. 创建项目目录，如 `E:/cjworks/test` （注：这里的项目名称为`test`），打开控制台，并进入到 `E:/cjworks/test` 目录下
-3. 输入 `cjpm init` 并回车，初始化项目
-4. 此时可用自己熟悉的IDE打开项目，接着打开项目中的 `cjpm.toml` 文件
-5. 在 `dependencies` 下面加入CJFinal的依赖，添加完成后， `cjpm.toml` 文件将如下所示
+# 添加依赖
+
+1. 打开项目中的 `cjpm.toml` 文件，在 `[dependencies]` 下面加入CJFinal的依赖：
   ```
     [dependencies]
+        // ... 其它依赖
         cjfinal = { git = "https://gitcode.com/CoderKevin/cjfinal.git", tag = "v0.1.0", output-type = "static"}
 
     [package]
         ... // 以下内容省略
   ```
-6. 在控制台中，进入到源码目录，执行 `cjpm update`，接着执行 `cjpm run`，此时，如果看到控制台打印的 `hello world`，则表示配置正确。那么，恭喜你，CJFinal已经正式融入到你的项目中了
+2. 添加依赖后，不要忘记执行 `cjpm update` 更新依赖包
 
-# 快速开始
+# 1. 快速上手
+## 1.1 CJFinal下开发
 1. 创建文件 `src/core/test_config.cj` 并打开，输入以下代码：
 ```
 // src/core/test_config.cj
@@ -45,33 +43,13 @@ package test.core
 
 import cjfinal.core.{CJFinalConfig, Constants, Interceptors, Routes, Handlers}
 
-/**
- * 每个CJFinal工程，必有一个继承自CJFinalConfig的类，用于配置整个项目
- * 需要实现以下几个方法
- */
 public class TestConfig <: CJFinalConfig{
-    /**
-     * 用于配置运行时常量
-     */
+
     public func configConstants(me: Constants): Unit{
         me.devMode = true   // 是否开发模式
     }
-
-    /**
-     * 用于配置拦截器
-     */
     public func configInterceptor(_: Interceptors): Unit{}
-
-    /**
-     * 用于配置路由
-     */
     public func configRoute(_: Routes): Unit{}
-
-    // 用于配置插件，configPlugin()暂未实现
-
-    /**
-     * 用于配置Handler
-     */
     public func configHandler(_: Handlers): Unit{}
 }
 ```
@@ -90,30 +68,17 @@ main(): Int64 {
     return 0
 }
 ```
-3. 此时，如果运行，将会在控制台看到如下信息：
-```
-// Console
-E:\CJWorks\test>cjpm run
-Welcom to use CJFinal Framework, current version is: 0.1.0
-Set devMode = true
-Total cost: 0.417500s
-```
-4. 但这个时候，我们并没有配置任何路由，接下来创建文件 `src/controller/root_controller.cj`，并输入以下代码
+3. 但这个时候，我们并没有配置任何路由，接下来创建文件 `src/controller/root_controller.cj`，并输入以下代码
 ```
 // src/controller/root_controller.cj
 package test.controller
 
 import cjfinal.core.Controller
 
-/**
- * 根目录控制器
- */
 public class RootController <: Controller{
 
-    /**
-     * 控制器内的pulic方法，将通过url直接驱动
-     */
     public func index(): Unit{
+		// 向用户返回一段文本
         this.renderText("Hello CJFinal")
     }
 }
@@ -127,8 +92,109 @@ public class RootController <: Controller{
 public func configRoute(me: Routes): Unit{
     // 注意，要在文件头部导入一下：import test.controller.RootController
     // 这样，就将RootController控制器绑定到了“/”目录上
-    // 如果访问“/index",就会调用RootController类的public func index()方法
+    // 如果访问“http://localhost/index",就会调用RootController.index()方法
     me.add("/", RootController())
 }
 ```
 6. 运行程序，并打开浏览器，输入 `localhost/index`，将会在页面上看到 `Hello CJFinal`。恭喜你！你已经上手CJFinal框架了！
+## 1.2 CJFinal下部署
+待更新...
+
+# 2. CJFinalConfig
+## 2.1 概述
+基于CJFinal的web项目需要创建一个继承自 `CJFinalConfig` 类的子类，该类用于对整个web项目进行配置。
+
+`CJFinalConfig` 子类需要实现四个抽象方法，如下所示：
+```
+public class TestConfig <: CJFinalConfig{
+	public func configConstants(me: Constants): Unit{}
+	public func configRoute(me: Routes): Unit{}
+	public func configInterceptor(me: Interceptors): Unit{}
+	public func configHandler(me: Handlers): Unit{}
+}
+```
+
+## 2.2 configConstants(..)
+此方法用来配置CJFinal常量值，如开发模式常量 `devMode` 的配置，如下代码是一些常用的配置：
+```
+public func configConstants(me: Constants): Unit{
+	// 配置开发模式，true为开发模式
+	me.devMode = true
+}
+```
+在开发模式下，CJFinal会对每次请求输出报告，如输出本次请求的URL、Controller、Method、Interceptor以及请求所携带的参数。
+## 2.3 configRoute(..)
+此方法用来配置访问路由：
+```
+public func configRoute(me: Routes): Unit{
+	me.add("/", RootController())
+	me.add("/user", UserController())
+}
+```
+访问 `http://localhost/hello` 将调用 `RootController.hello()` 方法<br/>
+访问 `http://localhost/user/info` 将调用 `UserController.info` 方法
+
+## 2.4 configInterceptor(..)
+该方法用于配置全局拦截器
+```
+public func configInterceptor(me: Interceptors): Unit{
+	me.add(FirstInterceptor())
+	me.add(SecondInterceptor())
+	me.add(ThirdInterceptor())
+}
+```
+全局拦截器可配置多个，按配置顺序链式执行。关于如何实现拦截器，请移步后面的 `AOP` 章节
+## 2.5 configHandler(..)
+此方法用来配置CJFinal的Handler，Handler可以接管所有web请求，并对应用拥有完全的控制权，可以很方便地实现更高层的功能性扩展。CJFinal的核心层也是通过实现了一个ActionHander来开发的。
+```
+public func configHandler(me: Handlers): Unit{
+	me.add(CorsHandler())
+	me.add(TestHandler())
+}
+```
+Handler可以配置多个，按配置顺序链式执行。例如，我们可以实现一个CorsHander来支持跨域请求：
+```
+public class CorsHandler <: Handler{
+    
+    public func handle(ctx: HttpContext): Unit{
+        let response = ctx.responseBuilder
+        response.header("Access-Control-Allow-Origin", "*");
+		response.header("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE");
+        var time = 2592000;	 // 默认缓存时间设置为30天
+        if(PropKit.getByDefaultTo<Bool>("devMode", false)) {
+			// 如果是开发模式，设置为10秒
+			time = 10;
+		}
+		// 设置缓存时间
+		response.header("Access-Control-Max-Age", time.toString());
+		response.header("Access-Control-Allow-Headers", "Accept,Origin,DNT,X-Custom-Header,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Last-Modified");
+
+		// 注意，这一步非常关键，会将业务交由下一个Handler去处理
+		// 因此开发者可通过业务逻辑来控制请求是否继续向后执行
+        this.next.handle(ctx)
+    }
+}
+```
+# 3. Controller
+待更新...
+
+# 4. AOP
+待更新...
+
+# 5. Db + Record
+待实现...
+
+# 6. RedisPlugin
+待实现...
+
+# 7. CronPlugin
+待实现...
+
+# 8. Validator
+待实现...
+
+# 9. Json转换
+待更新...
+
+# 10. CJFinal架构扩展
+待实现...
