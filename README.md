@@ -1,3 +1,5 @@
+	文档与框架本身，有任何问题，请联系QQ：107416106。另招募合作伙伴一起完善框架，欢迎小伙伴加入^_^
+
 # CJFinal极速Web框架
 
 为什么叫**极速框架**？因为**学习成本非常低**，**3分钟**上手，**2小时**干项目，**1天**精通Web服务开发。
@@ -182,8 +184,8 @@ PropKit工具类用来读取外部键值对配置文件，PropKit可以极度方
 // =号前后可加空格，也可不加
 // 配置文件内仅支持“//”形式的注释
 
-userName = james
-email = no-reply@jfinal.com
+userName = Kevin
+email = abc@qq.com
 devMode = true
 ```
 如下是 PropKit 代码示例：
@@ -211,7 +213,7 @@ let devMode: Bool = PropKit.getTo<Bool>("devMode");
 let name: String = getByDefault("name", "Kevin")
 
 // 读取isGirl的值，如果不存在，返回传入的第二个参数，返回值为T类型
-let isGirl: String = getByDefaultTo<Bool>("isGirl", true)
+let isGirl: Bool = getByDefaultTo<Bool>("isGirl", true)
 ```
 如果有多个配置文件，随时可以用PropKit.use()加载并缓存起来，但是要注意的是，多个配置文件中的key不要重复。如果重复，后加载key值会覆盖掉前面的同名key值。
 
