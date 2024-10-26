@@ -314,11 +314,11 @@ public class RootController <: Controller{
 
 ```
 // 清除所有上层拦截器，本层与下层不清除
-@Before[""]
+@Clear[""]
 public class RootController <: Controller{
 
 	// 仅清除GlobalInterceptor拦截器
-    @Before["test.interceptor.GlobalInterceptor"]
+    @Clear["test.interceptor.GlobalInterceptor"]
     public func index(){
         let obj = User()
         this.renderJson(obj)
