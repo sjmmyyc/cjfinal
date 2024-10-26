@@ -175,6 +175,46 @@ public class CorsHandler <: Handler{
     }
 }
 ```
+## 2.6 PropKit读取配置
+PropKit工具类用来读取外部键值对配置文件，PropKit可以极度方便地在系统任意时空使用，配置文件的格式如下：
+```
+// 假设有配置文件config.txt，与src目录属于同级关系
+// =号前后可加空格，也可不加
+// 配置文件内仅支持“//”形式的注释
+
+userName = james
+email = no-reply@jfinal.com
+devMode = true
+```
+如下是 PropKit 代码示例：
+```
+// 需要引入以下包
+// import cjfinal.kit.PropKit
+
+// 将config.txt中的配置项缓存起来
+PropKit.use("config.txt");
+
+// 还可以这样写，用appendIfExist()方法加载开发环境的配置文件，如果存在，则加载，并更新缓存，如果不存在，啥也不干
+// 这样做的好处是，避免了在开发环境和生产环境中频繁的切换配置文件，或因忘记切换配置文件导致意外发生
+// 也就是说，开发环境下，可以只有config.txt文件，而生产环境下，只需要将config.txt复制一份，起名为config-pro.txt
+// 然后生产环境中，就会用config-pro.txt中的配置项更新PropKit缓存，执行生成环境的配置
+PropKit.use("config.txt").appendIfExist("config-pro.txt")
+
+// 加载完配置文件后，就可以读取了
+// 读取配置userName的值，get()方法返回的是字符串类型的值
+let userName: String = PropKit.get("userName");
+
+// 也可以使用getTo<T>()方法，将读取的值转换成T类型
+let devMode: Bool = PropKit.getTo<Bool>("devMode");
+
+// 读取name的值，如果不存在，返回传入的第二个参数，返回值为String类型
+let name: String = getByDefault("name", "Kevin")
+
+// 读取isGirl的值，如果不存在，返回传入的第二个参数，返回值为T类型
+let isGirl: String = getByDefaultTo<Bool>("isGirl", true)
+```
+如果有多个配置文件，随时可以用PropKit.use()加载并缓存起来，但是要注意的是，多个配置文件中的key不要重复。如果重复，后加载key值会覆盖掉前面的同名key值。
+
 # 3. Controller
 
 ## 3.1 概述
