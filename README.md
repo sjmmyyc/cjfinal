@@ -209,7 +209,7 @@ public class UserController <: Controller{
 | get("title") | 获取“title”的参数值，返回值为 `String` 类型，如果没有，则返回空字符串 |
 | getTo\<T>("age") | 泛型方法，获取“age”的参数值，返回值类型为传入的泛型类型，如果没有或转换失败，抛出 `IllegalArgumentException` 异常 |
 | getArray("students") | 获取“students”的参数值，返回值为 `Array<String>` 类型 |
-| getArrayTo\<Student>("students") | 泛型方法，获取“students”的参数值，返回值类型为传入的泛型类型，如果转换失败，抛出 `IllegalArgumentException` 异常 |
+| getArrayTo\<Float64>("cost") | 泛型方法，获取“cost”的参数值，返回值类型为传入的泛型类型，如果转换失败，抛出 `IllegalArgumentException` 异常 |
 
 ### 3.3.2. 获取CJFinal便捷请求参数
 如：`http://localhost/user/list/1-2-3` 中的 `1-2-3`，就指的是便捷参数，多个参数之间用 `-` 分隔，通过以下方法获取，需传入索引号，注意，索引号以 `0` 开始。
@@ -217,6 +217,19 @@ public class UserController <: Controller{
 |:-|:-|
 | getParam(0) | 获取第一个参数，返回值为 `String` 类型 |
 | getParamTo\<T>(1) | 泛型方法，获取第二个参数，返回值类型为传入的泛型类型 |
+
+## 3.4 render方法
+`render` 系列方法用于简化向用户返回数据的方法
+```
+// 渲染纯文本
+renderText("Hello CJFianl")
+
+// 渲染HTML，传入的是HTML格式的字符串
+renderHtml("<p></p>")
+
+// 渲染Json，传入的是可被转化成json对象
+renderJson<T>(obj: Serializable<T>)
+```
 
 # 4. AOP
 待更新...
