@@ -14,12 +14,12 @@
 | AOP | <font color=green>[√] 已完成</font> | CJFinal专注AOP最核心的目标，将概念减少到极致<br/>仅有三个概念：Interceptor、Before、Clear，并且无需引入IOC也无需使用啰嗦的XML |
 | Json转换 | <font color=green>[√] 已完成</font> | CJFinal通过在class或struct定义前加上@Json宏，使其具备可被自动解析成Json的功能 |
 | 文件上传/下载 | <font color=red>[*] 进行中</font> | 该功能将作为Controller中的方法提供给大家，可轻松实现文件上传或下载功能 |
-| Validator | [ ] 待完成 | 校验组件，在Validator类中将提供非常方便的校验方法，学习简单，使用方便 |
-| 插件化 | [ ] 待完成 | CJFinal后续功能将采用插件化的方式进行扩展，大家也可以为CJFinal开发插件，方便更多人<br/>但目前尚未实现插件扩展的功能，敬请期待... |
-| MySQLPlugin | [ ] 待完成 | 将以插件的形式，首先支持MySQL数据库连接 |
-| Db + Record | [ ] 待完成 | Db和Record将作为CJFinal的核心类，届时会有丰富的数据库操作功能 |
-| CronPlugin | [ ] 待完成 | 将以插件的形式提供定时任务功能 |
-| RedisPlugin| [ ] 待完成 | 将以插件的形式提供对Redis的支持 |
+| Validator | [×] 待完成 | 校验组件，在Validator类中将提供非常方便的校验方法，学习简单，使用方便 |
+| 插件化 | [×] 待完成 | CJFinal后续功能将采用插件化的方式进行扩展，大家也可以为CJFinal开发插件，方便更多人<br/>但目前尚未实现插件扩展的功能，敬请期待... |
+| MySQLPlugin | [×] 待完成 | 将以插件的形式，首先支持MySQL数据库连接 |
+| Db + Record | [×] 待完成 | Db和Record将作为CJFinal的核心类，届时会有丰富的数据库操作功能 |
+| CronPlugin | [×] 待完成 | 将以插件的形式提供定时任务功能 |
+| RedisPlugin| [×] 待完成 | 将以插件的形式提供对Redis的支持 |
 
 # 添加依赖
 
