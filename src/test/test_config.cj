@@ -41,4 +41,12 @@ public class TestConfig <: CJFinalConfig{
         me.add(CORSHandler())
         me.add(TestHandler())
     }
+
+    public func onStart(): Unit{
+        println("on server start...")
+    }
+
+    public func onStop(): Unit{
+        println("before server stop...")
+    }
 }

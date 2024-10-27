@@ -18,6 +18,8 @@ package cjfinal.core
 import net.http.{Server, ServerBuilder, HttpContext}
 import log.LogLevel
 import std.time.MonoTime
+import std.process.Process
+import std.fs.{File, OpenOption}
 
 /**
  * CJFinal服务器类
@@ -50,11 +52,19 @@ public class CJFinal{
         me.config.configInterceptor(me._interceptors)
         me.config.configRoute(me.routes)
         me.config.configHandler(me.handlers)
-        
         me.create(port)
         let endTime = MonoTime.now()
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
-        me.server?.serve()
+        let sevThread = spawn {
+            me.server?.serve()
+        }
+        me.server?.afterBind({ => me.config.onStart()})
+        me.server?.onShutdown({ => println("onShutdown")})
+        let currPro = Process.current
+        currPro.atExit({ => 
+            File("atExit.log", OpenOption.Create(false))
+        })
+        sevThread.get()
     }
 
     /**

@@ -22,22 +22,32 @@ public abstract class CJFinalConfig{
     /**
      * 配置运行时常量
      */
-    public func configConstants(me: Constants): Unit
+    public open func configConstants(_: Constants): Unit{}
 
     /**
      * 配置拦截器
      */
-    public func configInterceptor(me: Interceptors): Unit
+    public open func configInterceptor(_: Interceptors): Unit{}
 
     /**
      * 配置路由
      */
-    public func configRoute(me: Routes): Unit
+    public open func configRoute(_: Routes): Unit{}
 
     // configPlugin()
 
     /**
      * 配置Handler
      */
-    public func configHandler(me: Handlers): Unit
+    public open func configHandler(_: Handlers): Unit{}
+
+    /**
+     * 服务器启动完成后的回调
+     */
+    public open func onStart(): Unit{}
+
+    /**
+     * 服务器关闭前的回调
+     */
+    public open func onStop(): Unit{}
 }
