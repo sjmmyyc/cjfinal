@@ -29,7 +29,7 @@
   ```
     [dependencies]
         // ... 其它依赖
-        cjfinal = { git = "https://gitcode.com/CoderKevin/cjfinal.git", tag = "v0.1.0", output-type = "static"}
+        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.1.1", output-type = "static"}
 
     [package]
         ... // 以下内容省略
@@ -100,7 +100,51 @@ public func configRoute(me: Routes): Unit{
 ```
 6. 运行程序，并打开浏览器，输入 `localhost/index`，将会在页面上看到 `Hello CJFinal`。恭喜你！你已经上手CJFinal框架了！
 ## 1.2 CJFinal下部署
-待更新...
+仓颉目前无法交叉编译，因此，需要部署到哪个平台，就得到哪个平台下编译打包项目。部署CJFinal项目非常简单。
+
+### 1.2.1 打包
+```
+cjpm build -o [your-project-name]
+```
+
+### 1.2.2 构建脚本
+打包完成后，在项目的 `target/release/bin` 目录下会生成平台可执行程序。如果你的项目使用了外部文件，如图片、视频、配置文件等，打包命令并不会将其一并复制到 `target/release/bin` 下。此时，你可以手动将其复制过来，或者编写“构建脚本”，实现编译时自动复制外部文件的功能。“构建脚本”是仓颉自身的特性，查官方文档即可了解如何编写，非常简单好用。这里我们给出一个简单的示例：
+```
+// build.cj
+import std.process.*
+import std.fs.{Path, copy}
+
+/**
+ * 编译完成后的回调
+ */
+func stagePostBuild(): Int64{
+    // 将config目录下的文件复制到打包目录中
+    let source = Path("./config")
+    let target = Path("./target/release/bin/config")
+    copy(source, to: target, overwrite: true)
+    return 0
+}
+
+main(): Int64{
+    match(Process.current.arguments[0]){
+        // Add operation here with format: "pre-"/"post-" + optionName
+        // case "pre-build" => stagePreBuild()              // 编译前
+        case "post-build" => stagePostBuild()               // 编译后
+        // case "pre-clean" => stagePreClean()              // clean前
+        // case "post-clean" => stagePostClean()            // clean后
+        case _ => return 0
+    }
+}
+```
+注意：`build.cj` 要和 `cjpm.toml` 在同一级目录中。
+
+### 1.2.3 运行
+将 `target/release/bin` 目录复制到你期望的目录中，然后 `./your-porject-name` 即可运行程序。
+
+### 1.2.4 退出
+程序运行后，可输入 `quit` 来终止程序。
+
+注意：如果使用了 `onStop()` 回调，一定不要用 `Ctrl + C` 的方式来终止程序，否则 `onStop()` 回调不会被执行。
 
 # 2. CJFinalConfig
 ## 2.1 概述
@@ -177,7 +221,21 @@ public class CorsHandler <: Handler{
     }
 }
 ```
-## 2.6 PropKit读取配置
+
+## 2.6 onStart() / onStop()回调
+在 `CJFinalConfig` 继承类中可以添加 `onStart()` 与 `onStop()`，CJFinal 会在系统启动完成之后以及系统关闭之前分别回调这两个方法：
+```
+// 系统启动完成后回调
+public void onStart() {}
+    
+// 系统关闭之前回调
+// 注意：如果使用了 onStop() 回调，一定不要用 Ctrl+C 的方式来终止程序，否则 onStop() 回调不会被执行
+public void onStop() {}
+```
+这两个方法可以很方便地在项目启动后与关闭前让开发者有机会进行额外操作，如在系统启动后创建调度线程或在系统关闭前写回缓存。
+
+
+## 2.7 PropKit读取配置
 PropKit工具类用来读取外部键值对配置文件，PropKit可以极度方便地在系统任意时空使用，配置文件的格式如下：
 ```
 // 假设有配置文件config.txt，与src目录属于同级关系
