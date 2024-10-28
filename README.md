@@ -1,3 +1,14 @@
+<div align="center">
+<h1>CJFinal</h1>
+</div>
+<p align="center">
+<img alt="" src="https://img.shields.io/badge/release-v0.1.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjcov-100%25-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/license-MulanPSL2.0-brightgreen" style="display: inline-block;" />
+</p>
+
 	文档与框架本身，有任何问题，请加QQ群：247445547。另招募合作伙伴一起完善框架，欢迎小伙伴加入^_^
 
 # CJFinal极速Web框架
