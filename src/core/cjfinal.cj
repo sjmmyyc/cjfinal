@@ -20,13 +20,14 @@ import log.LogLevel
 import std.time.MonoTime
 import std.process.Process
 import std.fs.{File, OpenOption}
+import std.console.Console
 
 /**
  * CJFinal服务器类
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.1.0"
+    public static let version = "0.1.1"
 
     public static let me: CJFinal = CJFinal()
 
@@ -55,16 +56,28 @@ public class CJFinal{
         me.create(port)
         let endTime = MonoTime.now()
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
-        let sevThread = spawn {
+        spawn {
             me.server?.serve()
         }
         me.server?.afterBind({ => me.config.onStart()})
-        me.server?.onShutdown({ => println("onShutdown")})
-        let currPro = Process.current
-        currPro.atExit({ => 
-            File("atExit.log", OpenOption.Create(false))
-        })
-        sevThread.get()
+        me.server?.onShutdown({ => me.config.onStop()})
+        readCommand()
+    }
+
+    /**
+     * 读取用户输入的命令
+     */
+    private static func readCommand(): Unit{
+        var isQuit = false
+        while(!isQuit){
+            println("You can enter \u{1b}[32mquit\u{1b}[0m to exit CJFinal.")
+            if(let Some(cmd) <- Console.stdIn.readln()){
+                if(cmd == "quit"){
+                    me.server?.close()
+                    isQuit = true
+                }
+            }
+        }
     }
 
     /**
@@ -76,6 +89,7 @@ public class CJFinal{
             .port(UInt16(port))
             .distributor(RequestDistributor())
             .build()
+        println("\u{1b}[32mListen: http://127.0.0.1:${port}\u{1b}[0m")
         // 关闭默认日志
         this.server?.logger.level = LogLevel.OFF
         this.server?.distributor.register("/", globalHandler)

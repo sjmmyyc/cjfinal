@@ -19,6 +19,6 @@ package cjfinal
 // import cjfinal.test.TestConfig
 
 // main(): Int64 {
-//     CJFinal.start(TestConfig(), 80)
+//     CJFinal.start(TestConfig(), 8080)
 //     return 0
 // }
