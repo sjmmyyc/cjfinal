@@ -226,11 +226,11 @@ public class CorsHandler <: Handler{
 在 `CJFinalConfig` 继承类中可以添加 `onStart()` 与 `onStop()`，CJFinal 会在系统启动完成之后以及系统关闭之前分别回调这两个方法：
 ```
 // 系统启动完成后回调
-public void onStart() {}
+public func onStart(): Unit {}
     
 // 系统关闭之前回调
 // 注意：如果使用了 onStop() 回调，一定不要用 Ctrl+C 的方式来终止程序，否则 onStop() 回调不会被执行
-public void onStop() {}
+public func onStop(): Unit {}
 ```
 这两个方法可以很方便地在项目启动后与关闭前让开发者有机会进行额外操作，如在系统启动后创建调度线程或在系统关闭前写回缓存。
 
