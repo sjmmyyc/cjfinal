@@ -47,13 +47,14 @@ public class MultipartForm{
      */
     public func resolving(): Unit{
         let contentLength = this.getContentLength()
+        println("contentLength: ${contentLength}")
         let body = Array<Byte>(contentLength, repeat: 0)
         let buffer = BufferedInputStream(this._request.body)
         buffer.read(body)
         let separator = getSeparator()
         let itemArr = body.split(separator)
         for(item in itemArr){
-            this._items.append(FormDataItem(item))
+            this._items.append(FormDataItem(item, this._uploadPath))
         }
     }
 

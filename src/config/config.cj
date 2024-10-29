@@ -13,12 +13,16 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.core
+package cjfinal.config
 
 /**
  * CJFinal运行时配置信息
  */
-class Config{
+public class Config{
+
     // 是否是开发模式
     public static var DEV_MODE = false
+
+    // 上传文件存放目录
+    public static var UPLOAD_PATH = "upload"
 }

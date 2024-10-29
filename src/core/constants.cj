@@ -15,6 +15,8 @@
  */
 package cjfinal.core
 
+import cjfinal.config.Config
+
 /**
  * CJFinal运行时常量
  */
