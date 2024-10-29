@@ -28,6 +28,7 @@ public class ActionHandler <: Handler{
 
     public func handle(ctx: HttpContext): Unit{
         if(let Some(action) <- Action.get(ctx)){
+            action.invoke()
             if(Config.DEV_MODE){
                 println("------------------------------ Action Handler ------------------------------")
                 println("URL:\t\t${ctx.request.url}")
@@ -54,7 +55,6 @@ public class ActionHandler <: Handler{
                 }
                 println("------------------------------------ End -----------------------------------\n")
             }
-            action.invoke()
         }else{
             println("request: ${ctx.request.url} is not found.")
             let responst = ctx.responseBuilder

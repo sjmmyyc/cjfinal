@@ -34,10 +34,6 @@ public class Action{
     private let _controllerName: String
     // 表示controller中的哪个方法
     private let _method: InstanceFunctionInfo
-    // 参数，非请求中?打头的参数
-    private let _params: Array<String>
-    // 参数，请求中？打头的参数
-    private let _form: Form
     private let _interceptors: Array<Interceptor>
 
     private init(path: String, con: Controller, controllerName: String, method: InstanceFunctionInfo, interceptors: Array<Interceptor>){
@@ -45,8 +41,6 @@ public class Action{
         this._controller = con
         this._controllerName = controllerName
         this._method = method
-        this._params = con.param
-        this._form = con.form
         this._interceptors = interceptors
     }
 
@@ -253,7 +247,7 @@ public class Action{
 
     public prop params: Array<String>{
         get(){
-            this._params
+            this.controller.param
         }
     }
 
@@ -265,7 +259,7 @@ public class Action{
 
     public prop form: Form{
         get(){
-            this._form
+            this._controller.form
         }
     }
 }
