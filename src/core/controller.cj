@@ -22,6 +22,7 @@ import serialization.serialization.Serializable
 import std.convert.Parsable
 import std.collection.ArrayList
 import std.reflect.TypeInfo
+import cjfinal.upload.{MultipartForm, UploadFile}
 
 /**
  * 控制器基类
@@ -108,6 +109,14 @@ public abstract class Controller{
             println('\u{1b}[33m"${str}" can not parse to ${typeInfo}\u{1b}[0m')
             throw IllegalArgumentException('"${str}" can not parse to ${typeInfo}')
         }
+    }
+
+    protected func getFiles(_: String, _: Int): Array<UploadFile>{
+        if(let Some(multiForm) <- MultipartForm.get(this.ctx.request)){
+            // this._form = multiForm.form
+            // multiForm.uploadFile()
+        }
+        return Array<UploadFile>()
     }
 
     /**

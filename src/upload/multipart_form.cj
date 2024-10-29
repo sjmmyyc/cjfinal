@@ -13,31 +13,25 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test.controller
+package cjfinal.upload
 
-import cjfinal.core.Controller
-import cjfinal.aop.{Before, Clear}
-import cjfinal.test.model.User
+import net.http.HttpRequest
+import encoding.url.Form
 
-@Before["cjfinal.test.interceptor.ControllerInterceptor"]
-@Clear[""]
-public class RootController <: Controller{
+/**
+ * multipart/form-data请求
+ */
+public class MultipartForm{
 
-    @Before["cjfinal.test.interceptor.MethodInterceptor"]
-    public func index(){
-        let obj = User()
-        this.renderJson(obj)
-    }
+    private var _form: ?Form = None
 
-    public func login(){
-        println(this.get("phone"))
-        let user = User()
-        this.renderJson(user)
-    }
+    private init(){}
 
-    @Clear[""]
-    public func formdata(){
-        this.getFiles("/upload", 10 * 1024 * 1024)
-        this.renderText("/formdata is invoke.")
+    public static func get(req: HttpRequest): ?MultipartForm{
+        var form: ?MultipartForm = None
+        if(let Some(contentType) <- req.headers.getFirst("content-type")){
+            println(contentType)
+        }
+        return form
     }
 }

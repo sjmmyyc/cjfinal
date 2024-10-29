@@ -27,7 +27,7 @@ import std.console.Console
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.1.1"
+    public static let version = "0.1.2"
 
     public static let me: CJFinal = CJFinal()
 

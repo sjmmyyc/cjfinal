@@ -29,8 +29,8 @@ public class TestConfig <: CJFinalConfig{
     }
 
     public func configRoute(me: Routes): Unit{
-        me.add("/api", RootController())
-        me.add("/api/user", UserController())
+        me.add("/", RootController())
+        me.add("/user", UserController())
     }
 
     public func configInterceptor(me: Interceptors): Unit{
