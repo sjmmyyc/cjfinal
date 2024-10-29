@@ -22,7 +22,7 @@ import serialization.serialization.Serializable
 import std.convert.Parsable
 import std.collection.ArrayList
 import std.reflect.TypeInfo
-import cjfinal.upload.{MultipartForm, UploadFile}
+import cjfinal.upload.{MultipartForm, UploadFile, ExceedingLimitException}
 
 /**
  * 控制器基类
@@ -50,6 +50,13 @@ public abstract class Controller{
             .header("content-type", "text/json; charset=utf8")
             .status(HttpStatusCode.STATUS_OK)
             .body(obj.serialize().toJson().asObject().toJsonString())
+    }
+
+    protected func renderErr413(): Unit{
+        this.ctx.responseBuilder
+            .header("content-type", "text/html; charset=utf8")
+            .status(HttpStatusCode.STATUS_REQUEST_CONTENT_TOO_LARGE)
+            .body(HttpStatusCode.STATUS_REQUEST_CONTENT_TOO_LARGE.toString() + " - STATUS_REQUEST_CONTENT_TOO_LARGE")
     }
 
     /**
@@ -111,11 +118,13 @@ public abstract class Controller{
         }
     }
 
-    protected func getFiles(_: String, _: Int): Array<UploadFile>{
-        if(let Some(multiForm) <- MultipartForm.get(this.ctx.request)){
+    protected func getFiles(uploadPath: String, maxPostSize: Int): Array<UploadFile>{
+        if(let Some(multiForm) <- MultipartForm.get(this.ctx.request, uploadPath, maxPostSize)){
             // this._form = multiForm.form
             // multiForm.uploadFile()
+            this._form = multiForm.form
         }
+        
         return Array<UploadFile>()
     }
 

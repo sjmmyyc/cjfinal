@@ -13,32 +13,14 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test.controller
+package cjfinal.upload
 
-import cjfinal.core.Controller
-import cjfinal.aop.{Before, Clear}
-import cjfinal.test.model.User
-
-@Before["cjfinal.test.interceptor.ControllerInterceptor"]
-@Clear[""]
-public class RootController <: Controller{
-
-    @Before["cjfinal.test.interceptor.MethodInterceptor"]
-    public func index(){
-        let obj = User()
-        this.renderJson(obj)
+public class ExceedingLimitException <: Exception{
+    public init(msg: String){
+        super(msg)
     }
 
-    public func login(){
-        println(this.get("phone"))
-        let user = User()
-        this.renderJson(user)
-    }
-
-    @Clear[""]
-    public func formdata(){
-        this.getFiles("/upload", 500)
-        println(this.getArray("tags"))
-        this.renderText("/formdata is invoke.")
+    public override func getClassName(): String{
+        return "ExceedingLimitException"
     }
 }

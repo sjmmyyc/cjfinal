@@ -17,6 +17,9 @@ package cjfinal.upload
 
 import std.fs.File
 
+/**
+ * UploadFile.
+ */
 public class UploadFile{
 
     private var _parameterName: String
@@ -24,12 +27,14 @@ public class UploadFile{
     private var _uploadPath: String
     private var _fileName: String
     private var _originalFileName: String
+    private var _contentType: String
 
-    public init(parameterName: String, uploadPath: String, fileName: String, originalFileName: String){
+    public init(parameterName: String, uploadPath: String, fileName: String, originalFileName: String, contentType: String){
         this._parameterName = parameterName
         this._uploadPath = uploadPath
         this._fileName = fileName
         this._originalFileName = originalFileName
+        this._contentType = contentType
     }
 
     public prop parameterName: String{
