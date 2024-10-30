@@ -39,7 +39,7 @@
 1. 打开项目中的 `cjpm.toml` 文件，在 `[dependencies]` 下面加入CJFinal的依赖：
   ```
     [dependencies]
-        // ... 其它依赖
+        // CJFinal依赖
         cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.1.1", output-type = "static"}
 
     [package]
@@ -153,9 +153,8 @@ main(): Int64{
 将 `target/release/bin` 目录复制到你期望的目录中，然后 `./your-porject-name` 即可运行程序。
 
 ### 1.2.4 退出
-程序运行后，可输入 `quit` 来终止程序。
 
-注意：如果使用了 `onStop()` 回调，一定不要用 `Ctrl + C` 的方式来终止程序，否则 `onStop()` 回调不会被执行。
+可使用 `Ctrl + C` 退出程序。如果通过强制杀进程的方式来结束应用， `onStop()` 回调不会被执行。
 
 # 2. CJFinalConfig
 ## 2.1 概述
@@ -240,7 +239,7 @@ public class CorsHandler <: Handler{
 public func onStart(): Unit {}
     
 // 系统关闭之前回调
-// 注意：如果使用了 onStop() 回调，一定不要用 Ctrl+C 的方式来终止程序，否则 onStop() 回调不会被执行
+// 注意：如果使用了 onStop() 回调，一定不要用强制杀进程的方式来终止程序，否则 onStop() 回调不会被执行
 public func onStop(): Unit {}
 ```
 这两个方法可以很方便地在项目启动后与关闭前让开发者有机会进行额外操作，如在系统启动后创建调度线程或在系统关闭前写回缓存。
