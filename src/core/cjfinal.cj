@@ -21,6 +21,9 @@ import std.time.MonoTime
 import std.process.Process
 import std.fs.{File, OpenOption}
 import std.console.Console
+import std.posix.*
+
+foreign func signal(signum: Int32, handler: CFunc<(Int32) -> Unit>): Unit
 
 /**
  * CJFinal服务器类
@@ -56,28 +59,12 @@ public class CJFinal{
         me.create(port)
         let endTime = MonoTime.now()
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
-        spawn {
-            me.server?.serve()
-        }
         me.server?.afterBind({ => me.config.onStart()})
         me.server?.onShutdown({ => me.config.onStop()})
-        readCommand()
-    }
-
-    /**
-     * 读取用户输入的命令
-     */
-    private static func readCommand(): Unit{
-        var isQuit = false
-        while(!isQuit){
-            println("You can enter \u{1b}[32mquit\u{1b}[0m to exit CJFinal.")
-            if(let Some(cmd) <- Console.stdIn.readln()){
-                if(cmd == "quit"){
-                    me.server?.close()
-                    isQuit = true
-                }
-            }
+        unsafe{
+            signal(SIGINT, {_ => me.server?.close()})
         }
+        me.server?.serve()
     }
 
     /**
