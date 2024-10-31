@@ -19,7 +19,8 @@ import net.http.{HttpRequest, HttpHeaders}
 import encoding.url.Form
 import std.convert.Parsable
 import std.collection.ArrayList
-import std.io.BufferedInputStream
+import std.io.{BufferedInputStream, ByteBuffer}
+import cjfinal.config.Config
 
 /**
  * MultipartForm.
@@ -28,47 +29,97 @@ import std.io.BufferedInputStream
  */
 public class MultipartForm{
 
+    private let _contentType: String
     private let _request: HttpRequest
     private let _uploadPath: String
     // 允许的单文件最大尺寸
     private let _maxPostSize: Int
 
     private let _items = ArrayList<FormDataItem>()
+    // 拼装用的临时数据存储单元
+    private let _tempData = ArrayList<Byte>()
+
+    private var _boundary: Array<Byte> = Array<Byte>()
+    private var _isFirst = true       // 是否是第一次匹配
     
-    private init(req: HttpRequest, uploadPath: String, maxPostSize: Int){
+    private init(req: HttpRequest, contentType: String, uploadPath: String, maxPostSize: Int){
         this._request = req
         this._uploadPath = uploadPath
         this._maxPostSize = maxPostSize
+        this._contentType = contentType
+        this._boundary = this.getBoundary()
         this.resolving()
     }
 
     /**
      * 解析请求，从请求中获取FormDataItem数组
      */
-    public func resolving(): Unit{
-        let contentLength = this.getContentLength()
-        println("contentLength: ${contentLength}")
-        let body = Array<Byte>(contentLength, repeat: 0)
-        let buffer = BufferedInputStream(this._request.body)
-        buffer.read(body)
-        let separator = getSeparator()
-        let itemArr = body.split(separator)
-        for(item in itemArr){
-            this._items.append(FormDataItem(item, this._uploadPath))
+    private func resolving(): Unit{
+        // 计算buffer的大小
+        let buffLength = this.calcBufferedLength(capacity: Config.UPLOAD_BUFFER_CAPACITY)
+        let fragment = Array<Byte>(buffLength, repeat: 0)
+        let buffer = BufferedInputStream(this._request.body, buffLength)
+        while(buffer.read(fragment) > 0){
+            var byteBuff = ByteBuffer(fragment)
+            for(byte in byteBuff.bytes()){
+                this._tempData.append(byte)
+                if(let Some(formItem) <- resolvingTempdata()){
+                    this._items.append(formItem)
+                }
+            }
         }
+        // cjc 0.56.4版本无法访问此方法，待cjc升级后再
+        // buffer.close()
+    }
+
+    /**
+     * 从tempData中解析数据
+     * @return Option<FormDataItem> - 如果没有解析到，返回None
+     */
+    private func resolvingTempdata(): ?FormDataItem{
+        var result: ?FormDataItem = None
+        // 如果还没读到开始位置的"--"
+        if(this._isFirst){
+            // 判断已读数据是否是boundary
+            if(this._tempData.toArray() == this._boundary){
+                this._tempData.clear()
+                this._isFirst = false
+            }
+        }else{
+            // 判断已读取数据的结尾是否是boundary
+            if(this._tempData.size >= this._boundary.size){
+                if(this._tempData.toArray()[this._tempData.size - this._boundary.size..] == this._boundary){
+                    let data = this._tempData.toArray()[2..this._tempData.size - this._boundary.size - 2]
+                    result = FormDataItem(data, this._uploadPath)
+                    this._tempData.clear()
+                }
+            }
+        }
+        return result
     }
 
     private func getContentLength(): Int{
         return Int.parse(this._request.headers.getFirst("content-length") ?? "0")
     }
 
-    private func getBoundary(): String{
-        let contentType = this._request.headers.getFirst("content-type").getOrThrow()
-        return contentType["multipart/form-data; boundary=".size..]
+    /**
+     * 计算Buffer的长度，可传入一个默认值
+     * @param default! - 默认大小，如果不指定，默认为4096（4K）
+     * @return - 当contentLength < capacity，返回contentLength，否则返回capacity
+     */
+    private func calcBufferedLength(capacity!: Int = 4096): Int{
+        let contentLength = this.getContentLength()
+        var len = 0;
+        if(contentLength < capacity){
+            len = contentLength
+        }else{
+            len = capacity
+        }
+        return len
     }
 
-    private func getSeparator(): Array<Byte>{
-        return "--${this.getBoundary()}".toArray()
+    private func getBoundary(): Array<Byte>{
+        return "--${this._contentType["multipart/form-data; boundary=".size..]}".toArray()
     }
 
     /**
@@ -82,7 +133,7 @@ public class MultipartForm{
         var form: ?MultipartForm = None
         if(let Some(contentType) <- req.headers.getFirst("content-type")){
             if(contentType.startsWith("multipart/form-data")){
-                form = MultipartForm(req, uploadPath, maxPostSize)
+                form = MultipartForm(req, contentType, uploadPath, maxPostSize)
             }
         }
         return form
@@ -110,34 +161,16 @@ extend Array<Byte> {
      */
     public func split(separator: Array<Byte>): Array<Array<Byte>>{
         let result = ArrayList<Array<Byte>>()
-        let thisSize = this.size
-        let separatorSize = separator.size
-        // 记录上一次匹配到的索引下标
-        var prevIndex = 0
-        for(i in 0..=thisSize - separatorSize){
-            if(this[i..i+separatorSize] == separator){
-                // 匹配上了
-                // i=0表示开头的位置，不需要，抛弃
-                if(i != 0){
-                    if(i - prevIndex != separatorSize){
-                        if(prevIndex == 0){
-                            result.append(this[separatorSize..i])
-                        }else{
-                            result.append(this[prevIndex + separatorSize..i])
-                        }
-                    }
+        var currentIndex = 0
+        for(i in 0..this.size - 1){
+            if(i >= separator.size){
+                if(this[i - separator.size..i] == separator){
+                    result.append(this[currentIndex..i-separator.size])
+                    currentIndex = i
                 }
-                // 记录上一个匹配的位置
-                prevIndex = i
             }
         }
-        // 如果上一次匹配到的索引下标 ＋ 分隔符长度不等于自身数组长度，说明后面还有内容
-        if(prevIndex + separatorSize != thisSize){
-            let last = this[prevIndex + separatorSize..]
-            if(last != "--\r\n".toArray()){
-                result.append(last)
-            }
-        }
+        result.append(this[currentIndex..])
         return result.toArray()
     }
 }

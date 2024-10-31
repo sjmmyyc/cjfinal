@@ -24,8 +24,6 @@ import std.fs.{exists, File, OpenOption, Directory}
  * 将form-data表单提交的数据，按参数数量分割成多个Item，每个Item将被封装成该类对象
  */
 public class FormDataItem{
-    // 原始数据
-    private let _source: Array<Byte>
 
     private var _header: String = ""
     private var _name: String = ""
@@ -34,23 +32,15 @@ public class FormDataItem{
     private var _file: ?UploadFile = None
     
     public init(source: Array<Byte>, uploadPath: String){
-        this._source = source
-        try{
-            // 转换成utf8时，可能会抛出异常，如不抛出异常，表示是一般属性
-            let sourceStr = String.fromUtf8(this._source)
-            let arr = sourceStr.trim().split("\r\n")
-            this._header = arr[0]
-            this._name = getName()
-            this._value = arr[2]
-        }catch(e: IllegalArgumentException){
-            // 抛出了异常，表示是上传文件
-            let arr = source.split("\r\n\r\n".toArray())
-            this._header = String.fromUtf8(arr[0])
-            this._name = this.getName()
-            let filename = this.getFilename()
+        let arr = source.split("\r\n\r\n".toArray())
+        this._header = String.fromUtf8(arr[0])
+        this._name = this.getName()
+        if(let Some(filename) <- this.getFilename()){
             this._value = filename
             let contentType = this.getContentType()
+            // 获取系统配置中的上传目录
             var path = Config.UPLOAD_PATH
+            // 拼接目录为 SysUploadPath/UserDefPath
             if(uploadPath.startsWith("/")){
                 path = path + uploadPath
             }else{
@@ -62,11 +52,12 @@ public class FormDataItem{
             if(!exists(path)){
                 Directory.create(path, recursive: true)
             }
-            
             try(file = File(path + filename, OpenOption.CreateOrTruncate(false))){
-                file.write(arr[1][..arr[1].size - 2])
+                file.write(arr[1])
             }
             this._file = UploadFile(this._name, path, filename, filename, contentType)
+        }else{
+            this._value = this.getValue(arr[1])
         }
     }
 
@@ -76,16 +67,30 @@ public class FormDataItem{
         return nameField[6..nameField.size-1]
     }
 
-    private func getFilename(): String {
+    /**
+     * 获取filename的值，如果不存在filename字段，返回None
+     */
+    private func getFilename(): ?String {
+        var result: ?String = None
         var arr = this._header.split("\r\n")
         arr = arr[0].split(";")
-        let filename = arr[2].trim()
-        return filename[10..filename.size-1]
+        if(arr.size == 3){
+            let filename = arr[2].trim()
+            result = filename[10..filename.size - 1]
+        }
+        return result
+    }
+
+    /**
+     * 获取值，调用此方法前，需确认getFilename()方法返回None
+     */
+    private func getValue(data: Array<Byte>): String{
+        return String.fromUtf8(data)
     }
 
     private func getContentType(): String{
         var arr = this._header.split("\r\n")
-        return arr[1][10..]
+        return arr[1][14..]
     }
 
     public prop name: String{

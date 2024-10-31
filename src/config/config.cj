@@ -23,6 +23,12 @@ public class Config{
     // 是否是开发模式
     public static var DEV_MODE = false
 
-    // 上传文件存放目录
+    // 上传文件存放目录，默认相对于当前目录，如果指定为其它目录，请确保有对应目录的访问权限
     public static var UPLOAD_PATH = "upload"
+
+    // 上传文件允许的最大尺寸，默认为20MB
+    public static var UPLOAD_MAX_LIMIT = 20* 1024 * 1024
+
+    // 上传文件时的BufferedInputStream缓冲区大小，默认为4K
+    public static var UPLOAD_BUFFER_CAPACITY = 4096
 }
