@@ -4,4 +4,4 @@ target
 cjpm.lock
 build-script-cache
 *.macrocall
-upload
+upload/*
