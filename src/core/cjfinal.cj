@@ -21,9 +21,12 @@ import std.time.MonoTime
 import std.process.Process
 import std.fs.{File, OpenOption}
 import std.console.Console
-import std.posix.*
+import std.posix.SIGINT
 
-foreign func signal(signum: Int32, handler: CFunc<(Int32) -> Unit>): Unit
+// void (*signal(int sig, CFunc<(Int32) -> Unit>))(int)
+type SignalHandler = CFunc<(Int32) -> Unit>
+
+foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
 
 /**
  * CJFinal服务器类
@@ -61,9 +64,11 @@ public class CJFinal{
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
         me.server?.afterBind({ => me.config.onStart()})
         me.server?.onShutdown({ => me.config.onStop()})
+        
         unsafe{
-            signal(SIGINT, {_ => me.server?.close()})
+            signal(SIGINT, { _ => me.server?.close()})
         }
+
         me.server?.serve()
     }
 
