@@ -60,7 +60,7 @@ public class FormDataItem{
                         // 拿到header了
                         this._header = String.fromUtf8(dataList.toArray()[..dataList.size - 4])
                         this._name = this.getName()
-                        this._value = this.getFilename().getOrThrow()
+                        this._value = this.getFilename() ?? ""
                         dataList.clear()
                         this._file = createFile(uploadPath, buff)
                     }

@@ -20,7 +20,7 @@ import encoding.url.Form
 import std.convert.Parsable
 import std.collection.{ArrayList, LinkedList}
 import std.io.{BufferedInputStream, BufferedOutputStream}
-import std.fs.{File, OpenOption}
+import std.fs.{File, OpenOption, FSException, Directory, exists}
 import std.random.Random
 import cjfinal.config.Config
 
@@ -112,7 +112,11 @@ public class MultipartForm{
                     if(this._tempData.size > Config.UPLOAD_BUFFER_CAPACITY){
                         if(let None <- this._cacheFile){
                             this._filename = "cache_${Random().nextUInt64()}"
+                            if(!exists(Config.UPLOAD_PATH)){
+                                Directory.create(Config.UPLOAD_PATH, recursive: true)
+                            }
                             this._cacheFile = File("${Config.UPLOAD_PATH}/${this._filename}", OpenOption.CreateOrAppend)
+
                             this._fileOutputStream = BufferedOutputStream<File>(this._cacheFile.getOrThrow(), Config.UPLOAD_BUFFER_CAPACITY)
                             // 将开始的\r\t移除
                             this._tempData.remove(0)

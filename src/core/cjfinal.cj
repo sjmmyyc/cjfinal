@@ -15,6 +15,7 @@
  */
 package cjfinal.core
 
+import cjfinal.config.Config
 import net.http.{Server, ServerBuilder, HttpContext}
 import log.LogLevel
 import std.time.MonoTime
@@ -33,7 +34,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.1.2"
+    public static let version = "0.1.3"
 
     public static let me: CJFinal = CJFinal()
 
@@ -80,6 +81,7 @@ public class CJFinal{
             .addr("127.0.0.1")
             .port(UInt16(port))
             .distributor(RequestDistributor())
+            .maxRequestBodySize(Config.MAX_UPLOAD_SIZE)
             .build()
         println("\u{1b}[32mListen: http://127.0.0.1:${port}\u{1b}[0m")
         // 关闭默认日志

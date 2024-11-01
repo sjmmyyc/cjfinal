@@ -37,8 +37,12 @@ public class RootController <: Controller{
 
     @Clear[""]
     public func formdata(){
-        this.getFiles("/abc", 500)
-        println(this.getArray("tags"))
-        this.renderText("/formdata is invoke.")
+        try{
+            this.getFiles("/abc", 500)
+            println(this.getArray("tags"))
+            this.renderText("/formdata is invoke.")
+        }catch(e: Exception){
+            e.printStackTrace()
+        }
     }
 }

@@ -26,6 +26,7 @@ public class TestConfig <: CJFinalConfig{
     public func configConstants(me: Constants): Unit{
         PropKit.use("./config/config").appendIfExist("./config/config-pro")
         me.devMode = PropKit.getByDefaultTo<Bool>("devMode", false)
+        me.maxUploadSize = 50 * 1024 * 1024
     }
 
     public func configRoute(me: Routes): Unit{

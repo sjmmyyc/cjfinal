@@ -27,7 +27,7 @@ public class Config{
     public static var UPLOAD_PATH = "upload"
 
     // 上传文件允许的最大尺寸，默认为20MB
-    public static var UPLOAD_MAX_LIMIT = 20* 1024 * 1024
+    public static var MAX_UPLOAD_SIZE = 20* 1024 * 1024
 
     // 上传文件时的BufferedInputStream缓冲区大小，默认为4K
     public static var UPLOAD_BUFFER_CAPACITY = 4096
