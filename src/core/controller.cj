@@ -120,7 +120,6 @@ public abstract class Controller{
 
     protected func getFiles(uploadPath: String, maxPostSize: Int): Array<UploadFile>{
         if(let Some(multiForm) <- MultipartForm.get(this.ctx.request, uploadPath, maxPostSize)){
-            // this._form = multiForm.form
             // multiForm.uploadFile()
             this._form = multiForm.form
         }

@@ -17,7 +17,10 @@ package cjfinal.upload
 
 import cjfinal.config.Config
 import std.unicode.UnicodeExtension
-import std.fs.{exists, File, OpenOption, Directory}
+import std.fs.{exists, File, OpenOption, Directory, removeIfExists}
+import std.io.BufferedInputStream
+import std.collection.ArrayList
+import std.random.Random
 
 /**
  * FormDataItem.
@@ -35,30 +38,88 @@ public class FormDataItem{
         let arr = source.split("\r\n\r\n".toArray())
         this._header = String.fromUtf8(arr[0])
         this._name = this.getName()
-        if(let Some(filename) <- this.getFilename()){
-            this._value = filename
-            let contentType = this.getContentType()
-            // 获取系统配置中的上传目录
-            var path = Config.UPLOAD_PATH
-            // 拼接目录为 SysUploadPath/UserDefPath
-            if(uploadPath.startsWith("/")){
-                path = path + uploadPath
-            }else{
-                path = path + "/" + uploadPath
-            }
-            if(!path.endsWith("/")){
-                path += "/"
-            }
-            if(!exists(path)){
-                Directory.create(path, recursive: true)
-            }
-            try(file = File(path + filename, OpenOption.CreateOrTruncate(false))){
-                file.write(arr[1])
-            }
-            this._file = UploadFile(this._name, path, filename, filename, contentType)
+        if(let Some(originFilename) <- this.getFilename()){
+            this._value = originFilename
+            this._file = this.createFile(uploadPath, arr[1])
         }else{
             this._value = this.getValue(arr[1])
         }
+    }
+
+    /**
+     * 通过缓存文件来构造，一个缓存文件，表示一个文件数据块，包含header和content两部分
+     */
+    public init(filename: String, uploadPath: String){
+        let dataList = ArrayList<Byte>()
+        try(file = File(filename, OpenOption.Open(true, false))){
+            let buff = BufferedInputStream<File>(file, Config.UPLOAD_BUFFER_CAPACITY)
+            while(let Some(data) <- buff.readByte()){
+                dataList.append(data)
+                if(dataList.size > 4){
+                    if(dataList.toArray()[dataList.size - 4..] == "\r\n\r\n".toArray()){
+                        // 拿到header了
+                        this._header = String.fromUtf8(dataList.toArray()[..dataList.size - 4])
+                        this._name = this.getName()
+                        this._value = this.getFilename().getOrThrow()
+                        dataList.clear()
+                        this._file = createFile(uploadPath, buff)
+                    }
+                }
+            }
+        }
+        removeIfExists(filename)
+    }
+
+    /**
+     * 创建文件
+     * @param uploadPath - 上传目录
+     */
+    private func createFile(uploadPath: String, source: Array<Byte>): UploadFile{
+        let path = this.calcPath(uploadPath)
+        let filename = "${Random().nextUInt64()}${this.getExtName()}"
+        try(file = File(path + filename, OpenOption.CreateOrTruncate(false))){
+            file.write(source)
+        }
+        return UploadFile(this._name, path, filename, this._value, this.getContentType())
+    }
+
+    private func createFile(uploadPath: String, source: BufferedInputStream<File>): UploadFile{
+        let path = this.calcPath(uploadPath)
+        let filename = "${Random().nextUInt64()}${this.getExtName()}"
+        try(file = File(path + filename, OpenOption.CreateOrTruncate(false))){
+            let temp = Array<Byte>(Config.UPLOAD_BUFFER_CAPACITY, repeat: 0)
+            while(source.read(temp) > 0){
+                file.write(temp)
+            }
+        }
+        return UploadFile(this._name, path, filename, this._value, this.getContentType())
+    }
+
+    private func getExtName(): String {
+        let arr = this._value.split(".")
+        var extName = ""
+        if(arr.size >= 2){
+            extName = ".${arr[arr.size-1]}"
+        }
+        return extName
+    }
+
+    private func calcPath(uploadPath: String): String{
+        // 获取系统配置中的上传目录
+        var path = Config.UPLOAD_PATH
+        // 拼接目录为 SysUploadPath/UserDefPath
+        if(uploadPath.startsWith("/")){
+            path = path + uploadPath
+        }else{
+            path = path + "/" + uploadPath
+        }
+        if(!path.endsWith("/")){
+            path += "/"
+        }
+        if(!exists(path)){
+            Directory.create(path, recursive: true)
+        }
+        return path
     }
 
     private func getName(): String{

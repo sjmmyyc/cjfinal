@@ -18,8 +18,10 @@ package cjfinal.upload
 import net.http.{HttpRequest, HttpHeaders}
 import encoding.url.Form
 import std.convert.Parsable
-import std.collection.ArrayList
-import std.io.{BufferedInputStream, ByteBuffer}
+import std.collection.{ArrayList, LinkedList}
+import std.io.{BufferedInputStream, BufferedOutputStream}
+import std.fs.{File, OpenOption}
+import std.random.Random
 import cjfinal.config.Config
 
 /**
@@ -40,7 +42,10 @@ public class MultipartForm{
     private let _tempData = ArrayList<Byte>()
 
     private var _boundary: Array<Byte> = Array<Byte>()
-    private var _isFirst = true       // 是否是第一次匹配
+    private var _isFirst = true             // 是否是第一次匹配
+    private var _cacheFile: ?File = None    // 缓存文件，默认为空，表示不需要缓存
+    private var _fileOutputStream: ?BufferedOutputStream<File> = None
+    private var _filename: String = ""
     
     private init(req: HttpRequest, contentType: String, uploadPath: String, maxPostSize: Int){
         this._request = req
@@ -57,15 +62,11 @@ public class MultipartForm{
     private func resolving(): Unit{
         // 计算buffer的大小
         let buffLength = this.calcBufferedLength(capacity: Config.UPLOAD_BUFFER_CAPACITY)
-        let fragment = Array<Byte>(buffLength, repeat: 0)
         let buffer = BufferedInputStream(this._request.body, buffLength)
-        while(buffer.read(fragment) > 0){
-            var byteBuff = ByteBuffer(fragment)
-            for(byte in byteBuff.bytes()){
-                this._tempData.append(byte)
-                if(let Some(formItem) <- resolvingTempdata()){
-                    this._items.append(formItem)
-                }
+        while(let Some(byte) <- buffer.readByte()){
+            this._tempData.append(byte)
+            if(let Some(formItem) <- resolvingTempdata()){
+                this._items.append(formItem)
             }
         }
         // cjc 0.56.4版本无法访问此方法，待cjc升级后再看情况吧
@@ -86,12 +87,39 @@ public class MultipartForm{
                 this._isFirst = false
             }
         }else{
-            // 判断已读取数据的结尾是否是boundary
+            // 判断tempData长度是否大于boundary，如果小于boundary，说明还没到结束位置，什么也不用干 
             if(this._tempData.size >= this._boundary.size){
+                // 判断已读取数据的结尾是否是boundary
                 if(this._tempData.toArray()[this._tempData.size - this._boundary.size..] == this._boundary){
-                    let data = this._tempData.toArray()[2..this._tempData.size - this._boundary.size - 2]
-                    result = FormDataItem(data, this._uploadPath)
+                    if(let Some(file) <- this._cacheFile){
+                        // 数据被存储到缓存文件
+                        this._fileOutputStream?.write(this._tempData.toArray()[..this._tempData.size - this._boundary.size - 2])
+                        this._fileOutputStream?.flush()
+                        this._fileOutputStream?.close()
+                        this._fileOutputStream = None
+                        this._cacheFile?.close()
+                        this._cacheFile = None
+                        result = FormDataItem("${Config.UPLOAD_PATH}/${this._filename}", this._uploadPath)
+                        this._filename = ""
+                    }else{
+                        // 未被存储到缓存文件中
+                        let data = this._tempData.toArray()[2..this._tempData.size - this._boundary.size - 2]
+                        result = FormDataItem(data, this._uploadPath)
+                    }
                     this._tempData.clear()
+                }else{
+                    // 说明结尾不是boundary，这时判断tempData是否大于缓冲临界值
+                    if(this._tempData.size > Config.UPLOAD_BUFFER_CAPACITY){
+                        if(let None <- this._cacheFile){
+                            this._filename = "cache_${Random().nextUInt64()}"
+                            this._cacheFile = File("${Config.UPLOAD_PATH}/${this._filename}", OpenOption.CreateOrAppend)
+                            this._fileOutputStream = BufferedOutputStream<File>(this._cacheFile.getOrThrow(), Config.UPLOAD_BUFFER_CAPACITY)
+                            // 将开始的\r\t移除
+                            this._tempData.remove(0)
+                            this._tempData.remove(0)
+                        }
+                        this._fileOutputStream?.writeByte(this._tempData.remove(0))
+                    }
                 }
             }
         }
