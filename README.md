@@ -341,7 +341,7 @@ public class UserController <: Controller{
 | getParamTo\<T>(1) | 泛型方法，获取第二个参数，返回值类型为传入的泛型类型 |
 
 ## 3.4 getFiles/getFile
-在你的 `Controller` 中调用`getFiles(..)` 或 `getFile(..)`系列方法， 即可实现文件上传的功能。需要注意的是，对于 `form-data` 类型的表单，必须得先调用一次 `getFiles(..)` 或 `getFile(..)` 系列方法，才能在后续代码中调用 `get/getArray` 来获取请求中的参数。
+在你的 `Controller` 中调用`getFiles(..)` 或 `getFile(..)`系列方法， 即可实现文件上传的功能。上传后的文件会统一被重命名，原文件名称可通过 `UploadFile` 对象获取。需要注意的是，对于 `form-data` 类型的表单，必须得先调用一次 `getFiles(..)` 或 `getFile(..)` 系列方法，才能在后续代码中调用 `get/getArray` 来获取请求中的参数。
 ```
 public class UserController <: Controller{
 
@@ -375,6 +375,11 @@ public class UserController <: Controller{
 		this.renderText("response info...")
 	}
 }
+```
+另外，`getFiles()` 和 `getFile()` 系列方法可能会抛出异常，建议使用 `try{}catch()` 块包裹。下面是几种异常出现时的含义：
+```
+ExceedingLimitException 表示上传的文件超出限制大小
+FSException             表示上传文件在保存到服务器时，出现了文件重名的情况，这种情况概率极低
 ```
 
 ## 3.5 render方法
