@@ -23,6 +23,7 @@ import std.convert.Parsable
 import std.collection.ArrayList
 import std.reflect.TypeInfo
 import cjfinal.upload.{MultipartForm, UploadFile, ExceedingLimitException}
+import cjfinal.config.Config
 
 /**
  * 控制器基类
@@ -118,13 +119,87 @@ public abstract class Controller{
         }
     }
 
+    /**
+     * 上传文件
+     */
+    protected func getFiles(): Array<UploadFile>{
+        return this.getFiles(Config.UPLOAD_PATH, Config.MAX_UPLOAD_SIZE)
+    }
+
+    /**
+     * 上传文件
+     * ＠param maxPostSize - 允许的最大上传尺寸
+     */
+    protected func getFiles(maxPostSize: Int): Array<UploadFile>{
+        return this.getFiles(Config.UPLOAD_PATH, maxPostSize)
+    }
+
+    protected func getFiles(uploadPath: String): Array<UploadFile>{
+        return this.getFiles(uploadPath, Config.MAX_UPLOAD_SIZE)
+    }
+
+    /**
+     * 上传文件
+     * @param uploadPath - 字符串表示的路径，可使用绝对路径和相对路径
+     * @param maxPostSize - 允许的最大上传尺寸
+     * @throw FSException - 在根据路径创建目录时，如果没有权限，则会抛出该异常
+     * @throw ExceedingLimitException - 上传文件超过限制尺寸时抛出该异常
+     */
     protected func getFiles(uploadPath: String, maxPostSize: Int): Array<UploadFile>{
+        var result = Array<UploadFile>()
         if(let Some(multiForm) <- MultipartForm.get(this.ctx.request, uploadPath, maxPostSize)){
-            // multiForm.uploadFile()
             this._form = multiForm.form
+            result = multiForm.uploadFiles
         }
-        
-        return Array<UploadFile>()
+        return result
+    }
+
+    protected func getFile(parameterName: String): ?UploadFile {
+        let uploadFiles = this.getFiles()
+        var result: ?UploadFile = None
+        for(uploadFile in uploadFiles){
+            if(uploadFile.parameterName == parameterName){
+                result = uploadFile
+                break
+            }
+        }
+        return result
+    }
+
+    protected func getFile(parameterName: String, uploadPath: String): ?UploadFile {
+        let uploadFiles = this.getFiles(uploadPath)
+        var result: ?UploadFile = None
+        for(uploadFile in uploadFiles){
+            if(uploadFile.parameterName == parameterName){
+                result = uploadFile
+                break
+            }
+        }
+        return result
+    }
+
+    protected func getFile(parameterName: String, maxPostSize: Int): ?UploadFile{
+        let uploadFiles = this.getFiles(maxPostSize)
+        var result: ?UploadFile = None
+        for(uploadFile in uploadFiles){
+            if(uploadFile.parameterName == parameterName){
+                result = uploadFile
+                break
+            }
+        }
+        return result
+    }
+
+    protected func getFile(parameterName: String, uploadPath: String, maxPostSize: Int): ?UploadFile{
+        let uploadFiles = this.getFiles(uploadPath, maxPostSize)
+        var result: ?UploadFile = None
+        for(uploadFile in uploadFiles){
+            if(uploadFile.parameterName == parameterName){
+                result = uploadFile
+                break
+            }
+        }
+        return result
     }
 
     /**

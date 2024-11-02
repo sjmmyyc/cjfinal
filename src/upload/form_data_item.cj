@@ -62,10 +62,10 @@ public class FormDataItem{
         return result
     }
 
-    // private func getContentType(): String{
-    //     var arr = this._header.split("\r\n")
-    //     return arr[1][14..]
-    // }
+    public func getContentType(): String{
+        var arr = this._header.split("\r\n")
+        return arr[1][14..]
+    }
 
     public prop name: String{
         get(){
@@ -95,6 +95,26 @@ public class FormDataItem{
                 result = true
             }
             return result
+        }
+    }
+
+    public mut prop uploadFile: UploadFile{
+        set(value){
+            this._uploadfile = value
+        }
+        get(){
+            return this._uploadfile.getOrThrow()
+        }
+    }
+
+    public prop extName: String{
+        get(){
+            let arr = this.filename.split(".")
+            if(arr.size == 1){
+                return ""
+            }else{
+                return ".${arr[arr.size - 1]}"
+            }
         }
     }
 }

@@ -20,21 +20,25 @@ import std.fs.File
 /**
  * UploadFile.
  */
-public class UploadFile{
+public class UploadFile <: ToString{
 
     private var _parameterName: String
 
     private var _uploadPath: String
-    private var _fileName: String
-    private var _originalFileName: String
+    private var _filename: String
+    private var _originalFilename: String
     private var _contentType: String
 
-    public init(parameterName: String, uploadPath: String, fileName: String, originalFileName: String, contentType: String){
+    public init(parameterName: String, uploadPath: String, filename: String, originalFilename: String, contentType: String){
         this._parameterName = parameterName
         this._uploadPath = uploadPath
-        this._fileName = fileName
-        this._originalFileName = originalFileName
+        this._filename = filename
+        this._originalFilename = originalFilename
         this._contentType = contentType
+    }
+
+    public func toString(): String{
+        return "UploadFile: parameterName: ${this._parameterName}, uploadPath: ${this._uploadPath}, fileName: ${this._filename}, originalFilename: ${this._originalFilename}, contentType: ${this._contentType}"
     }
 
     public prop parameterName: String{
@@ -49,15 +53,15 @@ public class UploadFile{
         }
     }
 
-    public prop fileName: String{
+    public prop filename: String{
         get(){
-            this._fileName
+            this._filename
         }
     }
 
-    public prop originalFileName: String{
+    public prop originalFilename: String{
         get(){
-            this._originalFileName
+            this._originalFilename
         }
     }
 }

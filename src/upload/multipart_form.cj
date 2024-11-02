@@ -98,16 +98,23 @@ public class MultipartForm{
                     if(let Some(splitIndex) <- currentFragment.indexOf("\r\n\r\n".toArray(), currentIndex)){
                         // 找到了头部数据
                         tempItem = FormDataItem(currentFragment[currentIndex+2..splitIndex], this._uploadPath)
-                        if(tempItem.getOrThrow().isFile){
-                            tempItem?.value = tempItem.getOrThrow().filename
-                            // println("是文件，新建文件${tempItem?.filename}")
-                            // 将curentIndex到末尾的值写入文件
-                            let path = "${Config.UPLOAD_PATH}/${this._uploadPath}/"
-                            if(!exists(path)){
-                                Directory.create(path, recursive: true)
+                        if(let Some(item) <- tempItem){
+                            if(item.isFile){
+                                item.value = item.filename
+                                // println("是文件，新建文件${tempItem?.filename}")
+                                // 将curentIndex到末尾的值写入文件
+                                var path = "${this._uploadPath}"
+                                if(!path.endsWith("/")){
+                                    path = path + "/"
+                                }
+                                if(!exists(path)){
+                                    Directory.create(path, recursive: true)
+                                }
+                                currentFile?.close()
+                                let filename = "${Random().nextUInt64()}${item.extName}"
+                                currentFile = File(path + filename, OpenOption.Create(false))
+                                item.uploadFile = UploadFile(item.name, this._uploadPath, filename, item.value, item.getContentType())
                             }
-                            currentFile?.close()
-                            currentFile = File(path + tempItem.getOrThrow().filename, OpenOption.Create(false))
                         }
                         // 更新currentIndex
                         currentIndex = splitIndex + 4
@@ -190,17 +197,13 @@ public class MultipartForm{
         // buffer.close()
     }
 
-    private func getContentLength(): Int{
-        return Int.parse(this._request.headers.getFirst("content-length") ?? "0")
-    }
-
     /**
      * 计算Buffer的长度，可传入一个默认值
      * @param capacity! - 默认大小，如果不指定，默认为Config.UPLOAD_BUFFER_CAPACITY
      * @return - 当contentLength < capacity，返回contentLength，否则返回capacity
      */
     private func calcBufferedLength(capacity!: Int = Config.UPLOAD_BUFFER_CAPACITY): Int{
-        let contentLength = this.getContentLength()
+        let contentLength = getContentLength(this._request)
         var len = 0;
         if(contentLength < capacity){
             len = contentLength
@@ -228,6 +231,9 @@ public class MultipartForm{
     public static func get(req: HttpRequest, uploadPath: String, maxPostSize: Int): ?MultipartForm{
         var form: ?MultipartForm = None
         if(let Some(contentType) <- req.headers.getFirst("content-type")){
+            if(getContentLength(req) > maxPostSize){
+                throw ExceedingLimitException("upload file size must be less than ${maxPostSize}.")
+            }
             if(contentType.startsWith("multipart/form-data")){
                 form = MultipartForm(req, contentType, uploadPath, maxPostSize)
             }
@@ -244,4 +250,20 @@ public class MultipartForm{
             return form
         }
     }
+
+    public prop uploadFiles: Array<UploadFile>{
+        get(){
+            let arr = ArrayList<UploadFile>()
+            for(item in this._items){
+                if(item.isFile){
+                    arr.append(item.uploadFile)
+                }
+            }
+            return arr.toArray()
+        }
+    }
+}
+
+public func getContentLength(request: HttpRequest): Int{
+    return Int.parse(request.headers.getFirst("content-length") ?? "0")
 }

@@ -18,6 +18,8 @@ package cjfinal.test.controller
 import cjfinal.core.Controller
 import cjfinal.aop.{Before, Clear}
 import cjfinal.test.model.User
+import cjfinal.upload.ExceedingLimitException
+import std.fs.FSException
 
 @Before["cjfinal.test.interceptor.ControllerInterceptor"]
 @Clear[""]
@@ -38,9 +40,17 @@ public class RootController <: Controller{
     @Clear[""]
     public func formdata(){
         try{
-            this.getFiles("/abc", 500)
-            println("name: ${this.get('name')}")
+            // let uploadFiles = this.getFiles()
+            // for(uploadFile in uploadFiles){
+            //     println(uploadFile)
+            // }
+            // println("name: ${this.get('name')}")
+            println(this.getFile("avatar"))
             this.renderText("/formdata is invoke.")
+        }catch(e: ExceedingLimitException){
+            this.renderErr413()
+        }catch(e: FSException){
+            this.renderText("Already exist...")
         }catch(e: Exception){
             e.printStackTrace()
         }
