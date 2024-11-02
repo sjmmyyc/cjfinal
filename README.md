@@ -40,7 +40,7 @@
   ```
     [dependencies]
         // CJFinal依赖
-        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.1.1", output-type = "static"}
+        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.2.0", output-type = "static"}
 
     [package]
         ... // 以下内容省略
