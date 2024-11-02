@@ -26,9 +26,9 @@ public class Config{
     // 上传文件存放目录，默认相对于当前目录，如果指定为其它目录，请确保有对应目录的访问权限
     public static var UPLOAD_PATH = "upload"
 
-    // 上传文件允许的最大尺寸，默认为20MB
-    public static var MAX_UPLOAD_SIZE = 20* 1024 * 1024
+    // 上传文件允许的最大尺寸，默认为2MB
+    public static var MAX_UPLOAD_SIZE = 2 * 1024 * 1024
 
-    // 上传文件时的BufferedInputStream缓冲区大小，默认为4K
-    public static var UPLOAD_BUFFER_CAPACITY = 4096
+    // 上传文件时的BufferedInputStream缓冲区大小，默认为64K，下限为128字节
+    public static var UPLOAD_BUFFER_CAPACITY = 64 * 1024
 }

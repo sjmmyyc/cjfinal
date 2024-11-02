@@ -39,7 +39,7 @@ public class RootController <: Controller{
     public func formdata(){
         try{
             this.getFiles("/abc", 500)
-            println(this.getArray("tags"))
+            println("name: ${this.get('name')}")
             this.renderText("/formdata is invoke.")
         }catch(e: Exception){
             e.printStackTrace()

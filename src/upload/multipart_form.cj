@@ -38,8 +38,6 @@ public class MultipartForm{
     private let _maxPostSize: Int
 
     private let _items = ArrayList<FormDataItem>()
-    // 拼装用的临时数据存储单元
-    private let _tempData = ArrayList<Byte>()
 
     private var _boundary: Array<Byte> = Array<Byte>()
     private var _isFirst = true             // 是否是第一次匹配
@@ -53,6 +51,7 @@ public class MultipartForm{
         this._maxPostSize = maxPostSize
         this._contentType = contentType
         this._boundary = this.getBoundary()
+        // println("boundary:\n${this._boundary}")
         this.resolving()
     }
 
@@ -62,72 +61,133 @@ public class MultipartForm{
     private func resolving(): Unit{
         // 计算buffer的大小
         let buffLength = this.calcBufferedLength(capacity: Config.UPLOAD_BUFFER_CAPACITY)
+        // println(buffLength)
         let buffer = BufferedInputStream(this._request.body, buffLength)
-        while(let Some(byte) <- buffer.readByte()){
-            this._tempData.append(byte)
-            if(let Some(formItem) <- resolvingTempdata()){
-                this._items.append(formItem)
-            }
-        }
-        // cjc 0.56.4版本无法访问此方法，待cjc升级后再看情况吧
-        // buffer.close()
-    }
+        var fragment = Array<Byte>(buffLength, repeat: 0)
+        // 记录是否是第一次查询
+        var isStart = true
+        // 记录上当前操作的索引起始位置
+        var currentIndex = 0
+        var tempItem: ?FormDataItem = None
+        // 表示是否在寻找header，另一种情况是寻找value
+        var isFindHead = true
+        // 是否需要在当前fragment中继续查找
+        var needFind = true
+        // 上一fragment未解析剩余部分
+        var lastRemining = Array<Byte>()
+        // 当前文件
+        var currentFile: ?File = None
 
-    /**
-     * 从tempData中解析数据
-     * @return Option<FormDataItem> - 如果没有解析到，返回None
-     */
-    private func resolvingTempdata(): ?FormDataItem{
-        var result: ?FormDataItem = None
-        // 如果还没读到开始位置的"--"
-        if(this._isFirst){
-            // 判断已读数据是否是boundary
-            if(this._tempData.toArray() == this._boundary){
-                this._tempData.clear()
-                this._isFirst = false
+        while(buffer.read(fragment) > 0){
+            let currentFragment = lastRemining.concat(fragment)
+            currentIndex = 0
+            lastRemining = Array<Byte>()
+
+            // 如果是第一次，直接更新currentIndex
+            if(isStart){
+                currentIndex = this._boundary.size
+                isStart = false
             }
-        }else{
-            // 判断tempData长度是否大于boundary，如果小于boundary，说明还没到结束位置，什么也不用干 
-            if(this._tempData.size >= this._boundary.size){
-                // 判断已读取数据的结尾是否是boundary
-                if(this._tempData.toArray()[this._tempData.size - this._boundary.size..] == this._boundary){
-                    if(let Some(file) <- this._cacheFile){
-                        // 数据被存储到缓存文件
-                        this._fileOutputStream?.write(this._tempData.toArray()[..this._tempData.size - this._boundary.size - 2])
-                        this._fileOutputStream?.flush()
-                        this._fileOutputStream?.close()
-                        this._fileOutputStream = None
-                        this._cacheFile?.close()
-                        this._cacheFile = None
-                        result = FormDataItem("${Config.UPLOAD_PATH}/${this._filename}", this._uploadPath)
-                        this._filename = ""
-                    }else{
-                        // 未被存储到缓存文件中
-                        let data = this._tempData.toArray()[2..this._tempData.size - this._boundary.size - 2]
-                        result = FormDataItem(data, this._uploadPath)
-                    }
-                    this._tempData.clear()
-                }else{
-                    // 说明结尾不是boundary，这时判断tempData是否大于缓冲临界值
-                    if(this._tempData.size > Config.UPLOAD_BUFFER_CAPACITY){
-                        if(let None <- this._cacheFile){
-                            this._filename = "cache_${Random().nextUInt64()}"
-                            if(!exists(Config.UPLOAD_PATH)){
-                                Directory.create(Config.UPLOAD_PATH, recursive: true)
+            do{
+                // println("------------ inner loop start ------------")
+                if(isFindHead){
+                    // println(">> Find header")
+                    // println("currentIndex: ${currentIndex}")
+                    // 查找header
+                    // 那么从currentIndex－2到分隔符“\r\n\r\n“之间的数据，即为头部数据
+                    if(let Some(splitIndex) <- currentFragment.indexOf("\r\n\r\n".toArray(), currentIndex)){
+                        // 找到了头部数据
+                        tempItem = FormDataItem(currentFragment[currentIndex+2..splitIndex], this._uploadPath)
+                        if(tempItem.getOrThrow().isFile){
+                            tempItem?.value = tempItem.getOrThrow().filename
+                            // println("是文件，新建文件${tempItem?.filename}")
+                            // 将curentIndex到末尾的值写入文件
+                            let path = "${Config.UPLOAD_PATH}/${this._uploadPath}/"
+                            if(!exists(path)){
+                                Directory.create(path, recursive: true)
                             }
-                            this._cacheFile = File("${Config.UPLOAD_PATH}/${this._filename}", OpenOption.CreateOrAppend)
-
-                            this._fileOutputStream = BufferedOutputStream<File>(this._cacheFile.getOrThrow(), Config.UPLOAD_BUFFER_CAPACITY)
-                            // 将开始的\r\t移除
-                            this._tempData.remove(0)
-                            this._tempData.remove(0)
+                            currentFile?.close()
+                            currentFile = File(path + tempItem.getOrThrow().filename, OpenOption.Create(false))
                         }
-                        this._fileOutputStream?.writeByte(this._tempData.remove(0))
+                        // 更新currentIndex
+                        currentIndex = splitIndex + 4
+                        // 置为查找value
+                        isFindHead = false
+                        needFind = true
+                    }else{
+                        // println("no header, collect remining data...")
+                        // 没找到，说明当前fragment中，已无分隔符了
+                        needFind = false
+                        // 需要将剩下的fragment缓存起来
+                        lastRemining = currentFragment.clone(currentIndex..currentFragment.size)
+                    }
+                }else{
+                    // 查找value
+                    if(let Some(item) <- tempItem){
+                        // println(">> Find '${item.name}' value, isFile: ${item.isFile}")
+                        // println("currentIndex: ${currentIndex}")
+                        // 那么从currentIndex到boundaryIndex-2之间的数据，即为value
+                        if(let Some(boundaryIndex) <- currentFragment.indexOf(this._boundary, currentIndex)){
+                            // println("find boundary, resolving...")
+                            // 判断是否是文件
+                            if(item.isFile){
+                                // 是文件
+                                // println("writefile: ${currentIndex}..${boundaryIndex-2}")
+                                currentFile?.write(currentFragment[currentIndex..boundaryIndex-2])
+                                // item.value = item.filename
+                                this._items.append(item)
+                                // 说明文件结尾了
+                                currentFile?.close()
+                                currentFile = None
+                            }else{
+                                // 是普通属性
+                                item.value = String.fromUtf8(currentFragment[currentIndex..boundaryIndex-2])
+                                // println("value: ${item.value}")
+                                this._items.append(item)
+                            }
+                            tempItem = None
+                            currentIndex = boundaryIndex + this._boundary.size
+                            // println('currentIndex / fragmentSize: ${currentIndex} / ${currentFragment.size}')
+                            // 判断boundary后面跟的是不是"--"
+                            if(currentIndex <= currentFragment.size - 2 && currentFragment[currentIndex..currentIndex+2] == "--".toArray()){
+                                currentFile?.close()
+                                needFind = false
+                                // println("over...")
+                            }else{
+                                needFind = true
+                            }
+                            isFindHead = true
+                        }else{
+                            // println("current fragment has no boundary...collect remining data...")
+                            // 说明当前fragment中已无boundary了
+                            // 接着要看是文件还是常规属性
+                            if(item.isFile){
+                                // 如果是文件，还不能马上写入文件中，否则boudary若被拆分到下一页，将无法正确的找到下一个boundary
+                                if(currentIndex < currentFragment.size - this._boundary.size){
+                                    // println("write to file: ${currentIndex}..${currentFragment.size - this._boundary.size}")
+                                    currentFile?.write(currentFragment[currentIndex..currentFragment.size - this._boundary.size])
+                                    lastRemining = currentFragment.clone(currentFragment.size - this._boundary.size..currentFragment.size)
+                                }else{
+                                    lastRemining = currentFragment.clone(currentIndex..currentFragment.size)
+                                }
+                            }else{
+                                // 表示是常规属性，说明在这个fragment中没有拼够完整的值数据
+                                // 需要将剩下的fragment缓存起来
+                                lastRemining = currentFragment.clone(currentIndex..currentFragment.size)
+                            }
+                            // 既然没找到boundary，那就直接去下一个循环
+                            needFind = false
+                        }
                     }
                 }
-            }
+                // println("------------ inner loop end ------------")
+            }while(needFind)
+            // println("remining: ${lastRemining.size}， Start enter next fragment...")
+            // println("----------------------------------------------------------------------")
         }
-        return result
+
+        // cjc 0.56.4版本无法访问此方法，待cjc升级后再看情况吧
+        // buffer.close()
     }
 
     private func getContentLength(): Int{
@@ -136,16 +196,20 @@ public class MultipartForm{
 
     /**
      * 计算Buffer的长度，可传入一个默认值
-     * @param default! - 默认大小，如果不指定，默认为4096（4K）
+     * @param capacity! - 默认大小，如果不指定，默认为Config.UPLOAD_BUFFER_CAPACITY
      * @return - 当contentLength < capacity，返回contentLength，否则返回capacity
      */
-    private func calcBufferedLength(capacity!: Int = 4096): Int{
+    private func calcBufferedLength(capacity!: Int = Config.UPLOAD_BUFFER_CAPACITY): Int{
         let contentLength = this.getContentLength()
         var len = 0;
         if(contentLength < capacity){
             len = contentLength
         }else{
-            len = capacity
+            if(capacity > 128){
+                len = capacity
+            }else{
+                len = 128
+            }
         }
         return len
     }
@@ -179,30 +243,5 @@ public class MultipartForm{
             }
             return form
         }
-    }
-}
-
-/**
- * extend Array<Byte>.
- */
-extend Array<Byte> {
-
-    /**
-     * 分割Array<Byte>
-     * @param separator: Array<Byte> - 分割符号
-     */
-    public func split(separator: Array<Byte>): Array<Array<Byte>>{
-        let result = ArrayList<Array<Byte>>()
-        var currentIndex = 0
-        for(i in 0..this.size - 1){
-            if(i >= separator.size){
-                if(this[i - separator.size..i] == separator){
-                    result.append(this[currentIndex..i-separator.size])
-                    currentIndex = i
-                }
-            }
-        }
-        result.append(this[currentIndex..])
-        return result.toArray()
     }
 }

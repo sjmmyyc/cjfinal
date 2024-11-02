@@ -31,96 +31,16 @@ public class FormDataItem{
     private var _header: String = ""
     private var _name: String = ""
     private var _value: String = ""
+    private var _uploadPath: String = ""
 
-    private var _file: ?UploadFile = None
+    private var _uploadfile: ?UploadFile = None
     
-    public init(source: Array<Byte>, uploadPath: String){
-        let arr = source.split("\r\n\r\n".toArray())
-        this._header = String.fromUtf8(arr[0])
+    public init(header: Array<Byte>, uploadPath: String){
+        this._header = String.fromUtf8(header)
+        this._uploadPath = uploadPath
         this._name = this.getName()
-        if(let Some(originFilename) <- this.getFilename()){
-            this._value = originFilename
-            this._file = this.createFile(uploadPath, arr[1])
-        }else{
-            this._value = this.getValue(arr[1])
-        }
     }
 
-    /**
-     * 通过缓存文件来构造，一个缓存文件，表示一个文件数据块，包含header和content两部分
-     */
-    public init(filename: String, uploadPath: String){
-        let dataList = ArrayList<Byte>()
-        try(file = File(filename, OpenOption.Open(true, false))){
-            let buff = BufferedInputStream<File>(file, Config.UPLOAD_BUFFER_CAPACITY)
-            while(let Some(data) <- buff.readByte()){
-                dataList.append(data)
-                if(dataList.size > 4){
-                    if(dataList.toArray()[dataList.size - 4..] == "\r\n\r\n".toArray()){
-                        // 拿到header了
-                        this._header = String.fromUtf8(dataList.toArray()[..dataList.size - 4])
-                        this._name = this.getName()
-                        this._value = this.getFilename() ?? ""
-                        dataList.clear()
-                        this._file = createFile(uploadPath, buff)
-                    }
-                }
-            }
-        }
-        removeIfExists(filename)
-    }
-
-    /**
-     * 创建文件
-     * @param uploadPath - 上传目录
-     */
-    private func createFile(uploadPath: String, source: Array<Byte>): UploadFile{
-        let path = this.calcPath(uploadPath)
-        let filename = "${Random().nextUInt64()}${this.getExtName()}"
-        try(file = File(path + filename, OpenOption.CreateOrTruncate(false))){
-            file.write(source)
-        }
-        return UploadFile(this._name, path, filename, this._value, this.getContentType())
-    }
-
-    private func createFile(uploadPath: String, source: BufferedInputStream<File>): UploadFile{
-        let path = this.calcPath(uploadPath)
-        let filename = "${Random().nextUInt64()}${this.getExtName()}"
-        try(file = File(path + filename, OpenOption.CreateOrTruncate(false))){
-            let temp = Array<Byte>(Config.UPLOAD_BUFFER_CAPACITY, repeat: 0)
-            while(source.read(temp) > 0){
-                file.write(temp)
-            }
-        }
-        return UploadFile(this._name, path, filename, this._value, this.getContentType())
-    }
-
-    private func getExtName(): String {
-        let arr = this._value.split(".")
-        var extName = ""
-        if(arr.size >= 2){
-            extName = ".${arr[arr.size-1]}"
-        }
-        return extName
-    }
-
-    private func calcPath(uploadPath: String): String{
-        // 获取系统配置中的上传目录
-        var path = Config.UPLOAD_PATH
-        // 拼接目录为 SysUploadPath/UserDefPath
-        if(uploadPath.startsWith("/")){
-            path = path + uploadPath
-        }else{
-            path = path + "/" + uploadPath
-        }
-        if(!path.endsWith("/")){
-            path += "/"
-        }
-        if(!exists(path)){
-            Directory.create(path, recursive: true)
-        }
-        return path
-    }
 
     private func getName(): String{
         let arr = this._header.split(";")
@@ -142,17 +62,10 @@ public class FormDataItem{
         return result
     }
 
-    /**
-     * 获取值，调用此方法前，需确认getFilename()方法返回None
-     */
-    private func getValue(data: Array<Byte>): String{
-        return String.fromUtf8(data)
-    }
-
-    private func getContentType(): String{
-        var arr = this._header.split("\r\n")
-        return arr[1][14..]
-    }
+    // private func getContentType(): String{
+    //     var arr = this._header.split("\r\n")
+    //     return arr[1][14..]
+    // }
 
     public prop name: String{
         get(){
@@ -160,9 +73,28 @@ public class FormDataItem{
         }
     }
 
-    public prop value: String{
+    public mut prop value: String{
+        set(value){
+            this._value = value
+        }
         get(){
             this._value
+        }
+    }
+
+    public prop filename: String{
+        get(){
+            return this.getFilename() ?? ""
+        }
+    }
+
+    public prop isFile: Bool{
+        get(){
+            var result = false
+            if(let Some(filename) <- this.getFilename()){
+                result = true
+            }
+            return result
         }
     }
 }

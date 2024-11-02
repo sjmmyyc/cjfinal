@@ -33,6 +33,7 @@ public class Constants{
         }
     }
 
+    // 最大上传文件大小
     public mut prop maxUploadSize: Int {
         set(value){
             Config.MAX_UPLOAD_SIZE = value
@@ -40,6 +41,21 @@ public class Constants{
         }
         get(){
             return Config.MAX_UPLOAD_SIZE
+        }
+    }
+
+    // 上传文件缓冲区大小，最低为128
+    public mut prop uploadBufferCapacity: Int{
+        set(value){
+            var v = value
+            if(v < 128){
+                v = 128
+            }
+            Config.UPLOAD_BUFFER_CAPACITY = v
+            println("Set \u{1b}[32muploadBufferCapacity\u{1b}[0m = \u{1b}[32m${Config.UPLOAD_BUFFER_CAPACITY / 1024}KB\u{1b}[0m")
+        }
+        get(){
+            return Config.UPLOAD_BUFFER_CAPACITY
         }
     }
 }
