@@ -396,10 +396,10 @@ renderHtml("<p></p>")
 renderJson(obj)
 
 // 渲染下载文件，参数为表示文件名称的字符串，可包含目录，如：path/path2/avatar.jpg，目录必须用“/”分隔
-// 也可是绝对目录，如果是绝对目前请确定是否有访问权限
+// 也可是绝对目录，如果是绝对目录请确定是否有访问权限
 renderFile(file)
 
-// 也可传入InputStream, filename表示用户接收到的文件名
+// 渲染下载文件，inputStream表示输入流, filename表示用户接收到的文件名
 renderFile(inputStream, filename)
 ```
 
