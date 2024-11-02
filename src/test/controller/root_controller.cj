@@ -19,7 +19,7 @@ import cjfinal.core.Controller
 import cjfinal.aop.{Before, Clear}
 import cjfinal.test.model.User
 import cjfinal.upload.ExceedingLimitException
-import std.fs.FSException
+import std.fs.{FSException, File, OpenOption}
 
 @Before["cjfinal.test.interceptor.ControllerInterceptor"]
 @Clear[""]
@@ -58,6 +58,6 @@ public class RootController <: Controller{
 
     @Clear[""]
     public func down(){
-        this.renderFile("html/upload.html")
+        this.renderFile(File("html/upload.html", OpenOption.Open(true, false)), "test.html")
     }
 }

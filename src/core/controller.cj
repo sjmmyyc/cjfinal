@@ -56,10 +56,14 @@ public abstract class Controller{
     protected func renderFile(filepath: String): Unit{
         var arr = filepath.split("/")
         var filename = arr.last.getOrDefault({ => "download"})
+        this.renderFile(File(filepath, OpenOption.Open(true, false)), filename)
+    }
+
+    protected func renderFile(inputStream: InputStream, filename: String): Unit{
         this.setContentType(ContentType.File)
             .setStatus(HttpStatusCode.STATUS_OK)
             .setHeader("Content-Disposition", "attachment; filename=${filename}")
-            .body(File(filepath, OpenOption.Open(true, false)))
+            .body(inputStream)
     }
 
     protected func renderErr413(): Unit{
