@@ -153,9 +153,10 @@ main(): Int64{
 将 `target/release/bin` 目录复制到你期望的目录中，然后 `./your-porject-name` 即可运行程序。
 
 ### 1.2.4 退出
-注意：该功能目前在Linux环境下不能正常工作。
 
 可使用 `Ctrl + C` 退出程序。如果通过强制杀进程的方式来结束应用， `onStop()` 回调不会被执行。
+
+注意：该功能目前在Linux环境下不能正常调用 `onStop()`
 
 # 2. CJFinalConfig
 ## 2.1 概述
@@ -172,11 +173,21 @@ public class TestConfig <: CJFinalConfig{
 ```
 
 ## 2.2 configConstants(..)
-此方法用来配置CJFinal常量值，如开发模式常量 `devMode` 的配置，如下代码是一些常用的配置：
+此方法用来配置CJFinal常量值，如下代码是一些常用的配置：
 ```
 public func configConstants(me: Constants): Unit{
-	// 配置开发模式，true为开发模式
+
+	// 配置开发模式，true为开发模式，默认为false
 	me.devMode = true
+
+    // 配置上传文件目录，默认为"upload"
+    me.uploadPath = "upload/image"
+
+    // 配置允许上传的最大尺寸，单位为字节，默认为2MB
+    me.maxUploadSize = 50 * 1024 * 1024
+
+    // 配置上传Buff管道大小，默认为64KB
+    me.uploadBufferCapacity = 64 * 1024
 }
 ```
 在开发模式下，CJFinal会对每次请求输出报告，如输出本次请求的URL、Controller、Method、Interceptor以及请求所携带的参数。
@@ -329,7 +340,44 @@ public class UserController <: Controller{
 | getParam(0) | 获取第一个参数，返回值为 `String` 类型 |
 | getParamTo\<T>(1) | 泛型方法，获取第二个参数，返回值类型为传入的泛型类型 |
 
-## 3.4 render方法
+## 3.4 getFiles/getFile
+在你的 `Controller` 中调用`getFiles(..)` 或 `getFile(..)`系列方法， 即可实现文件上传的功能。需要注意的是，对于 `form-data` 类型的表单，必须得先调用一次 `getFiles(..)` 或 `getFile(..)` 系列方法，才能在后续代码中调用 `get/getArray` 来获取请求中的参数。
+```
+public class UserController <: Controller{
+
+	public func avatar(): Unit{
+        // 获取上传文件列表
+        let uploadFiles: UploadFile = this.getFiles()
+
+        // 获取到的 uploadFiles 是 Array<UploadFile> 类型的
+        for(uploadFile in uploadFiles){
+            // UploadFile对象可直接通过以下方法打印信息
+            println(uploadFile)
+        }
+
+        // 以下是其它几种形态的getFiles(..)
+        // 注明限制上传的大小
+        this.getFiles(maxPostSize)        
+
+        // 注明上传文件的保存目录                
+        this.getFiles(uploadPath)          
+
+        // 注明保存目录和限制的大小                 
+        this.getFiles(uploadPath, maxPostSize)                  
+
+        // getFile()系列方法返回值为 UploadFile
+        // 参数意义同上，只多了一个 parameterName，含意在这： <input type="file" name="[parameterName]"/>
+        this.getFile(parameterName)
+        this.getFile(parameterName, uploadPath)
+        this.getFile(parameterName, maxPostSize)
+        this.getFile(parameterName, uploadPath, maxPostSize)
+        
+		this.renderText("response info...")
+	}
+}
+```
+
+## 3.5 render方法
 `render` 系列方法是用于简化向用户返回数据的方法
 ```
 // 渲染纯文本

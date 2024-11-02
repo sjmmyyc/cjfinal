@@ -34,7 +34,7 @@ public class ActionHandler <: Handler{
                 println("------------------------------ Action Handler ------------------------------")
                 println("URL:\t\t${ctx.request.url}")
                 println("Controller:\t[${action.path}] ${action.controllerName}")
-                println("Action:\t\t${action.method}")
+                println("Method:\t\t${action.method}")
                 if(action.interceptors.size > 0){
                     print("Interceptors:\t")
                     var index = 0
