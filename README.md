@@ -380,6 +380,7 @@ public class UserController <: Controller{
 ```
 ExceedingLimitException 表示上传的文件超出限制大小
 FSException             表示上传文件在保存到服务器时，出现了文件重名的情况，这种情况概率极低
+                        或者是创建文件或目录时，系统权限不够
 ```
 
 ## 3.5 render方法
