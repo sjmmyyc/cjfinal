@@ -33,6 +33,16 @@ public class Constants{
         }
     }
 
+    public mut prop uploadPath: String{
+        set(value){
+            Config.UPLOAD_PATH = value
+            println("Set \u{1b}[32muploadPath\u{1b}[0m = \u{1b}[32m${Config.UPLOAD_PATH}\u{1b}[0m")
+        }
+        get(){
+            return Config.UPLOAD_PATH
+        }
+    }
+
     // 最大上传文件大小
     public mut prop maxUploadSize: Int {
         set(value){

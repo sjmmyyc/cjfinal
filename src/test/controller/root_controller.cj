@@ -40,12 +40,12 @@ public class RootController <: Controller{
     @Clear[""]
     public func formdata(){
         try{
-            // let uploadFiles = this.getFiles()
-            // for(uploadFile in uploadFiles){
-            //     println(uploadFile)
-            // }
-            // println("name: ${this.get('name')}")
-            println(this.getFile("avatar"))
+            let uploadFiles = this.getFiles()
+            for(uploadFile in uploadFiles){
+                println(uploadFile)
+            }
+            println("name: ${this.get('name')}")
+            // println(this.getFile("avatar"))
             this.renderText("/formdata is invoke.")
         }catch(e: ExceedingLimitException){
             this.renderErr413()

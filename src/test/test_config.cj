@@ -26,6 +26,7 @@ public class TestConfig <: CJFinalConfig{
     public func configConstants(me: Constants): Unit{
         PropKit.use("./config/config").appendIfExist("./config/config-pro")
         me.devMode = PropKit.getByDefaultTo<Bool>("devMode", false)
+        me.uploadPath = "upload/image"
         me.maxUploadSize = 50 * 1024 * 1024
         me.uploadBufferCapacity = 64 * 1024
     }
