@@ -347,7 +347,7 @@ public class UserController <: Controller{
 
 	public func avatar(): Unit{
         // 获取上传文件列表
-        let uploadFiles: UploadFile = this.getFiles()
+        let uploadFiles = this.getFiles()
 
         // 获取到的 uploadFiles 是 Array<UploadFile> 类型的
         for(uploadFile in uploadFiles){
