@@ -55,4 +55,9 @@ public class RootController <: Controller{
             e.printStackTrace()
         }
     }
+
+    @Clear[""]
+    public func down(){
+        this.renderFile("html/upload.html")
+    }
 }

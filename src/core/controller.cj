@@ -22,6 +22,8 @@ import serialization.serialization.Serializable
 import std.convert.Parsable
 import std.collection.ArrayList
 import std.reflect.TypeInfo
+import std.fs.{File, OpenOption}
+import std.io.{InputStream, BufferedInputStream}
 import cjfinal.upload.{MultipartForm, UploadFile, ExceedingLimitException}
 import cjfinal.config.Config
 
@@ -34,29 +36,35 @@ public abstract class Controller{
     private var _params: Array<String> = []
 
     protected func renderText(text: String): Unit{
-        this.ctx.responseBuilder
-            .status(HttpStatusCode.STATUS_OK)
+        this.setContentType(ContentType.Text)
+            .setStatus(HttpStatusCode.STATUS_OK)
             .body(text)
     }
 
     protected func renderHtml(str: String): Unit{
-        this.ctx.responseBuilder
-            .header("content-type", "text/html; charset=utf8")
-            .status(HttpStatusCode.STATUS_OK)
+        this.setContentType(ContentType.Html)
+            .setStatus(HttpStatusCode.STATUS_OK)
             .body(str)
     }
 
     protected func renderJson<T>(obj: Serializable<T>): Unit{
-        this.ctx.responseBuilder
-            .header("content-type", "text/json; charset=utf8")
-            .status(HttpStatusCode.STATUS_OK)
+        this.setContentType(ContentType.Json)
+            .setStatus(HttpStatusCode.STATUS_OK)
             .body(obj.serialize().toJson().asObject().toJsonString())
     }
 
+    protected func renderFile(filepath: String): Unit{
+        var arr = filepath.split("/")
+        var filename = arr.last.getOrDefault({ => "download"})
+        this.setContentType(ContentType.File)
+            .setStatus(HttpStatusCode.STATUS_OK)
+            .setHeader("Content-Disposition", "attachment; filename=${filename}")
+            .body(File(filepath, OpenOption.Open(true, false)))
+    }
+
     protected func renderErr413(): Unit{
-        this.ctx.responseBuilder
-            .header("content-type", "text/html; charset=utf8")
-            .status(HttpStatusCode.STATUS_REQUEST_CONTENT_TOO_LARGE)
+        this.setContentType(ContentType.Html)
+            .setStatus(HttpStatusCode.STATUS_REQUEST_CONTENT_TOO_LARGE)
             .body(HttpStatusCode.STATUS_REQUEST_CONTENT_TOO_LARGE.toString() + " - STATUS_REQUEST_CONTENT_TOO_LARGE")
     }
 
@@ -207,7 +215,27 @@ public abstract class Controller{
      */
     protected func setHeader(key: String, value: String): Controller{
         this.ctx.responseBuilder.header(key, value)
-        return this
+        this
+    }
+
+    protected func setContentType(contentType: ContentType): Controller{
+        this.setHeader("Content-Type", contentType.toString())
+        this
+    }
+
+    protected func setStatus(status: UInt16): Controller {
+        this.ctx.responseBuilder.status(status)
+        this
+    }
+
+    protected func body(str: String): Controller {
+        this.ctx.responseBuilder.body(str)
+        this
+    }
+
+    protected func body(inputStream: InputStream): Controller{
+        this.ctx.responseBuilder.body(inputStream)
+        this
     }
 
     public mut prop ctx: HttpContext{
