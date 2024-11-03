@@ -73,9 +73,7 @@ public class CJFinal{
         spawn{
             me.server?.serve()
         }
-        while(isRun){
-            sleep(Duration.second)
-        }
+        while(isRun){}
         me.server?.closeGracefully()
     }
 

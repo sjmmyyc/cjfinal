@@ -154,15 +154,12 @@ main(): Int64{
 
 ### 1.2.4 退出
 
-可使用 `Ctrl + C` 退出程序。或以下命令来退出程序：
-```
-// Linux
-pkill -2 [your-project-name]
+可使用 `Ctrl + C` 退出程序。在 `Linux` 下还可使用 `pkill -2 [your-program-name]` 向程序发送 `Ctrl + C` 信号来结束程序。
 
-// Window
-taskkill /im [you-project-name]
-```
-如果通过强制杀进程的方式来结束应用， `onStop()` 回调不会被执行。
+需要注意的是，通过以下方式关闭程序时，不会调用 `onStop()` 回调
+
+1. 强制杀进程
+2. 在 Windows 下直接关闭 cmd 窗口
 
 # 2. CJFinalConfig
 ## 2.1 概述
