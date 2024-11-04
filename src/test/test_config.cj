@@ -15,20 +15,21 @@
  */
 package cjfinal.test
 
-import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors, Handlers}
+import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors, Handlers, Plugins}
 import cjfinal.kit.PropKit
 import cjfinal.test.controller.{RootController, UserController}
 import cjfinal.test.interceptor.GlobalInterceptor
 import cjfinal.test.handler.{CORSHandler, TestHandler}
+import cjfinal.test.plugin.TestPlugin
 
 public class TestConfig <: CJFinalConfig{
 
     public func configConstants(me: Constants): Unit{
         PropKit.use("./config/config").appendIfExist("./config/config-pro")
         me.devMode = PropKit.getByDefaultTo<Bool>("devMode", false)
-        me.uploadPath = "upload/image"
-        me.maxUploadSize = 50 * 1024 * 1024
-        me.uploadBufferCapacity = 64 * 1024
+        // me.uploadPath = "upload/image"
+        // me.maxUploadSize = 50 * 1024 * 1024
+        // me.uploadBufferCapacity = 64 * 1024
     }
 
     public func configRoute(me: Routes): Unit{
@@ -38,6 +39,10 @@ public class TestConfig <: CJFinalConfig{
 
     public func configInterceptor(me: Interceptors): Unit{
         me.add(GlobalInterceptor())
+    }
+
+    public func configPlugin(me: Plugins): Unit{
+        me.add(TestPlugin())
     }
 
     public func configHandler(me: Handlers): Unit{

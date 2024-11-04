@@ -34,13 +34,14 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.2.1"
+    public static let version = "0.2.2"
 
     public static let me: CJFinal = CJFinal()
 
     private var _config: ?CJFinalConfig = None
     private var _constants = Constants()
     private var _routes = Routes()
+    private var _plugins = Plugins()
     private var _handlers = Handlers()
     // 全局拦截器工具
     private var _interceptors = Interceptors()
@@ -64,12 +65,13 @@ public class CJFinal{
         me.config.configConstants(me.constants)
         me.config.configInterceptor(me._interceptors)
         me.config.configRoute(me.routes)
+        me.config.configPlugin(me._plugins)
         me.config.configHandler(me.handlers)
         me.create(port)
         let endTime = MonoTime.now()
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
-        me.server?.afterBind({ => me.config.onStart()})
-        me.server?.onShutdown({ => me.config.onStop()})
+        me.server?.afterBind(me.onAfterBind)
+        me.server?.onShutdown(me.onShutdown)
         spawn{
             me.server?.serve()
         }
@@ -91,6 +93,20 @@ public class CJFinal{
         // 关闭默认日志
         this.server?.logger.level = LogLevel.OFF
         this.server?.distributor.register("/", globalHandler)
+    }
+
+    private func onAfterBind(): Unit{
+        for(plugin in me._plugins.pluginList){
+            plugin.start()
+        }
+        me.config.onStart()
+    }
+
+    private func onShutdown(): Unit{
+        for(plugin in me._plugins.pluginList){
+            plugin.stop()
+        }
+        me.config.onStop()
     }
 
     /**

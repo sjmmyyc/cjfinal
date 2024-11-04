@@ -13,12 +13,12 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal
+package cjfinal.plugin
 
-// import cjfinal.core.CJFinal
-// import cjfinal.test.TestConfig
-
-// main(): Int64 {
-//     CJFinal.start(TestConfig(), 8080)
-//     return 0
-// }
+/**
+ * IPlugin
+ */
+public interface IPlugin{
+    func start(): Bool
+    func stop(): Bool
+}

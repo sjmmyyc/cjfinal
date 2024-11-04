@@ -13,12 +13,26 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal
+package cjfinal.core
 
-// import cjfinal.core.CJFinal
-// import cjfinal.test.TestConfig
+import cjfinal.plugin.IPlugin
+import std.collection.ArrayList
 
-// main(): Int64 {
-//     CJFinal.start(TestConfig(), 8080)
-//     return 0
-// }
+/**
+ * Plugins.
+ */
+public class Plugins{
+    
+    private let _pluginList = ArrayList<IPlugin>()
+
+    public func add(plugin: IPlugin): Plugins{
+        this._pluginList.append(plugin)
+        this
+    }
+
+    public prop pluginList: ArrayList<IPlugin>{
+        get(){
+            this._pluginList
+        }
+    }
+}

@@ -34,7 +34,10 @@ public abstract class CJFinalConfig{
      */
     public open func configRoute(_: Routes): Unit{}
 
-    // configPlugin()
+    /**
+     * 配置插件
+     */
+    public open func configPlugin(_: Plugins): Unit{}
 
     /**
      * 配置Handler

@@ -2,7 +2,7 @@
 <h1>CJFinal</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.2.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.2.2-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-100%25-brightgreen" style="display: inline-block;" />
@@ -27,12 +27,12 @@
 | AOP | <font color=green>[√] 已完成</font> | CJFinal专注AOP最核心的目标，将概念减少到极致<br/>仅有三个概念：Interceptor、Before、Clear，并且无需引入IOC也无需使用啰嗦的XML |
 | Json转换 | <font color=green>[√] 已完成</font> | CJFinal通过在class或struct定义前加上@Json宏，使其具备可被自动解析成Json的功能 |
 | 上传/下载 | <font color=green>[√] 已完成</font> | 文件上传用getFiles(..)/getFile(..)系列方法<br/>文件下载用renderFile(..)系列方法 |
-| 插件化 | <font color=red>[▶] 进行中</font> | CJFinal后续功能将采用插件化的方式进行扩展，大家也可以为CJFinal开发插件，方便更多人<br/>该功能正在开发中，敬请期待... |
-| Validator | [×] 待完成 | 校验组件，在Validator类中将提供非常方便的校验方法，学习简单，使用方便 |
-| MySQLPlugin | [×] 待完成 | 将以插件的形式，首先支持MySQL数据库连接 |
+| 插件化 | <font color=green>[√] 已完成</font> | CJFinal支持采用插件化的方式进行扩展（实验性） |
+| MySQLPlugin | <font color=red>[▶] 进行中</font> | 将以插件的形式，首先支持MySQL数据库连接 |
 | Db + Record | [×] 待完成 | Db和Record将作为CJFinal的核心类，届时会有丰富的数据库操作功能 |
 | CronPlugin | [×] 待完成 | 将以插件的形式提供定时任务功能 |
 | RedisPlugin| [×] 待完成 | 将以插件的形式提供对Redis的支持 |
+| Validator | [×] 待完成 | 校验组件，在Validator类中将提供非常方便的校验方法，学习简单，使用方便 |
 
 # 添加依赖
 
@@ -546,4 +546,4 @@ public class RootController <: Controller{
 ```
 
 # 10. CJFinal架构扩展
-待实现...
+实验验证中，敬请期待...
