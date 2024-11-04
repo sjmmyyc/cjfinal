@@ -63,6 +63,7 @@ public class TestConfig <: CJFinalConfig{
     }
     public func configInterceptor(_: Interceptors): Unit{}
     public func configRoute(_: Routes): Unit{}
+    public func configPlugin(_: Plugins): Unit{}
     public func configHandler(_: Handlers): Unit{}
 }
 ```
@@ -215,7 +216,13 @@ public func configInterceptor(me: Interceptors): Unit{
 }
 ```
 全局拦截器可配置多个，按配置顺序链式执行。关于如何实现拦截器，请移步后面的 `AOP` 章节
-## 2.5 configHandler(..)
+
+## 2.5 configPlugin(..)
+此方法用来配置 CJFinal 的插件。
+
+CJFinal插件架构是其主要扩展方式之一，可以方便地创建插件并应用到项目中去。
+
+## 2.6 configHandler(..)
 此方法用来配置CJFinal的Handler，Handler可以接管所有web请求，并对应用拥有完全的控制权，可以很方便地实现更高层的功能性扩展。CJFinal的核心层也是通过实现了一个ActionHander来开发的。
 ```
 public func configHandler(me: Handlers): Unit{
@@ -247,7 +254,7 @@ public class CorsHandler <: Handler{
 }
 ```
 
-## 2.6 onStart() / onStop()回调
+## 2.7 onStart() / onStop()回调
 在 `CJFinalConfig` 继承类中可以添加 `onStart()` 与 `onStop()`，CJFinal 会在系统启动完成之后以及系统关闭之前分别回调这两个方法：
 ```
 // 系统启动完成后回调
@@ -260,7 +267,7 @@ public func onStop(): Unit {}
 这两个方法可以很方便地在项目启动后与关闭前让开发者有机会进行额外操作，如在系统启动后创建调度线程或在系统关闭前写回缓存。
 
 
-## 2.7 PropKit读取配置
+## 2.8 PropKit读取配置
 PropKit工具类用来读取外部键值对配置文件，PropKit可以极度方便地在系统任意时空使用，配置文件的格式如下：
 ```
 // 假设有配置文件config.txt，与src目录属于同级关系
