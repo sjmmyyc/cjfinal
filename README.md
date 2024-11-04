@@ -2,7 +2,7 @@
 <h1>CJFinal</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.1.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.2.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-100%25-brightgreen" style="display: inline-block;" />
@@ -15,7 +15,7 @@
 
 为什么叫**极速框架**？因为**学习成本非常低**，**3分钟**上手，**2小时**干项目，**1天**精通Web服务开发。
 
-<font color=red>**特别鸣谢**</font>[**JFinal**](https://www.jfinal.com)，采用**仓颉**来临摹一款类似的框架。考虑到**前后端分离**已成现下最流行的方式，因此**CJFinal**不会实现渲染HTML页面及相关功能，是的，**CJFinal**只适合写**API**（一切都以**返回Json为目的**）。**CJFinal**目前仍处于探索开发阶段，现已来到了 `v0.2.0` 版本，欢迎大家体验。
+<font color=red>**特别鸣谢**</font>[**JFinal**](https://www.jfinal.com)，采用**仓颉**来临摹一款类似的框架。考虑到**前后端分离**已成现下最流行的方式，因此**CJFinal**不会实现渲染HTML页面及相关功能，是的，**CJFinal**只适合写**API**（一切都以**返回Json为目的**）。**CJFinal**目前仍处于探索开发阶段，欢迎大家体验。
 
 # 模块划分及进度
 
@@ -154,9 +154,15 @@ main(): Int64{
 
 ### 1.2.4 退出
 
-可使用 `Ctrl + C` 退出程序。如果通过强制杀进程的方式来结束应用， `onStop()` 回调不会被执行。
+可使用 `Ctrl + C` 退出程序。或以下命令来退出程序：
+```
+// Linux
+pkill -2 [your-project-name]
 
-注意：该功能目前在Linux环境下不能正常调用 `onStop()`
+// Window
+taskkill /im [you-project-name]
+```
+如果通过强制杀进程的方式来结束应用， `onStop()` 回调不会被执行。
 
 # 2. CJFinalConfig
 ## 2.1 概述

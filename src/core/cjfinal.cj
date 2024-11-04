@@ -34,7 +34,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.2.0"
+    public static let version = "0.2.1"
 
     public static let me: CJFinal = CJFinal()
 
@@ -47,12 +47,17 @@ public class CJFinal{
 
     private var server: ?Server = None
 
+    private static var isRun = true
+
     private init(){}
 
     /**
      * 启动服务器
      */
     public static func start(config: CJFinalConfig, port: Int64){
+        unsafe{
+            signal(SIGINT, { _ => isRun = false})
+        }
         let startTime = MonoTime.now()
         println("Welcom to use \u{1b}[32mCJFinal\u{1b}[0m Framework, current version is: \u{1b}[32m${version}\u{1b}[0m")
         me.config = config
@@ -65,12 +70,13 @@ public class CJFinal{
         println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
         me.server?.afterBind({ => me.config.onStart()})
         me.server?.onShutdown({ => me.config.onStop()})
-        
-        unsafe{
-            signal(SIGINT, { _ => me.server?.close()})
+        spawn{
+            me.server?.serve()
         }
-
-        me.server?.serve()
+        while(isRun){
+            sleep(Duration.second)
+        }
+        me.server?.closeGracefully()
     }
 
     /**
