@@ -23,6 +23,7 @@ import std.process.Process
 import std.fs.{File, OpenOption}
 import std.console.Console
 import std.posix.SIGINT
+import std.reflect.TypeInfo
 
 // void (*signal(int sig, CFunc<(Int32) -> Unit>))(int)
 type SignalHandler = CFunc<(Int32) -> Unit>
@@ -34,7 +35,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.2.2"
+    public static let version = "0.2.3"
 
     public static let me: CJFinal = CJFinal()
 
@@ -56,10 +57,10 @@ public class CJFinal{
      * 启动服务器
      */
     public static func start(config: CJFinalConfig, port: Int64){
+        let startTime = MonoTime.now()
         unsafe{
             signal(SIGINT, { _ => isRun = false})
         }
-        let startTime = MonoTime.now()
         println("Welcom to use \u{1b}[32mCJFinal\u{1b}[0m Framework, current version is: \u{1b}[32m${version}\u{1b}[0m")
         me.config = config
         me.config.configConstants(me.constants)
@@ -68,14 +69,16 @@ public class CJFinal{
         me.config.configPlugin(me._plugins)
         me.config.configHandler(me.handlers)
         me.create(port)
+        me.server?.afterBind({ => me.config.onStart()})
+        me.server?.onShutdown({ => me.config.onStop()})
+        me.startPlugins()
         let endTime = MonoTime.now()
-        println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1000.0 / 1000.0}s")
-        me.server?.afterBind(me.onAfterBind)
-        me.server?.onShutdown(me.onShutdown)
+        println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1e9}s")
         spawn{
             me.server?.serve()
         }
         while(isRun){}
+        me.stopPlugins()
         me.server?.closeGracefully()
     }
 
@@ -95,18 +98,21 @@ public class CJFinal{
         this.server?.distributor.register("/", globalHandler)
     }
 
-    private func onAfterBind(): Unit{
+    private func startPlugins(): Unit{
         for(plugin in me._plugins.pluginList){
-            plugin.start()
+            print("Plugin: start ${TypeInfo.of(plugin).name}...")
+            if(plugin.start()){
+                println("\u{1b}[32mSuccess\u{1b}[0m")
+            }else{
+                println("\u{1b}[31mFailed\u{1b}[0m")
+            }
         }
-        me.config.onStart()
     }
 
-    private func onShutdown(): Unit{
+    private func stopPlugins(): Unit{
         for(plugin in me._plugins.pluginList){
             plugin.stop()
         }
-        me.config.onStop()
     }
 
     /**

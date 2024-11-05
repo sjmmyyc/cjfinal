@@ -17,15 +17,15 @@ package cjfinal.test
 
 import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors, Handlers, Plugins}
 import cjfinal.kit.PropKit
+import cjfinal.plugin.mysql.MysqlPlugin
 import cjfinal.test.controller.{RootController, UserController}
 import cjfinal.test.interceptor.GlobalInterceptor
 import cjfinal.test.handler.{CORSHandler, TestHandler}
-import cjfinal.test.plugin.TestPlugin
 
 public class TestConfig <: CJFinalConfig{
 
     public func configConstants(me: Constants): Unit{
-        PropKit.use("./config/config").appendIfExist("./config/config-pro")
+        PropKit.use("./configs/config").appendIfExist("./configs/config-pro")
         me.devMode = PropKit.getByDefaultTo<Bool>("devMode", false)
         // me.uploadPath = "upload/image"
         // me.maxUploadSize = 50 * 1024 * 1024
@@ -42,7 +42,8 @@ public class TestConfig <: CJFinalConfig{
     }
 
     public func configPlugin(me: Plugins): Unit{
-        me.add(TestPlugin())
+        let mysqlPlugin = MysqlPlugin("192.168.1.9", "root", "sjmmyyc1658", "cjtest")
+        me.add(mysqlPlugin)
     }
 
     public func configHandler(me: Handlers): Unit{

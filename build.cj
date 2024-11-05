@@ -20,8 +20,8 @@ import std.fs.{Path, copy}
 
 func stagePostBuild(): Int64{
     // 将config目录下的文件复制到打包目录中
-    let source = Path("./config")
-    let target = Path("./target/release/bin/config")
+    let source = Path("./configs")
+    let target = Path("./target/release/bin/configs")
     copy(source, to: target, overwrite: true)
     return 0
 }

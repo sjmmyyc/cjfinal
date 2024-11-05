@@ -1,8 +1,10 @@
 [dependencies]
+  # mysql驱动
+  mysqlclient4cj = {git = "https://gitcode.com/weixin_64400442/mysqlclient4cj.git", branch="master"}
 
 [package]
   cjc-version = "0.56.4"
-  compile-option = ""
+  compile-option = "--link-options \"-rpath=.\""
   description = "nothing here"
   link-option = ""
   name = "cjfinal"
@@ -10,5 +12,5 @@
   override-compile-option = ""
   src-dir = ""
   target-dir = ""
-  version = "0.2.2"
+  version = "0.2.3"
   [package.package-configuration]
