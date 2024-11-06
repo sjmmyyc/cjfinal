@@ -17,7 +17,8 @@ package cjfinal.test
 
 import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors, Handlers, Plugins}
 import cjfinal.kit.PropKit
-import cjfinal.plugin.mysql.MysqlPlugin
+import cjfinal.plugin.database.DatasourcePlugin
+import cjfinal.plugin.activerecord.ActiveRecordPlugin
 import cjfinal.test.controller.{RootController, UserController}
 import cjfinal.test.interceptor.GlobalInterceptor
 import cjfinal.test.handler.{CORSHandler, TestHandler}
@@ -42,8 +43,10 @@ public class TestConfig <: CJFinalConfig{
     }
 
     public func configPlugin(me: Plugins): Unit{
-        let mysqlPlugin = MysqlPlugin("192.168.1.9", "root", "sjmmyyc1658", "cjtest")
-        me.add(mysqlPlugin)
+        let dp = DatasourcePlugin("192.168.1.9", "root", "sjmmyyc1658", "cjtest")
+        me.add(dp)
+        let arp = ActiveRecordPlugin(dp)
+        me.add(arp)
     }
 
     public func configHandler(me: Handlers): Unit{

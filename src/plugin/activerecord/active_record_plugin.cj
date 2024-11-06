@@ -13,12 +13,29 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal
+package cjfinal.plugin.activerecord
 
-// import cjfinal.core.CJFinal
-// import cjfinal.test.TestConfig
+import cjfinal.plugin.IPlugin
+import cjfinal.plugin.database.DatasourcePlugin
 
-// main(): Int64 {
-//     CJFinal.start(TestConfig(), 8080)
-//     return 0
-// }
+public class ActiveRecordPlugin <: IPlugin{
+
+    private let _dp: DatasourcePlugin
+
+    private var _isStarted = false
+
+    public init(dp: DatasourcePlugin){
+        _dp = dp
+    }
+
+    public func start(): Bool{
+        if(_isStarted){
+            return true
+        }
+        true
+    }
+
+    public func stop(): Bool{
+        true
+    }
+}

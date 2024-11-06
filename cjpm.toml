@@ -12,5 +12,5 @@
   override-compile-option = ""
   src-dir = ""
   target-dir = ""
-  version = "0.2.3"
+  version = "0.2.4"
   [package.package-configuration]
