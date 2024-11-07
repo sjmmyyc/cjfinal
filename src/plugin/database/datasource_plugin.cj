@@ -17,36 +17,31 @@ package cjfinal.plugin.database
 
 
 import cjfinal.plugin.IPlugin
-import std.database.sql.PooledDatasource
-import mysqlclient4cj.jdbc.impl.{DatasourceImpl, ConnectionImpl}
-import mysqlclient4cj.jdbc.{DriverManager, Datasource, Connection, SqlException}
+import cjfinal.plugin.IDatasourceProvider
+import cjfinal.exception.NotFoundException
+import std.database.sql.{DriverManager, PooledDatasource, Datasource}
+import mysqlclient4cj.cdbc.{DatasourceImpl}
 
 /**
  * DatasourcePlugin.
  */
-public class DatasourcePlugin <: IPlugin{
+public class DatasourcePlugin <: IPlugin & IDatasourceProvider{
 
     private var _ds: ?Datasource = None
 
     // 基本属性
-    private let _host: String
-    private let _port: Int
+    private let _url: String
+    private let _database: String
     private let _username: String
     private let _password: String
-    private let _database: String
     
     private var _isStarted = false
 
-    public init(host: String, username: String, password: String, database: String){
-        this(host, 3306, username, password, database)
-    }
-
-    public init(host: String, port: Int, username: String, password: String, database: String){
-        _host = host
-        _port = port
+    public init(url: String, database: String, username: String, password: String){
+        _url = url
+        _database = database
         _username = username
         _password = password
-        _database = database
     }
 
     public func start(): Bool{
@@ -56,8 +51,14 @@ public class DatasourcePlugin <: IPlugin{
         let usernameProp = ("username", _username)
         let passwordProp = ("password", _password)
         let databaseProp = ("database", _database)
-        let driver = DriverManager.getDriver("mysql").getOrThrow()
-        this._ds = driver.open("mysql://${_host}:${_port}", [usernameProp, passwordProp, databaseProp])
+        let driverName = _url.split("://")[0]
+
+        if(driverName != "mysql"){
+            throw UnsupportedException('"${driverName}" database is not yet supported')
+        }
+
+        let driver = DriverManager.getDriver(driverName).getOrThrow()
+        _ds = PooledDatasource(driver.open(_url, [usernameProp, passwordProp, databaseProp]))
 
         _isStarted = true
         return true
@@ -73,9 +74,7 @@ public class DatasourcePlugin <: IPlugin{
     /**
      * 获取datasource
      */
-    public prop datasource: Datasource{
-        get(){
-            return _ds.getOrThrow()
-        }
+    public override func getDatasource(): Datasource{
+        return _ds.getOrThrow()
     }
 }

@@ -13,30 +13,14 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test.controller
+package cjfinal.plugin
 
-import cjfinal.core.Controller
-import cjfinal.plugin.activerecord.{Record, Db}
-import std.time.DateTime
+import std.database.sql.Datasource
 
-public class UserController <: Controller{
-    public func index(){
-        this.renderText("user index...")
-    }
-
-    public func list(){
-        this.renderText("user list...")
-    }
-
-    public func add(){
-        let test = Record().set("varcharCol", "Test")
-            .set("intCol", 12)
-            .set("doubleCol", 10.1)
-            .set("decimalCol", 20.2)
-            .set("dataCol", DateTime.now())
-            .set("timeCol", DateTime.now())
-            .set("datatimeCol", DateTime.now())
-        Db.save("simple", test)
-        this.renderText("add user...")
-    }
+/**
+ * IDatasourceProvider.
+ */
+public interface IDatasourceProvider{
+    
+    func getDatasource(): Datasource
 }

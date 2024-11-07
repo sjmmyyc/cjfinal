@@ -13,30 +13,31 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.test.controller
+package cjfinal.plugin.activerecord
 
-import cjfinal.core.Controller
-import cjfinal.plugin.activerecord.{Record, Db}
-import std.time.DateTime
+/**
+ * Db.
+ */
+public class Db{
 
-public class UserController <: Controller{
-    public func index(){
-        this.renderText("user index...")
+    private static var _MAIN: ?DbPro = None
+
+    /**
+     * for DbKit.addConfig(configName)
+     */
+    static func initi(configName: String): Unit{
+        
     }
 
-    public func list(){
-        this.renderText("user list...")
+    // public static func use(configName: String): DbPro{
+    //     // return DbKit.getDatasource(configName)
+    // }
+
+    public static func save(table: String, record: Record): Bool{
+        save(table, "id", record)
     }
 
-    public func add(){
-        let test = Record().set("varcharCol", "Test")
-            .set("intCol", 12)
-            .set("doubleCol", 10.1)
-            .set("decimalCol", 20.2)
-            .set("dataCol", DateTime.now())
-            .set("timeCol", DateTime.now())
-            .set("datatimeCol", DateTime.now())
-        Db.save("simple", test)
-        this.renderText("add user...")
+    public static func save(table: String, primaryKey: String, record: Record): Bool{
+        true
     }
 }

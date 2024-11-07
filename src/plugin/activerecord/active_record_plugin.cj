@@ -15,27 +15,63 @@
  */
 package cjfinal.plugin.activerecord
 
-import cjfinal.plugin.IPlugin
-import cjfinal.plugin.database.DatasourcePlugin
+import cjfinal.plugin.{IPlugin, IDatasourceProvider}
+import cjfinal.plugin.activerecord.dialect.{Dialect, MysqlDialect}
+import std.database.sql.Datasource
 
+/**
+ * ActiveRecordPlugin.
+ */
 public class ActiveRecordPlugin <: IPlugin{
 
-    private let _dp: DatasourcePlugin
+    private let _configName: String
+    private let _dp: IDatasourceProvider
+    private let _dialect: Dialect
 
     private var _isStarted = false
 
-    public init(dp: DatasourcePlugin){
-        _dp = dp
+    /**
+     * 构造器，configName使用默认名称main，方言默认为MysqlDialect
+     * @Param dsProvider - 数据源提供者
+     */
+    public init(dsProvider: IDatasourceProvider){
+        this(DbKit.MAIN_CONFIG_NAME, dsProvider)
     }
 
-    public func start(): Bool{
+    /**
+     * 构造器，由用户指定配置名称，方言默认为MysqlDialect
+     * @Param configName - 配置名称
+     * @Param dsProvider - 数据源提供者
+     */
+    public init(configName: String, dsProvider: IDatasourceProvider){
+        this(configName, dsProvider, MysqlDialect())
+    }
+
+    /**
+     * 构造器，由用户指定配置名称，方言
+     * @Param configName - 配置名称
+     * @Param dsProvider - 数据源提供者
+     * @Param dialect - 方言
+     */
+    public init(configName: String, dsProvider: IDatasourceProvider, dialect: Dialect){
+        if(configName == ""){
+            throw IllegalArgumentException("Config name can not be blank")
+        }
+        _configName = configName
+        _dp = dsProvider
+        _dialect = dialect
+    }
+
+    public override func start(): Bool{
         if(_isStarted){
             return true
         }
+        // let config = Config(datasource: Datasource)
+        // DbKit.addConfig(_config)
         true
     }
 
-    public func stop(): Bool{
+    public override func stop(): Bool{
         true
     }
 }
