@@ -23,11 +23,16 @@ import std.database.sql.Datasource
  */
 public class Config{
 
+    private let _name: String
     private let _ds: Datasource
-    
     private let _dialect: Dialect
-
     private var _showSql: Bool
+
+    public prop name: String{
+        get(){
+            this._name
+        }
+    }
 
     public mut prop showSql: Bool{
         set(value){
@@ -39,21 +44,16 @@ public class Config{
     }
 
     /**
-     * 构造器，默认方言为MysqlDialect
-     * @Param datasource - 数据源
-     */
-    public init(datasource: Datasource){
-        this(datasource, MysqlDialect())
-    }
-
-    /**
      * 构造器
+     * @Param name - 配置名称
      * @Param datasource - 数据源
      * @Param dialect - 方言
+     * @Param showSql - 是否显示生成的SQL语句
      */
-    public init(datasource: Datasource, dialect: Dialect){
+    public init(name: String, datasource: Datasource, dialect: Dialect, showSql: Bool){
+        _name = name
         _ds = datasource
         _dialect = dialect
-        _showSql = false
+        _showSql = showSql
     }
 }

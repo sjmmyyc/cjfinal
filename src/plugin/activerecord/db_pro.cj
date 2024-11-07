@@ -15,6 +15,23 @@
  */
 package cjfinal.plugin.activerecord
 
+/**
+ * DbPro.数据库访问操作的主要实现类
+ */
 public class DbPro{
-    
+
+    private let _config: Config
+
+    public init(config: Config){
+        _config = config
+    }
+
+    public func save(table: String, record: Record): Bool{
+        return save(table, "id", record)
+    }
+
+    public func save(table: String, primaryKey: String, record: Record): Bool{
+        println(_config.name)
+        true
+    }
 }

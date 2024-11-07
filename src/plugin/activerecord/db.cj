@@ -15,29 +15,41 @@
  */
 package cjfinal.plugin.activerecord
 
+import std.collection.{Map, HashMap}
+
 /**
  * Db.
  */
 public class Db{
 
-    private static var _MAIN: ?DbPro = None
+    private static var MAIN: ?DbPro = None
+    private static let cache: Map<String, DbPro> = HashMap<String, DbPro>()
 
     /**
      * for DbKit.addConfig(configName)
      */
-    static func initi(configName: String): Unit{
-        
+    public static func setMain(config: Config): Unit{
+        MAIN = DbPro(config)
     }
 
-    // public static func use(configName: String): DbPro{
-    //     // return DbKit.getDatasource(configName)
-    // }
+    /**
+     * 选择使用哪个数据源
+     */
+    public static func use(configName: String): DbPro{
+        if(let Some(dbPro) <- cache.get(configName)){
+            return dbPro
+        }else{
+            let dbPro = DbPro(DbKit.getConfig(configName))
+            cache.put(configName, dbPro)
+            return dbPro
+        }
+    }
 
     public static func save(table: String, record: Record): Bool{
-        save(table, "id", record)
+        return MAIN.getOrThrow().save(table, record)
     }
 
     public static func save(table: String, primaryKey: String, record: Record): Bool{
-        true
+        return MAIN.getOrThrow().save(table, primaryKey, record)
     }
 }

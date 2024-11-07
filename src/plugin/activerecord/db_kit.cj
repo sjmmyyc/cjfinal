@@ -15,12 +15,31 @@
  */
 package cjfinal.plugin.activerecord
 
+import std.collection.{Map, HashMap}
+
+/**
+ * DbKit用于管理多数据源和其配置信息
+ */
 public class DbKit{
 
     public static let MAIN_CONFIG_NAME = "main"
+    private static let configs: Map<String, Config> = HashMap<String, Config>()
     
-    
-    public static func addConfig(config: Config): Unit{
+    /**
+     * 添加数据源配置
+     */
+    public static func addConfig(name: String, config: Config): Unit{
+        configs.put(name, config)
+        // 如果此时只有一个数据源配置项，便将其设置为Db的主DbPro
+        if(configs.size == 1){
+            Db.setMain(config)
+        }
+    }
 
+    /**
+     * 获取数据源配置
+     */
+    public static func getConfig(name: String): Config{
+        return configs.get(name).getOrThrow()
     }
 }

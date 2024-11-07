@@ -27,8 +27,21 @@ public class ActiveRecordPlugin <: IPlugin{
     private let _configName: String
     private let _dp: IDatasourceProvider
     private let _dialect: Dialect
+    private var _showSql = false
 
     private var _isStarted = false
+
+    /**
+     * 是否显示生成的SQL语句
+     */
+    public mut prop showSql: Bool{
+        set(value){
+            _showSql = value
+        }
+        get(){
+            return _showSql
+        }
+    }
 
     /**
      * 构造器，configName使用默认名称main，方言默认为MysqlDialect
@@ -48,7 +61,7 @@ public class ActiveRecordPlugin <: IPlugin{
     }
 
     /**
-     * 构造器，由用户指定配置名称，方言
+     * 构造器，由用户指定配置名称和方言
      * @Param configName - 配置名称
      * @Param dsProvider - 数据源提供者
      * @Param dialect - 方言
@@ -62,15 +75,22 @@ public class ActiveRecordPlugin <: IPlugin{
         _dialect = dialect
     }
 
+    /**
+     * 启动插件
+     */
     public override func start(): Bool{
         if(_isStarted){
             return true
         }
-        // let config = Config(datasource: Datasource)
-        // DbKit.addConfig(_config)
-        true
+
+        let config = Config(_configName, _dp.getDatasource(), _dialect, _showSql)
+        DbKit.addConfig(_configName, config)
+        return true
     }
 
+    /**
+     * 停止插件
+     */
     public override func stop(): Bool{
         true
     }

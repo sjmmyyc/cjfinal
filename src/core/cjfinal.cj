@@ -35,7 +35,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.2.5"
+    public static let version = "0.2.6"
 
     public static let me: CJFinal = CJFinal()
 
@@ -110,7 +110,9 @@ public class CJFinal{
     }
 
     private func stopPlugins(): Unit{
-        for(plugin in me._plugins.pluginList){
+        let reversePlugins = me._plugins.pluginList.toArray()
+        reversePlugins.reverse()
+        for(plugin in reversePlugins){
             print("Plugin: stop ${TypeInfo.of(plugin).name}...")
             if(plugin.stop()){
                 println("\u{1b}[32mSuccess\u{1b}[0m")
