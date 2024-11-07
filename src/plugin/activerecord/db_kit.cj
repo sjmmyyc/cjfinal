@@ -42,4 +42,13 @@ public class DbKit{
     public static func getConfig(name: String): Config{
         return configs.get(name).getOrThrow()
     }
+
+    /**
+     * 移除数据源配置
+     */
+    public static func removeConfig(name: String): Config{
+        let config = configs.remove(name).getOrThrow()
+        Db.removeDbPro(config)
+        return config
+    }
 }

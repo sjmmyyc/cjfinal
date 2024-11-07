@@ -22,6 +22,12 @@ public class DbPro{
 
     private let _config: Config
 
+    public prop config: Config{
+        get(){
+            this._config
+        }
+    }
+
     public init(config: Config){
         _config = config
     }

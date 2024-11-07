@@ -15,6 +15,7 @@
  */
 package cjfinal.plugin.activerecord
 
+import cjfinal.config.Config as CJFinalConfig
 import cjfinal.plugin.{IPlugin, IDatasourceProvider}
 import cjfinal.plugin.activerecord.dialect.{Dialect, MysqlDialect}
 import std.database.sql.Datasource
@@ -73,6 +74,7 @@ public class ActiveRecordPlugin <: IPlugin{
         _configName = configName
         _dp = dsProvider
         _dialect = dialect
+        _showSql = CJFinalConfig.DEV_MODE
     }
 
     /**
@@ -85,6 +87,8 @@ public class ActiveRecordPlugin <: IPlugin{
 
         let config = Config(_configName, _dp.getDatasource(), _dialect, _showSql)
         DbKit.addConfig(_configName, config)
+
+        _isStarted = true
         return true
     }
 
@@ -92,6 +96,8 @@ public class ActiveRecordPlugin <: IPlugin{
      * 停止插件
      */
     public override func stop(): Bool{
-        true
+        DbKit.removeConfig(_configName)
+        _isStarted = false
+        return true
     }
 }

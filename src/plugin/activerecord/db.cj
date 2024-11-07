@@ -33,6 +33,13 @@ public class Db{
     }
 
     /**
+     * 删除缓存的DbPro，如果不存在相应的DbPro，返回None
+     */
+    public static func removeDbPro(config: Config): ?DbPro{
+        return cache.remove(config.name)
+    }
+
+    /**
      * 选择使用哪个数据源
      */
     public static func use(configName: String): DbPro{
