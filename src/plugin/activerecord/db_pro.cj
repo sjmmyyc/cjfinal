@@ -15,6 +15,9 @@
  */
 package cjfinal.plugin.activerecord
 
+import std.collection.ArrayList
+import std.database.sql.{SqlDbType, UpdateResult}
+
 /**
  * DbPro.数据库访问操作的主要实现类
  */
@@ -32,12 +35,29 @@ public class DbPro{
         _config = config
     }
 
-    public func save(table: String, record: Record): Bool{
-        return save(table, "id", record)
+    public func save(table: String, record: Record): UpdateResult{
+        let conn = _config.connect()
+        let sql = StringBuilder()
+        let params = ArrayList<SqlDbType>()
+        _config.dialect.forDbSave(sql, table, record, params)
+        if(_config.showSql){
+            println(sql)
+        }
+        let stmt = conn.prepareStatement(sql.toString())
+        let result = stmt.update(params.toArray())
+        conn.close()
+        return result
     }
 
-    public func save(table: String, primaryKey: String, record: Record): Bool{
-        println(_config.name)
-        true
-    }
+    /**
+     * 根据主键组成的字符串，获取到主键列表
+     */
+    // private func getPrimaryKeys(primaryKey: String): Array<String>{
+    //     let list = ArrayList<String>()
+    //     let arr = primaryKey.split(",")
+    //     for(key in arr){
+    //         list.append(key.trimAscii())
+    //     }
+    //     return list.toArray()
+    // }
 }

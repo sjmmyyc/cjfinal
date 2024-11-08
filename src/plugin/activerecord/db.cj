@@ -16,6 +16,7 @@
 package cjfinal.plugin.activerecord
 
 import std.collection.{Map, HashMap}
+import std.database.sql.UpdateResult
 
 /**
  * Db.
@@ -52,11 +53,7 @@ public class Db{
         }
     }
 
-    public static func save(table: String, record: Record): Bool{
+    public static func save(table: String, record: Record): UpdateResult{
         return MAIN.getOrThrow().save(table, record)
-    }
-
-    public static func save(table: String, primaryKey: String, record: Record): Bool{
-        return MAIN.getOrThrow().save(table, primaryKey, record)
     }
 }

@@ -17,7 +17,6 @@ package cjfinal.plugin.activerecord
 
 import cjfinal.config.Config as CJFinalConfig
 import cjfinal.plugin.{IPlugin, IDatasourceProvider}
-import cjfinal.plugin.activerecord.dialect.{Dialect, MysqlDialect}
 import std.database.sql.Datasource
 
 /**

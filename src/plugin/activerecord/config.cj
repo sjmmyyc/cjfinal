@@ -15,8 +15,7 @@
  */
 package cjfinal.plugin.activerecord
 
-import cjfinal.plugin.activerecord.dialect.{Dialect, MysqlDialect}
-import std.database.sql.Datasource
+import std.database.sql.{Datasource, Connection}
 
 /**
  * ActiveRecordPlugin Config.
@@ -43,6 +42,12 @@ public class Config{
         }
     }
 
+    public prop dialect: Dialect{
+        get(){
+            return _dialect
+        }
+    }
+
     /**
      * 构造器
      * @Param name - 配置名称
@@ -55,5 +60,9 @@ public class Config{
         _ds = datasource
         _dialect = dialect
         _showSql = showSql
+    }
+
+    public func connect(): Connection{
+        return _ds.connect()
     }
 }

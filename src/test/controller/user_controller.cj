@@ -16,8 +16,11 @@
 package cjfinal.test.controller
 
 import cjfinal.core.Controller
+import cjfinal.aop.Clear
 import cjfinal.plugin.activerecord.{Record, Db}
 import std.time.DateTime
+import std.database.sql.{SqlNullableDouble, SqlNullableDecimal, SqlNullableDate, SqlNullableTime, SqlNullableTimestamp}
+import std.math.numeric.Decimal
 
 public class UserController <: Controller{
     public func index(){
@@ -28,15 +31,24 @@ public class UserController <: Controller{
         this.renderText("user list...")
     }
 
+    @Clear[""]
     public func add(){
-        let test = Record().set("varcharCol", "Test")
-            .set("intCol", 12)
-            .set("doubleCol", 10.1)
-            .set("decimalCol", 20.2)
-            .set("dataCol", DateTime.now())
-            .set("timeCol", DateTime.now())
-            .set("datatimeCol", DateTime.now())
-        Db.save("simple", test)
-        this.renderText("add user...")
+        let now = DateTime.now()
+        let test = Record()
+            .setString("varcharCol", None)
+            .setBigInt("intCol", 12)
+            .setFloat64("doubleCol", 10.1)
+            .setDecimal("decimalCol", Decimal(20.2))
+            .setDate("dataCol", None)
+            .setTime("timeCol", now)
+            .setDateTime("datatimeCol", now)
+            .setBool("boolCol", false)
+        let result = Db.save("simple", test)
+        this.renderText("add user...${result.lastInsertId}")
+    }
+
+    @Clear[""]
+    public func del(){
+        
     }
 }

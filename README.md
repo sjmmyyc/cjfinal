@@ -459,6 +459,8 @@ public class MyInterceptor <: Interceptor{
 ## 4.3 @Before
 `@Before` 注解用来对拦截器进行配置，该注解可配置class、method级别的拦截器，以下是代码示例：
 ```
+import cjfinal.aop.Before
+
 // 配置一个Class级别的拦截器，它将拦截本类中的所有方法
 @Before["test.interceptor.ControllerInterceptor"]
 public class RootController <: Controller{
@@ -495,6 +497,8 @@ public class RootController <: Controller{
 * 不带参数时清除所有拦截器，带参时清除参数指定的拦截器
 
 ```
+import cjfinal.aop.Clear
+
 // 清除所有上层拦截器，本层与下层不清除
 @Clear[""]
 public class RootController <: Controller{

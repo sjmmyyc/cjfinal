@@ -13,11 +13,15 @@
  * Mulan Permissive Software License，Version 2 (Mulan PSL v2)
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
-package cjfinal.plugin.activerecord.dialect
+package cjfinal.plugin.activerecord
+
+import std.collection.ArrayList
+import std.database.sql.SqlDbType
 
 /**
  * Dialect.
  */
 public abstract class Dialect{
 
+    public func forDbSave(sql: StringBuilder, tableName: String, record: Record, params: ArrayList<SqlDbType>): Unit
 }

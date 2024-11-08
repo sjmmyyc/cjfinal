@@ -35,7 +35,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.2.6"
+    public static let version = "0.2.7"
 
     public static let me: CJFinal = CJFinal()
 
