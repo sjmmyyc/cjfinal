@@ -16,7 +16,11 @@
 package cjfinal.plugin.activerecord
 
 import std.collection.ArrayList
-import std.database.sql.SqlDbType
+import std.database.sql.{SqlDbType, SqlNullableBigInt, SqlNullableVarchar, SqlNullableBinary, SqlNullableBlob, SqlNullableBool, SqlNullableByte, SqlNullableChar,
+        SqlNullableClob, SqlNullableDate, SqlNullableDecimal, SqlNullableDouble, SqlNullableInteger, SqlNullableInterval, SqlNullableReal, SqlNullableSmallInt,
+        SqlNullableTime, SqlNullableTimestamp, SqlNullableTimeTz, SqlNullableVarBinary}
+import std.convert.Parsable
+import std.reflect.TypeInfo
 
 /**
  * Dialect.
@@ -24,4 +28,33 @@ import std.database.sql.SqlDbType
 public abstract class Dialect{
 
     public func forDbSave(sql: StringBuilder, tableName: String, record: Record, params: ArrayList<SqlDbType>): Unit
+
+    public func forDbDelete(sql: StringBuilder, tableName: String, record: Record, params: ArrayList<SqlDbType>): Unit
+
+    func isNone(sqlType: SqlDbType): Bool{
+        var isNone = false
+        match(sqlType){
+            case v: SqlNullableBigInt => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableBinary => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableBlob => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableBool => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableByte => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableChar => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableClob => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableDate => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableDecimal => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableDouble => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableInteger => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableInterval => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableReal => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableSmallInt => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableTime => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableTimestamp => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableTimeTz => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableVarBinary => if(v.value.isNone()){isNone = true}
+            case v: SqlNullableVarchar => if(v.value.isNone()){isNone = true}
+            case _ => throw UnsupportedException("Unsupported SqlDbType")
+        }
+        return isNone
+    }
 }

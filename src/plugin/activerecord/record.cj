@@ -57,7 +57,7 @@ public class Record{
         return this
     }
 
-    public func setInt8(column: String, value: ?Int8): Record{
+    public func setByte(column: String, value: ?Int8): Record{
         _columns.put(column, SqlNullableByte(value))
         return this
     }
@@ -82,27 +82,27 @@ public class Record{
         return this
     }
 
-    public func setFloat64(column: String, value: ?Float64): Record{
+    public func setDouble(column: String, value: ?Float64): Record{
         _columns.put(column, SqlNullableDouble(value))
         return this
     }
 
-    public func setInt32(column: String, value: ?Int32): Record{
+    public func setInteger(column: String, value: ?Int32): Record{
         _columns.put(column, SqlNullableInteger(value))
         return this
     }
 
-    public func setDuration(column: String, value: ?Duration): Record{
+    public func setInterval(column: String, value: ?Duration): Record{
         _columns.put(column, SqlNullableInterval(value))
         return this
     }
 
-    public func setFloat32(column: String, value: ?Float32): Record{
+    public func setReal(column: String, value: ?Float32): Record{
         _columns.put(column, SqlNullableReal(value))
         return this
     }
 
-    public func setInt16(column: String, value: ?Int16): Record{
+    public func setSmallInt(column: String, value: ?Int16): Record{
         _columns.put(column, SqlNullableSmallInt(value))
         return this
     }
@@ -118,7 +118,7 @@ public class Record{
     }
 
     public func setDateTime(column: String, value: ?DateTime): Record{
-        _columns.put(column, SqlNullableTimestamp(value))
+        setTimestamp(column, value)
         return this
     }
 
@@ -127,12 +127,12 @@ public class Record{
         return this
     }
 
-    public func setByteArray(column: String, value: ?Array<Byte>): Record{
+    public func setVarBinary(column: String, value: ?Array<Byte>): Record{
         _columns.put(column, SqlNullableVarBinary(value))
         return this
     }
 
-    public func setString(column: String, value: ?String): Record{
+    public func setVarchar(column: String, value: ?String): Record{
         _columns.put(column, SqlNullableVarchar(value))
         return this
     }

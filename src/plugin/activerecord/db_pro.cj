@@ -17,6 +17,7 @@ package cjfinal.plugin.activerecord
 
 import std.collection.ArrayList
 import std.database.sql.{SqlDbType, UpdateResult}
+import std.reflect.TypeInfo
 
 /**
  * DbPro.数据库访问操作的主要实现类
@@ -40,6 +41,20 @@ public class DbPro{
         let sql = StringBuilder()
         let params = ArrayList<SqlDbType>()
         _config.dialect.forDbSave(sql, table, record, params)
+        if(_config.showSql){
+            println(sql)
+        }
+        let stmt = conn.prepareStatement(sql.toString())
+        let result = stmt.update(params.toArray())
+        conn.close()
+        return result
+    }
+
+    public func delete(table: String, record: Record): UpdateResult{
+        let conn = _config.connect()
+        let sql = StringBuilder()
+        let params = ArrayList<SqlDbType>()
+        _config.dialect.forDbDelete(sql, table, record, params)
         if(_config.showSql){
             println(sql)
         }

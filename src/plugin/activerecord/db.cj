@@ -56,4 +56,11 @@ public class Db{
     public static func save(table: String, record: Record): UpdateResult{
         return MAIN.getOrThrow().save(table, record)
     }
+
+    /**
+     * 将record中的所有参数以and连接做为判断条件，来删除table表中的条目
+     */
+    public static func delete(table: String, record: Record): UpdateResult{
+        return MAIN.getOrThrow().delete(table, record)
+    }
 }

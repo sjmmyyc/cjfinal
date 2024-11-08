@@ -35,9 +35,9 @@ public class UserController <: Controller{
     public func add(){
         let now = DateTime.now()
         let test = Record()
-            .setString("varcharCol", None)
+            .setVarchar("varcharCol", None)
             .setBigInt("intCol", 12)
-            .setFloat64("doubleCol", 10.1)
+            .setDouble("doubleCol", 10.1)
             .setDecimal("decimalCol", Decimal(20.2))
             .setDate("dataCol", None)
             .setTime("timeCol", now)
@@ -49,6 +49,10 @@ public class UserController <: Controller{
 
     @Clear[""]
     public func del(){
-        
+        let record = Record()
+            .setInteger("intCol", 12)
+            .setVarchar("varcharCol", None)
+        let result = Db.delete("simple", record)
+        this.renderHtml("delete: lastInsertId: ${result.lastInsertId} rowCount: ${result.rowCount}")
     }
 }

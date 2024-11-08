@@ -28,7 +28,7 @@
 | Json转换 | <font color=green>[√] 已完成</font> | CJFinal通过在class或struct定义前加上@Json宏，使其具备可被自动解析成Json的功能 |
 | 上传/下载 | <font color=green>[√] 已完成</font> | 文件上传用getFiles(..)/getFile(..)系列方法<br/>文件下载用renderFile(..)系列方法 |
 | 插件化 | <font color=green>[√] 已完成</font> | CJFinal支持采用插件化的方式进行扩展（实验性） |
-| DatasourcePlugin | <font color=green>[√] 已完成</font> | 数据库插件，暂仅支持未池化的MySQL数据库连接 |
+| DatasourcePlugin | <font color=green>[√] 已完成</font> | 数据库插件，支持仓颉官方PooledDatacource连接池，暂仅支持MySQL数据库 |
 | ActiveRecordPlugin | <font color=red>[▶] 进行中</font> | 延续 JFinal 的 Db+Record 模式，将作为 CJFinal 操作数据库的核心模块 |
 | CronPlugin | [×] 待完成 | 将以插件的形式提供定时任务功能 |
 | RedisPlugin| [×] 待完成 | 将以插件的形式提供对Redis的支持 |

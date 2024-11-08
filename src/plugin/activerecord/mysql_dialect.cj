@@ -16,7 +16,7 @@
 package cjfinal.plugin.activerecord
 
 import std.collection.ArrayList
-import std.database.sql.SqlDbType
+import std.database.sql.{SqlDbType, SqlNullableVarchar, SqlNullableBigInt}
 import std.reflect.TypeInfo
 
 /**
@@ -50,6 +50,34 @@ public class MysqlDialect <: Dialect{
         // 计算params
         for(key in keys){
             params.append(record.columns.get(key).getOrThrow())
+        }
+    }
+
+    public func forDbDelete(sql: StringBuilder, tableName: String, record: Record, params: ArrayList<SqlDbType>): Unit{
+        // 拼接sql
+        sql.append("delete from `${tableName}` where ")
+        let keys = record.columns.keys()
+        var index = 1
+        for(key in keys){
+            let value = record.columns.get(key).getOrThrow()   
+            let isNone = isNone(value)
+            if(index == 1){
+                if(!isNone){
+                    sql.append("`${key}`=?")
+                }else{
+                    sql.append("`${key}` is null")
+                }
+            }else{
+                if(!isNone){
+                    sql.append(" and `${key}`=?")
+                }else{
+                    sql.append(" and `${key}` is null")
+                }
+            }
+            if(!isNone){
+                params.append(record.columns.get(key).getOrThrow())
+            }
+            index++
         }
     }
 }
