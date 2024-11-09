@@ -77,4 +77,9 @@ public class Db{
         let paramList = ArrayList<Any>(params)
         return MAIN.getOrThrow().update(sql, paramList)
     }
+
+    public static func findFirst(sql: String, params: Array<Any>): Record{
+        let paramList = ArrayList<Any>(params)
+        return MAIN.getOrThrow().findFirst(sql, paramList)
+    }
 }

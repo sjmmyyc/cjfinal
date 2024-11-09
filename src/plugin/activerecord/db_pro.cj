@@ -87,8 +87,25 @@ public class DbPro{
         let conn = _config.connect()
         let stmt = conn.prepareStatement(sql)
         let result = stmt.update(paramList.toArray())
-        conn.close
+        conn.close()
         return result
+    }
+
+    public func findFirst(sql: String, params: ArrayList<Any>): Record{
+        let paramList = DbKit.getSqlDbTypeList(params)
+        let record = Record()
+        let conn = _config.connect()
+        let stmt = conn.prepareStatement(sql)
+        let result = stmt.query(paramList.toArray())
+        let results = DbKit.getSqlDbTypeList(result.columnInfos)
+        result.next(results)
+        var i = 0
+        for(columnInfo in result.columnInfos){
+            record.set(columnInfo.name, results.get(i).getOrThrow())
+            i++
+        }
+        conn.close()
+        return record
     }
 
     /**

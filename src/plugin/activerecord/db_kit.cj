@@ -61,7 +61,7 @@ public class DbKit{
      * @Throw UnsupportedException - 无法转换时抛出该异常
      */
     public static func toSqlDbType(value: Any): SqlDbType{
-         match(value){
+        match(value){
             case v: String => SqlVarchar(v)
             case v: Int8 => SqlByte(v)
             case v: Int16 => SqlSmallInt(v)
@@ -86,8 +86,8 @@ public class DbKit{
             case _ => throw UnsupportedException("Unsupported type ${TypeInfo.of(value)}")
         }
     }
-
-     /**
+    
+    /**
      * 将Array<Any>转换成ArrayList<SqlDbType>
      */
     public static func getSqlDbTypeList(params: ArrayList<Any>): ArrayList<SqlDbType>{
@@ -96,5 +96,36 @@ public class DbKit{
             list.append(DbKit.toSqlDbType(param))
         }
         return list
+    }
+
+    /**
+     * 根据Array<ColumnInfo>获取Array<SqlDbType>
+     */
+    public static func getSqlDbTypeList(columnInfoArray: Array<ColumnInfo>): Array<SqlDbType>{
+        let list = ArrayList<SqlDbType>()
+        for(columnInfo in columnInfoArray){
+            match(columnInfo.typeName){
+                case "SqlNullableBigInt" | "SqlBigInt" => list.append(SqlNullableBigInt(None))
+                case "SqlNullableBlob" | "SqlBlob" => list.append(SqlNullableBlob(None))
+                case "SqlNullableBool" | "SqlBool" => list.append(SqlNullableBool(None))
+                case "SqlNullableByte" | "SqlByte" => list.append(SqlNullableByte(None))
+                case "SqlNullableChar" | "SqlChar" => list.append(SqlNullableChar(None))
+                case "SqlNullableClob" | "SqlClob" => list.append(SqlNullableClob(None))
+                case "SqlNullableDate" | "SqlDate" => list.append(SqlNullableDate(None))
+                case "SqlNullableDecimal" | "SqlDecimal" => list.append(SqlNullableDecimal(None))
+                case "SqlNullableDouble" | "SqlDouble" => list.append(SqlNullableDouble(None))
+                case "SqlNullableInteger" | "SqlInteger" => list.append(SqlNullableInteger(None))
+                case "SqlNullableInterval" | "SqlInterval" => list.append(SqlNullableInterval(None))
+                case "SqlNullableReal" | "SqlReal" => list.append(SqlNullableReal(None))
+                case "SqlNullableSmallInt" | "SqlSmallInt" => list.append(SqlNullableSmallInt(None))
+                case "SqlNullableTime" | "SqlTime" => list.append(SqlNullableTime(None))
+                case "SqlNullableTimestamp" | "SqlTimestamp" => list.append(SqlNullableTimestamp(None))
+                case "SqlNullableTimeTz" | "SqlTimeTz" => list.append(SqlNullableTimeTz(None))
+                case "SqlNullableVarBinary" | "SqlVarBinary" => list.append(SqlNullableVarBinary(None))
+                case "SqlNullableVarchar" | "SqlVarchar" => list.append(SqlNullableVarchar(None))
+                case _ => throw UnsupportedException("Unsupported type ${columnInfo.typeName}")
+            }
+        }
+        return list.toArray()
     }
 }

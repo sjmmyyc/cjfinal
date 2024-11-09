@@ -75,6 +75,14 @@ public class UserController <: Controller{
 
     @Clear[""]
     public func get(){
-        
+        try{
+            let record = Db.findFirst("select * from simple where id=?", 21)
+            let id = record.get<Int32>("id")
+            let varcharCol = record.get<String>("varcharCol")
+            let intCol = record.get<Int32>("intCol")
+            this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}")
+        }catch(e: Exception){
+            e.printStackTrace()
+        }
     }
 }

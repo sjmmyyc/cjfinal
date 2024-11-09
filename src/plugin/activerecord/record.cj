@@ -16,7 +16,9 @@
 package cjfinal.plugin.activerecord
 
 import std.collection.{Map, HashMap}
-import std.database.sql.{SqlDbType}
+import std.database.sql.*
+import std.reflect.TypeInfo
+import std.convert.Parsable
 
 /**
  * Record.
@@ -35,4 +37,56 @@ public class Record{
         _columns.put(column, DbKit.toSqlDbType(value))
         return this
     }
+
+    public func set(column: String, value: SqlDbType): Record{
+        _columns.put(column, value)
+        return this
+    }
+
+    public func get<T>(column: String): ?T{
+        if(let Some(sqlDbType) <- columns.get(column)){
+            match(sqlDbType){
+                case v: SqlVarchar => v.value as T
+                case v: SqlByte => v.value as T
+                case v: SqlSmallInt => v.value as T
+                case v: SqlInteger => v.value as T
+                case v: SqlBigInt => v.value as T
+                case v: SqlReal => v.value as T
+                case v: SqlDouble => v.value as T
+                case v: SqlDecimal => v.value as T
+                case v: SqlTimestamp => v.value as T
+                case v: SqlTime => v.value as T
+                case v: SqlDate => v.value as T
+
+                case v: SqlNullableVarchar => if(let Some(val) <- v.value){(val as T).getOrThrow()}else{None}
+                case v: SqlNullableByte =>
+                    if(let Some(val) <- v.value){
+                        if(TypeInfo.of<T>().name == "Bool"){
+                            if(val == 0){
+                                false as T
+                            }else{
+                                true as T
+                            }
+                        }else{
+                            val as T
+                        }
+                    }else{
+                        None
+                    }
+                case v: SqlNullableSmallInt => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableInteger => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableBigInt => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableReal => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableDouble => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableDecimal => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableTimestamp => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableTime => if(let Some(val) <- v.value){val as T}else{None}
+                case v: SqlNullableDate => if(let Some(val) <- v.value){val as T}else{None}
+                case _ => None
+            }
+        }else{
+            None
+        }
+    }
+
 }
