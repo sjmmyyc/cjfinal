@@ -27,10 +27,6 @@ public class UserController <: Controller{
         this.renderText("user index...")
     }
 
-    public func list(){
-        this.renderText("user list...")
-    }
-
     @Clear[""]
     public func add(){
         let now = DateTime.now()
@@ -75,16 +71,39 @@ public class UserController <: Controller{
 
     @Clear[""]
     public func get(){
-        let record = Db.findFirst("select * from simple where id=?", 7)
-        let id = record.get<Int32>("id")
-        let varcharCol = record.get<String>("varcharCol")
-        let intCol = record.get<Int32>("intCol")
-        let doubleCol = record.get<Float64>("doubleCol")
-        let decimalCol = record.get<Decimal>("decimalCol")
-        let dataCol = record.get<DateTime>("dataCol")
-        let timeCol = record.get<DateTime>("timeCol")
-        let datatimeCol = record.get<DateTime>("datatimeCol")
-        let boolCol = record.get<Bool>("boolCol")
-        this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}\ndoubleCol: ${doubleCol}\ndecimalCol: ${decimalCol}\ndataCol: ${dataCol}\ntimeCol: ${timeCol}\ndatatimeCol: ${datatimeCol}\nboolCol: ${boolCol}")
+        try{
+            let record = Db.findFirst("select * from simple where id=?", 7)
+            let id = record.get<Int32>("id")
+            let varcharCol = record.get<String>("varcharCol")
+            let intCol = record.get<Int32>("intCol")
+            let doubleCol = record.get<Float64>("doubleCol")
+            let decimalCol = record.get<Decimal>("decimalCol")
+            let dataCol = record.get<DateTime>("dataCol")
+            let timeCol = record.get<DateTime>("timeCol")
+            let datatimeCol = record.get<DateTime>("datatimeCol")
+            let boolCol = record.get<Bool>("boolCol")
+            this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}\ndoubleCol: ${doubleCol}\ndecimalCol: ${decimalCol}\ndataCol: ${dataCol}\ntimeCol: ${timeCol}\ndatatimeCol: ${datatimeCol}\nboolCol: ${boolCol}")
+        }catch(e: Exception){
+            e.printStackTrace()
+        }
+    }
+
+    @Clear[""]
+    public func list(){
+        let recordList = Db.find("select * from simple where varcharCol=?", "Test")
+        let result = StringBuilder()
+        for(record in recordList){
+            let id = record.get<Int32>("id")
+            let varcharCol = record.get<String>("varcharCol")
+            let intCol = record.get<Int32>("intCol")
+            let doubleCol = record.get<Float64>("doubleCol")
+            let decimalCol = record.get<Decimal>("decimalCol")
+            let dataCol = record.get<DateTime>("dataCol")
+            let timeCol = record.get<DateTime>("timeCol")
+            let datatimeCol = record.get<DateTime>("datatimeCol")
+            let boolCol = record.get<Bool>("boolCol")
+            result.append("id: ${id}\tvarcharCol: ${varcharCol}\tintCol: ${intCol}\tdoubleCol: ${doubleCol}\tdecimalCol: ${decimalCol}\tdataCol: ${dataCol}\ttimeCol: ${timeCol}\tdatatimeCol: ${datatimeCol}\tboolCol: ${boolCol}\n")
+        }
+        this.renderText(result.toString())
     }
 }

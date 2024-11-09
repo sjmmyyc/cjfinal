@@ -82,4 +82,9 @@ public class Db{
         let paramList = ArrayList<Any>(params)
         return MAIN.getOrThrow().findFirst(sql, paramList)
     }
+
+    public static func find(sql: String, params: Array<Any>): ArrayList<Record>{
+        let paramList = ArrayList<Any>(params)
+        return MAIN.getOrThrow().find(sql, paramList)
+    }
 }

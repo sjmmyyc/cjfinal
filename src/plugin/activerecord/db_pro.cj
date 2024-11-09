@@ -108,6 +108,26 @@ public class DbPro{
         return record
     }
 
+    public func find(sql: String, params: ArrayList<Any>): ArrayList<Record>{
+        let list = ArrayList<Record>()
+        let paramList = DbKit.getSqlDbTypeList(params)
+        let conn = _config.connect()
+        let stmt = conn.prepareStatement(sql)
+        let result = stmt.query(paramList.toArray())
+        let results = DbKit.getSqlDbTypeList(result.columnInfos)
+        while(result.next(results)){
+            var i = 0
+            var record = Record()
+            for(columnInfo in result.columnInfos){
+                record.set(columnInfo.name, results.get(i).getOrThrow())
+                i++
+            }
+            list.append(record)
+        }
+        conn.close()
+        return list
+    }
+
     /**
      * 根据主键组成的字符串，获取到主键列表
      */
