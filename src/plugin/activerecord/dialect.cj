@@ -31,6 +31,8 @@ public abstract class Dialect{
 
     public func forDbDelete(sql: StringBuilder, tableName: String, record: Record, params: ArrayList<SqlDbType>): Unit
 
+    public func forDbUpdate(sql: StringBuilder, tableName: String, pKeys: Array<String>, record: Record, params: ArrayList<SqlDbType>): Unit
+
     func isNone(sqlType: SqlDbType): Bool{
         var isNone = false
         match(sqlType){

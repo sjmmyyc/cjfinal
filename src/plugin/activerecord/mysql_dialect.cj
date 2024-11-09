@@ -80,4 +80,35 @@ public class MysqlDialect <: Dialect{
             index++
         }
     }
+
+    public func forDbUpdate(sql: StringBuilder, tableName: String, pKeys: Array<String>, record: Record, params: ArrayList<SqlDbType>): Unit{
+        // 拼接sql
+        sql.append("update `${tableName}` set ")
+        let keys = record.columns.keys()
+        var index = 1
+        for(key in keys){
+            if(index == 1){
+                if(!pKeys.contains(key)){
+                    sql.append("`${key}`=?")
+                    params.append(record.columns.get(key).getOrThrow())
+                    index++
+                }
+            }else{
+                sql.append(", `${key}`=?")
+                params.append(record.columns.get(key).getOrThrow())
+                index++
+            }
+        }
+        sql.append(" where ")
+        index = 1
+        for(key in pKeys){
+            if(index == 1){
+                sql.append("`${key}`=?")
+            }else{
+                sql.append(" and `${key}`=?")
+            }
+            params.append(record.columns.get(key).getOrThrow())
+            index++
+        }
+    }
 }

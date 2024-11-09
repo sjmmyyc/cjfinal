@@ -35,24 +35,46 @@ public class UserController <: Controller{
     public func add(){
         let now = DateTime.now()
         let test = Record()
-            .setVarchar("varcharCol", None)
-            .setBigInt("intCol", 12)
-            .setDouble("doubleCol", 10.1)
-            .setDecimal("decimalCol", Decimal(20.2))
-            .setDate("dataCol", None)
-            .setTime("timeCol", now)
-            .setDateTime("datatimeCol", now)
-            .setBool("boolCol", false)
+            .set("varcharCol", "Kevin")
+            .set("intCol", 12)
+            .set("doubleCol", 10.1)
+            .set("decimalCol", Decimal(20.2))
+            .set("dataCol", now)
+            .set("timeCol", now)
+            .set("datatimeCol", now)
+            .set("boolCol", false)
         let result = Db.save("simple", test)
-        this.renderText("add user...${result.lastInsertId}")
+        this.renderText("add. lastInsertId: ${result.lastInsertId} rowCount: ${result.rowCount}")
     }
 
     @Clear[""]
     public func del(){
         let record = Record()
-            .setInteger("intCol", 12)
-            .setVarchar("varcharCol", None)
+            .set("varcharCol", Option<String>.None)
         let result = Db.delete("simple", record)
-        this.renderHtml("delete: lastInsertId: ${result.lastInsertId} rowCount: ${result.rowCount}")
+        this.renderHtml("delete. lastInsertId: ${result.lastInsertId} rowCount: ${result.rowCount}")
+    }
+
+    @Clear[""]
+    public func update(){
+        let now = DateTime.now()
+        let test = Record()
+            .set("id", 20)
+            .set("varcharCol", Option<String>.None)
+            .set("intCol", Option<Int>.None)
+            .set("doubleCol", 100.1)
+            .set("decimalCol", Decimal(202.2))
+            .set("dataCol", Option<DateTime>.None)
+            .set("timeCol", now)
+            .set("datatimeCol", now)
+            .set("boolCol", false)
+        let result = Db.update("simple", test)
+        // let result = Db.update("update simple set intCol=? where id=?", Option<Int>.None, 9)
+        this.renderText("update. lastInsertId: ${result.lastInsertId} rowCount: ${result.rowCount}")
+    }
+
+    @Clear[""]
+    public func get(){
+        
     }
 }

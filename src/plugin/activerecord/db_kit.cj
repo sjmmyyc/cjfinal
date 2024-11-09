@@ -15,7 +15,11 @@
  */
 package cjfinal.plugin.activerecord
 
-import std.collection.{Map, HashMap}
+import std.collection.{Map, HashMap, ArrayList}
+import std.math.numeric.Decimal
+import std.time.DateTime
+import std.database.sql.*
+import std.reflect.TypeInfo
 
 /**
  * DbKit用于管理多数据源和其配置信息
@@ -50,5 +54,47 @@ public class DbKit{
         let config = configs.remove(name).getOrThrow()
         Db.removeDbPro(config)
         return config
+    }
+
+    /**
+     * 将Any类型的值转换成SqlDbType类型
+     * @Throw UnsupportedException - 无法转换时抛出该异常
+     */
+    public static func toSqlDbType(value: Any): SqlDbType{
+         match(value){
+            case v: String => SqlVarchar(v)
+            case v: Int8 => SqlByte(v)
+            case v: Int16 => SqlSmallInt(v)
+            case v: Int32 => SqlInteger(v)
+            case v: Int64 => SqlBigInt(v)
+            case v: Float32 => SqlReal(v)
+            case v: Float64 => SqlDouble(v)
+            case v: Decimal => SqlDecimal(v)
+            case v: DateTime => SqlTimestamp(v)
+            case v: Bool => SqlBool(v)
+
+            case v: ?String => SqlNullableVarchar(v)
+            case v: ?Int8 => SqlNullableByte(v)
+            case v: ?Int16 => SqlNullableSmallInt(v)
+            case v: ?Int32 => SqlNullableInteger(v)
+            case v: ?Int64 => SqlNullableBigInt(v)
+            case v: ?Float32 => SqlNullableReal(v)
+            case v: ?Float64 => SqlNullableDouble(v)
+            case v: ?Decimal => SqlNullableDecimal(v)
+            case v: ?DateTime => SqlNullableTimestamp(v)
+            case v: ?Bool => SqlNullableBool(v)
+            case _ => throw UnsupportedException("Unsupported type ${TypeInfo.of(value)}")
+        }
+    }
+
+     /**
+     * 将Array<Any>转换成ArrayList<SqlDbType>
+     */
+    public static func getSqlDbTypeList(params: ArrayList<Any>): ArrayList<SqlDbType>{
+        let list = ArrayList<SqlDbType>()
+        for(param in params){
+            list.append(DbKit.toSqlDbType(param))
+        }
+        return list
     }
 }

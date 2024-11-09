@@ -17,6 +17,7 @@ package cjfinal.plugin.activerecord
 
 import std.collection.{Map, HashMap}
 import std.database.sql.UpdateResult
+import std.collection.ArrayList
 
 /**
  * Db.
@@ -62,5 +63,18 @@ public class Db{
      */
     public static func delete(table: String, record: Record): UpdateResult{
         return MAIN.getOrThrow().delete(table, record)
+    }
+
+    public static func update(table: String, record: Record): UpdateResult{
+        return MAIN.getOrThrow().update(table, record)
+    }
+
+    public static func update(table: String, primaryKeys: String, recrod: Record): UpdateResult{
+        return MAIN.getOrThrow().update(table, primaryKeys, recrod)
+    }
+
+    public static func update(sql: String, params: Array<Any>): UpdateResult{
+        let paramList = ArrayList<Any>(params)
+        return MAIN.getOrThrow().update(sql, paramList)
     }
 }

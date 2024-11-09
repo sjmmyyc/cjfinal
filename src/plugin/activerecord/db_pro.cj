@@ -14,7 +14,6 @@
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
 package cjfinal.plugin.activerecord
-
 import std.collection.ArrayList
 import std.database.sql.{SqlDbType, UpdateResult}
 import std.reflect.TypeInfo
@@ -64,15 +63,43 @@ public class DbPro{
         return result
     }
 
+    public func update(table: String, record: Record): UpdateResult{
+        return update(table, "id", record)
+    }
+
+    public func update(table: String, primaryKeys: String, record: Record): UpdateResult{
+        let conn = _config.connect()
+        let sql = StringBuilder()
+        let params = ArrayList<SqlDbType>()
+        let pKeys = toArray(primaryKeys)
+        _config.dialect.forDbUpdate(sql, table, pKeys, record, params)
+        if(_config.showSql){
+            println(sql)
+        }
+        let stmt = conn.prepareStatement(sql.toString())
+        let result = stmt.update(params.toArray())
+        conn.close()
+        return result
+    }
+
+    public func update(sql: String, params: ArrayList<Any>): UpdateResult{
+        let paramList = DbKit.getSqlDbTypeList(params)
+        let conn = _config.connect()
+        let stmt = conn.prepareStatement(sql)
+        let result = stmt.update(paramList.toArray())
+        conn.close
+        return result
+    }
+
     /**
      * 根据主键组成的字符串，获取到主键列表
      */
-    // private func getPrimaryKeys(primaryKey: String): Array<String>{
-    //     let list = ArrayList<String>()
-    //     let arr = primaryKey.split(",")
-    //     for(key in arr){
-    //         list.append(key.trimAscii())
-    //     }
-    //     return list.toArray()
-    // }
+    private func toArray(primaryKey: String): Array<String>{
+        let list = ArrayList<String>()
+        let arr = primaryKey.split(",")
+        for(key in arr){
+            list.append(key.trimAscii())
+        }
+        return list.toArray()
+    }
 }

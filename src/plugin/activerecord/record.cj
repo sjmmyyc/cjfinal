@@ -16,13 +16,7 @@
 package cjfinal.plugin.activerecord
 
 import std.collection.{Map, HashMap}
-import std.time.DateTime
-import std.io.InputStream
-import std.math.numeric.Decimal
-import std.database.sql.{SqlDbType, SqlNullableBigInt, SqlNullableBinary, SqlNullableBlob, SqlNullableBool, 
-        SqlNullableByte, SqlNullableChar, SqlNullableClob, SqlNullableDate, SqlNullableDecimal, SqlNullableDouble,
-        SqlNullableInteger, SqlNullableInterval, SqlNullableReal, SqlNullableSmallInt, SqlNullableTime, 
-        SqlNullableTimestamp, SqlNullableTimeTz, SqlNullableVarBinary, SqlNullableVarchar}
+import std.database.sql.{SqlDbType}
 
 /**
  * Record.
@@ -37,103 +31,8 @@ public class Record{
         }
     }
 
-    public func setBigInt(column: String, value: ?Int): Record{
-        _columns.put(column, SqlNullableBigInt(value))
-        return this
-    }
-
-    public func setBinary(column: String, value: ?Array<Byte>): Record{
-        _columns.put(column, SqlNullableBinary(value))
-        return this
-    }
-
-    public func setBlob(column: String, value: ?InputStream): Record{
-        _columns.put(column, SqlNullableBlob(value))
-        return this
-    }
-
-    public func setBool(column: String, value: ?Bool): Record{
-        _columns.put(column, SqlNullableBool(value))
-        return this
-    }
-
-    public func setByte(column: String, value: ?Int8): Record{
-        _columns.put(column, SqlNullableByte(value))
-        return this
-    }
-
-    public func setChar(column: String, value: ?String): Record{
-        _columns.put(column, SqlNullableChar(value))
-        return this
-    }
-
-    public func setClob(column: String, value: ?InputStream): Record{
-        _columns.put(column, SqlNullableClob(value))
-        return this
-    }
-
-    public func setDate(column: String, value: ?DateTime): Record{
-        _columns.put(column, SqlNullableDate(value))
-        return this
-    }
-
-    public func setDecimal(column:String, value: ?Decimal): Record{
-        _columns.put(column, SqlNullableDecimal(value))
-        return this
-    }
-
-    public func setDouble(column: String, value: ?Float64): Record{
-        _columns.put(column, SqlNullableDouble(value))
-        return this
-    }
-
-    public func setInteger(column: String, value: ?Int32): Record{
-        _columns.put(column, SqlNullableInteger(value))
-        return this
-    }
-
-    public func setInterval(column: String, value: ?Duration): Record{
-        _columns.put(column, SqlNullableInterval(value))
-        return this
-    }
-
-    public func setReal(column: String, value: ?Float32): Record{
-        _columns.put(column, SqlNullableReal(value))
-        return this
-    }
-
-    public func setSmallInt(column: String, value: ?Int16): Record{
-        _columns.put(column, SqlNullableSmallInt(value))
-        return this
-    }
-
-    public func setTime(column: String, value: ?DateTime): Record{
-        _columns.put(column, SqlNullableTime(value))
-        return this
-    }
-
-    public func setTimestamp(column: String, value: ?DateTime): Record{
-        _columns.put(column, SqlNullableTimestamp(value))
-        return this
-    }
-
-    public func setDateTime(column: String, value: ?DateTime): Record{
-        setTimestamp(column, value)
-        return this
-    }
-
-    public func setTimeTz(column: String, value: ?DateTime): Record{
-        _columns.put(column, SqlNullableTimeTz(value))
-        return this
-    }
-
-    public func setVarBinary(column: String, value: ?Array<Byte>): Record{
-        _columns.put(column, SqlNullableVarBinary(value))
-        return this
-    }
-
-    public func setVarchar(column: String, value: ?String): Record{
-        _columns.put(column, SqlNullableVarchar(value))
+    public func set(column: String, value: Any): Record{
+        _columns.put(column, DbKit.toSqlDbType(value))
         return this
     }
 }
