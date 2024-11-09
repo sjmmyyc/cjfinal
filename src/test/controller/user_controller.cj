@@ -75,14 +75,16 @@ public class UserController <: Controller{
 
     @Clear[""]
     public func get(){
-        try{
-            let record = Db.findFirst("select * from simple where id=?", 21)
-            let id = record.get<Int32>("id")
-            let varcharCol = record.get<String>("varcharCol")
-            let intCol = record.get<Int32>("intCol")
-            this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}")
-        }catch(e: Exception){
-            e.printStackTrace()
-        }
+        let record = Db.findFirst("select * from simple where id=?", 7)
+        let id = record.get<Int32>("id")
+        let varcharCol = record.get<String>("varcharCol")
+        let intCol = record.get<Int32>("intCol")
+        let doubleCol = record.get<Float64>("doubleCol")
+        let decimalCol = record.get<Decimal>("decimalCol")
+        let dataCol = record.get<DateTime>("dataCol")
+        let timeCol = record.get<DateTime>("timeCol")
+        let datatimeCol = record.get<DateTime>("datatimeCol")
+        let boolCol = record.get<Bool>("boolCol")
+        this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}\ndoubleCol: ${doubleCol}\ndecimalCol: ${decimalCol}\ndataCol: ${dataCol}\ntimeCol: ${timeCol}\ndatatimeCol: ${datatimeCol}\nboolCol: ${boolCol}")
     }
 }
