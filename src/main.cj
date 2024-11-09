@@ -15,10 +15,10 @@
  */
 package cjfinal
 
-import cjfinal.core.CJFinal
-import cjfinal.test.TestConfig
+// import cjfinal.core.CJFinal
+// import cjfinal.test.TestConfig
 
-main(): Int64 {
-    CJFinal.start(TestConfig(), 8080)
-    return 0
-}
+// main(): Int64 {
+//     CJFinal.start(TestConfig(), 8080)
+//     return 0
+// }
