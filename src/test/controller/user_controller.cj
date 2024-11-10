@@ -21,6 +21,7 @@ import cjfinal.plugin.activerecord.{Record, Db}
 import std.time.DateTime
 import std.database.sql.{SqlNullableDouble, SqlNullableDecimal, SqlNullableDate, SqlNullableTime, SqlNullableTimestamp}
 import std.math.numeric.Decimal
+import std.collection.ArrayList
 
 public class UserController <: Controller{
     public func index(){
@@ -105,5 +106,14 @@ public class UserController <: Controller{
             result.append("id: ${id}\tvarcharCol: ${varcharCol}\tintCol: ${intCol}\tdoubleCol: ${doubleCol}\tdecimalCol: ${decimalCol}\tdataCol: ${dataCol}\ttimeCol: ${timeCol}\tdatatimeCol: ${datatimeCol}\tboolCol: ${boolCol}\n")
         }
         this.renderText(result.toString())
+    }
+
+    @Clear[""]
+    public func query(){
+        // 获得单列列表
+        // let list = Db.queryList<String>("select varcharCol from simple where boolCol is null")
+        // this.renderText(list.toString())
+        let count = Db.query<String>("select varcharCol from simple where id=?", 1)
+        this.renderText("count: ${count}")
     }
 }

@@ -128,6 +128,41 @@ public class DbPro{
         return list
     }
 
+    public func queryList<T>(sql: String, params: ArrayList<Any>): ArrayList<?T>{
+        let list = ArrayList<?T>()
+        let paramList = DbKit.getSqlDbTypeList(params)
+        let conn = _config.connect()
+        let stmt = conn.prepareStatement(sql)
+        let result = stmt.query(paramList.toArray())
+        if(result.columnInfos.size != 1){
+            conn.close()
+            throw IllegalArgumentException("Db.query(..) only supports single column queries.")
+        }
+        let results = DbKit.getSqlDbTypeList(result.columnInfos)
+        while(result.next(results)){
+            list.append(DbKit.getValue<T>(results.get(0).getOrThrow()))
+        }
+        conn.close()
+        return list
+    }
+
+    public func query<T>(sql: String, params: ArrayList<Any>): ?T{
+        var value: ?T = None
+        let paramList = DbKit.getSqlDbTypeList(params)
+        let conn = _config.connect()
+        let stmt = conn.prepareStatement(sql)
+        let result = stmt.query(paramList.toArray())
+        if(result.columnInfos.size != 1){
+            conn.close()
+            throw IllegalArgumentException("Db.query(..) only supports single column queries.")
+        }
+        let results = DbKit.getSqlDbTypeList(result.columnInfos)
+        result.next(results)
+        value = DbKit.getValue<T>(results.get(0).getOrThrow())
+        conn.close()
+        return value
+    }
+
     /**
      * 根据主键组成的字符串，获取到主键列表
      */

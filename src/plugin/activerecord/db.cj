@@ -73,9 +73,17 @@ public class Db{
         return MAIN.getOrThrow().update(table, primaryKeys, recrod)
     }
 
+    public static func update(sql: String): UpdateResult{
+        return update(sql, [])
+    }
+
     public static func update(sql: String, params: Array<Any>): UpdateResult{
         let paramList = ArrayList<Any>(params)
         return MAIN.getOrThrow().update(sql, paramList)
+    }
+
+    public static func findFirst(sql: String): Record{
+        return findFirst(sql, [])
     }
 
     public static func findFirst(sql: String, params: Array<Any>): Record{
@@ -83,8 +91,30 @@ public class Db{
         return MAIN.getOrThrow().findFirst(sql, paramList)
     }
 
+    public static func find(sql: String): ArrayList<Record>{
+        return find(sql, [])
+    }
+
     public static func find(sql: String, params: Array<Any>): ArrayList<Record>{
         let paramList = ArrayList<Any>(params)
         return MAIN.getOrThrow().find(sql, paramList)
+    }
+
+    public static func queryList<T>(sql: String): ArrayList<?T>{
+        return queryList<T>(sql, [])
+    }
+
+    public static func queryList<T>(sql: String, params: Array<Any>): ArrayList<?T>{
+        let paramList = ArrayList<Any>(params)
+        return MAIN.getOrThrow().queryList(sql, paramList)
+    }
+
+    public static func query<T>(sql: String): ?T{
+        return query(sql, [])
+    }
+
+    public static func query<T>(sql: String, params: Array<Any>): ?T{
+        let paramList = ArrayList<Any>(params)
+        return MAIN.getOrThrow().query(sql, paramList)
     }
 }
