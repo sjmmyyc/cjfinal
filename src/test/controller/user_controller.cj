@@ -116,4 +116,16 @@ public class UserController <: Controller{
         let count = Db.query<String>("select varcharCol from simple where id=?", 1)
         this.renderText("count: ${count}")
     }
+
+    @Clear[""]
+    public func tx(){
+        Db.tx({ => 
+            Db.update("update simple set doubleCol=?", 12)
+            let record = Record().set("varcharCol", "Transaction")
+            Db.save("simple", record)
+            // 返回 true 提交，返回 false 回滚
+            return false
+        })
+        this.renderText("Db.tx()")
+    }
 }

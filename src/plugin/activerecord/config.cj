@@ -22,6 +22,9 @@ import std.database.sql.{Datasource, Connection}
  */
 public class Config{
 
+    private let threadLocalConnection = ThreadLocal<Connection>()
+    private let tdIsTransaction = ThreadLocal<Bool>()
+
     private let _name: String
     private let _ds: Datasource
     private let _dialect: Dialect
@@ -49,6 +52,19 @@ public class Config{
     }
 
     /**
+     * 是否开启事务
+     */
+    public prop isTransaction: Bool{
+        get(){
+            if(let Some(isTransaction) <- tdIsTransaction.get()){
+                return isTransaction
+            }else{
+                return false
+            }
+        }
+    }
+
+    /**
      * 构造器
      * @Param name - 配置名称
      * @Param datasource - 数据源
@@ -62,7 +78,31 @@ public class Config{
         _showSql = showSql
     }
 
+    /**
+     * 获取数据库连接，先从ThreadLocal中获取，如果没有，则从Datasource获取一个新的连接
+     */
     public func connect(): Connection{
-        return _ds.connect()
+        var conn = threadLocalConnection.get()
+        if(let Some(con) <- conn){
+            return con
+        }else{
+            return _ds.connect()
+        }
+    }
+
+    /**
+     * 设置ThreadLocalConnection
+     */
+    public func setThreadLocalConnection(conn: Connection){
+        threadLocalConnection.set(conn)
+        tdIsTransaction.set(true)
+    }
+
+    /**
+     * 该方法只负责清空ThreadLocal中的值，不负责关闭Connection，因此需要自己调用Connection的close()方法
+     */
+    public func clearThreadLocalConnection(): Unit{
+        threadLocalConnection.set(None)
+        tdIsTransaction.set(None)
     }
 }

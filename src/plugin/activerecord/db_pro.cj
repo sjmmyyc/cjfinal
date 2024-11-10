@@ -15,7 +15,7 @@
  */
 package cjfinal.plugin.activerecord
 import std.collection.ArrayList
-import std.database.sql.{SqlDbType, UpdateResult}
+import std.database.sql.{SqlDbType, UpdateResult, Connection}
 import std.reflect.TypeInfo
 
 /**
@@ -45,7 +45,7 @@ public class DbPro{
         }
         let stmt = conn.prepareStatement(sql.toString())
         let result = stmt.update(params.toArray())
-        conn.close()
+        autoClose(conn)
         return result
     }
 
@@ -59,7 +59,7 @@ public class DbPro{
         }
         let stmt = conn.prepareStatement(sql.toString())
         let result = stmt.update(params.toArray())
-        conn.close()
+        autoClose(conn)
         return result
     }
 
@@ -78,7 +78,7 @@ public class DbPro{
         }
         let stmt = conn.prepareStatement(sql.toString())
         let result = stmt.update(params.toArray())
-        conn.close()
+        autoClose(conn)
         return result
     }
 
@@ -87,7 +87,7 @@ public class DbPro{
         let conn = _config.connect()
         let stmt = conn.prepareStatement(sql)
         let result = stmt.update(paramList.toArray())
-        conn.close()
+        autoClose(conn)
         return result
     }
 
@@ -104,7 +104,7 @@ public class DbPro{
             record.set(columnInfo.name, results.get(i).getOrThrow())
             i++
         }
-        conn.close()
+        autoClose(conn)
         return record
     }
 
@@ -124,7 +124,7 @@ public class DbPro{
             }
             list.append(record)
         }
-        conn.close()
+        autoClose(conn)
         return list
     }
 
@@ -142,7 +142,7 @@ public class DbPro{
         while(result.next(results)){
             list.append(DbKit.getValue<T>(results.get(0).getOrThrow()))
         }
-        conn.close()
+        autoClose(conn)
         return list
     }
 
@@ -159,8 +159,22 @@ public class DbPro{
         let results = DbKit.getSqlDbTypeList(result.columnInfos)
         result.next(results)
         value = DbKit.getValue<T>(results.get(0).getOrThrow())
-        conn.close()
+        autoClose(conn)
         return value
+    }
+
+    public func tx(trans: () -> Bool): Unit{
+        let conn = _config.connect()
+        let transaction = conn.createTransaction()
+        transaction.begin()
+        _config.setThreadLocalConnection(conn)
+        if(trans()){
+            transaction.commit()
+        }else{
+            transaction.rollback()
+        }
+        _config.clearThreadLocalConnection()
+        conn.close()
     }
 
     /**
@@ -173,5 +187,14 @@ public class DbPro{
             list.append(key.trimAscii())
         }
         return list.toArray()
+    }
+
+    /**
+     * 自动关闭连接，用于对事务的支持
+     */
+    private func autoClose(conn: Connection): Unit{
+        if(!_config.isTransaction){
+            conn.close()
+        }
     }
 }

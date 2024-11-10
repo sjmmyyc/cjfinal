@@ -117,4 +117,8 @@ public class Db{
         let paramList = ArrayList<Any>(params)
         return MAIN.getOrThrow().query(sql, paramList)
     }
+
+    public static func tx(trans: () -> Bool): Unit{
+        MAIN.getOrThrow().tx(trans)
+    }
 }
