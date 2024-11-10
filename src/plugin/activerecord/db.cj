@@ -16,7 +16,7 @@
 package cjfinal.plugin.activerecord
 
 import std.collection.{Map, HashMap}
-import std.database.sql.UpdateResult
+import std.database.sql.{UpdateResult, TransactionIsoLevel}
 import std.collection.ArrayList
 
 /**
@@ -109,16 +109,28 @@ public class Db{
         return MAIN.getOrThrow().queryList(sql, paramList)
     }
 
-    public static func query<T>(sql: String): ?T{
-        return query(sql, [])
+    public static func query<T>(sql: String): T{
+        return query<T>(sql, [])
     }
 
-    public static func query<T>(sql: String, params: Array<Any>): ?T{
+    public static func query<T>(sql: String, params: Array<Any>): T{
+        return queryNullable<T>(sql, params).getOrThrow()
+    }
+
+    public static func queryNullable<T>(sql: String): ?T{
+        return queryNullable<T>(sql, [])
+    }
+
+    public static func queryNullable<T>(sql: String, params: Array<Any>): ?T{
         let paramList = ArrayList<Any>(params)
         return MAIN.getOrThrow().query(sql, paramList)
     }
 
-    public static func tx(trans: () -> Bool): Unit{
-        MAIN.getOrThrow().tx(trans)
+    public static func tx(trans: () -> Bool): Bool{
+        return MAIN.getOrThrow().tx(TransactionIsoLevel.RepeatableRead, trans)
+    }
+
+    public static func tx(level: TransactionIsoLevel, trans: () -> Bool): Bool{
+        return MAIN.getOrThrow().tx(level, trans)
     }
 }

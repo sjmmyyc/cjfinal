@@ -54,39 +54,36 @@ public class UserController <: Controller{
 
     @Clear[""]
     public func update(){
-        let now = DateTime.now()
-        let test = Record()
-            .set("id", 20)
-            .set("varcharCol", Option<String>.None)
-            .set("intCol", Option<Int>.None)
-            .set("doubleCol", 100.1)
-            .set("decimalCol", Decimal(202.2))
-            .set("dataCol", Option<DateTime>.None)
-            .set("timeCol", now)
-            .set("datatimeCol", now)
-            .set("boolCol", false)
-        let result = Db.update("simple", test)
-        // let result = Db.update("update simple set intCol=? where id=?", Option<Int>.None, 9)
+        // let now = DateTime.now()
+        // let test = Record()
+        //     .set("id", 20)
+        //     .set("varcharCol", Option<String>.None)
+        //     .set("intCol", Option<Int>.None)
+        //     .set("doubleCol", 100.1)
+        //     .set("decimalCol", Decimal(202.2))
+        //     .set("dataCol", Option<DateTime>.None)
+        //     .set("timeCol", now)
+        //     .set("datatimeCol", now)
+        //     .set("boolCol", false)
+        // let result = Db.update("simple", test)
+        let result = Db.update("update simple set boolCol=?", 1)
         this.renderText("update. lastInsertId: ${result.lastInsertId} rowCount: ${result.rowCount}")
     }
 
     @Clear[""]
     public func get(){
-        try{
-            let record = Db.findFirst("select * from simple where id=?", 7)
-            let id = record.get<Int32>("id")
-            let varcharCol = record.get<String>("varcharCol")
-            let intCol = record.get<Int32>("intCol")
-            let doubleCol = record.get<Float64>("doubleCol")
-            let decimalCol = record.get<Decimal>("decimalCol")
-            let dataCol = record.get<DateTime>("dataCol")
-            let timeCol = record.get<DateTime>("timeCol")
-            let datatimeCol = record.get<DateTime>("datatimeCol")
-            let boolCol = record.get<Bool>("boolCol")
-            this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}\ndoubleCol: ${doubleCol}\ndecimalCol: ${decimalCol}\ndataCol: ${dataCol}\ntimeCol: ${timeCol}\ndatatimeCol: ${datatimeCol}\nboolCol: ${boolCol}")
-        }catch(e: Exception){
-            e.printStackTrace()
-        }
+        let idVal = this.getParamTo<Int>(0)
+        let record = Db.findFirst("select * from simple where id=?", idVal)
+        let id = record.get<Int32>("id")
+        let varcharCol = record.get<String>("varcharCol")
+        let intCol = record.get<Int32>("intCol")
+        let doubleCol = record.get<Float64>("doubleCol")
+        let decimalCol = record.get<Decimal>("decimalCol")
+        let dataCol = record.get<DateTime>("dataCol").toString("yyyy-MM-dd")
+        let timeCol = record.get<DateTime>("timeCol").toString("HH:mm:ss")
+        let datatimeCol = record.get<DateTime>("datatimeCol").toString("yyyy-MM-dd HH:mm:ss")
+        let boolCol = record.get<Bool>("boolCol")
+        this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}\ndoubleCol: ${doubleCol}\ndecimalCol: ${decimalCol}\ndataCol: ${dataCol}\ntimeCol: ${timeCol}\ndatatimeCol: ${datatimeCol}\nboolCol: ${boolCol}")
     }
 
     @Clear[""]
@@ -113,19 +110,19 @@ public class UserController <: Controller{
         // 获得单列列表
         // let list = Db.queryList<String>("select varcharCol from simple where boolCol is null")
         // this.renderText(list.toString())
-        let count = Db.query<String>("select varcharCol from simple where id=?", 1)
+        let count = Db.query<Int>("select count(*) from simple")
         this.renderText("count: ${count}")
     }
 
     @Clear[""]
     public func tx(){
-        Db.tx({ => 
+        let result = Db.tx({ => 
             Db.update("update simple set doubleCol=?", 12)
             let record = Record().set("varcharCol", "Transaction")
             Db.save("simple", record)
             // 返回 true 提交，返回 false 回滚
             return false
         })
-        this.renderText("Db.tx()")
+        this.renderText("Db.tx()..${result}")
     }
 }

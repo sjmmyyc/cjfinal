@@ -23,7 +23,6 @@ import std.database.sql.{Datasource, Connection}
 public class Config{
 
     private let threadLocalConnection = ThreadLocal<Connection>()
-    private let tdIsTransaction = ThreadLocal<Bool>()
 
     private let _name: String
     private let _ds: Datasource
@@ -56,10 +55,10 @@ public class Config{
      */
     public prop isTransaction: Bool{
         get(){
-            if(let Some(isTransaction) <- tdIsTransaction.get()){
-                return isTransaction
-            }else{
+            if(threadLocalConnection.get().isNone()){
                 return false
+            }else{
+                return true
             }
         }
     }
@@ -95,7 +94,6 @@ public class Config{
      */
     public func setThreadLocalConnection(conn: Connection){
         threadLocalConnection.set(conn)
-        tdIsTransaction.set(true)
     }
 
     /**
@@ -103,6 +101,5 @@ public class Config{
      */
     public func clearThreadLocalConnection(): Unit{
         threadLocalConnection.set(None)
-        tdIsTransaction.set(None)
     }
 }

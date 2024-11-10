@@ -15,7 +15,7 @@
  */
 package cjfinal.plugin.activerecord
 import std.collection.ArrayList
-import std.database.sql.{SqlDbType, UpdateResult, Connection}
+import std.database.sql.{SqlDbType, UpdateResult, Connection, TransactionIsoLevel}
 import std.reflect.TypeInfo
 
 /**
@@ -163,18 +163,23 @@ public class DbPro{
         return value
     }
 
-    public func tx(trans: () -> Bool): Unit{
+    public func tx(level: TransactionIsoLevel, trans: () -> Bool): Bool{
         let conn = _config.connect()
         let transaction = conn.createTransaction()
+        transaction.isoLevel = level
         transaction.begin()
         _config.setThreadLocalConnection(conn)
+        var result = false
         if(trans()){
             transaction.commit()
+            result = true
         }else{
             transaction.rollback()
+            result = false
         }
         _config.clearThreadLocalConnection()
         conn.close()
+        return result
     }
 
     /**

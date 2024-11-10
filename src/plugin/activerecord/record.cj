@@ -43,11 +43,19 @@ public class Record{
         return this
     }
 
-    public func get<T>(column: String): ?T{
+    public func getNullable<T>(column: String): ?T{
         if(let Some(sqlDbType) <- columns.get(column)){
             return DbKit.getValue<T>(sqlDbType)
         }else{
             return None
+        }
+    }
+
+    public func get<T>(column: String): T{
+        if(let Some(val) <- getNullable<T>(column)){
+            return val
+        }else{
+            throw NoneValueException("${column}'s value is None.")
         }
     }
 }
