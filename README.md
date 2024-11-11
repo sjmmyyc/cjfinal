@@ -27,10 +27,10 @@
 | AOP | <font color=green>[√] 已完成</font> | CJFinal专注AOP最核心的目标，将概念减少到极致<br/>仅有三个概念：Interceptor、Before、Clear，并且无需引入IOC也无需使用啰嗦的XML |
 | Json转换 | <font color=green>[√] 已完成</font> | CJFinal通过在class或struct定义前加上@Json宏，使其具备可被自动解析成Json的功能 |
 | 上传/下载 | <font color=green>[√] 已完成</font> | 文件上传用getFiles(..)/getFile(..)系列方法<br/>文件下载用renderFile(..)系列方法 |
-| 插件化 | <font color=green>[√] 已完成</font> | CJFinal支持采用插件化的方式进行扩展（实验性） |
+| 插件化 | <font color=green>[√] 已完成</font> | CJFinal支持采用插件化的方式进行扩展 |
 | DatasourcePlugin | <font color=green>[√] 已完成</font> | 数据库插件，支持仓颉官方PooledDatacource连接池，暂仅支持MySQL数据库 |
-| ActiveRecordPlugin | <font color=red>[▶] 进行中</font> | 延续 JFinal 的 Db+Record 模式，将作为 CJFinal 操作数据库的核心模块 |
-| CronPlugin | [×] 待完成 | 将以插件的形式提供定时任务功能 |
+| ActiveRecordPlugin | <font color=green>[√] 已完成</font> | 延续 JFinal 的 Db+Record 模式，作为 CJFinal 操作数据库的核心模块 |
+| CronPlugin | <font color=red>[▶] 进行中</font> | 将以插件的形式提供定时任务功能 |
 | RedisPlugin| [×] 待完成 | 将以插件的形式提供对Redis的支持 |
 | Validator | [×] 待完成 | 校验组件，在Validator类中将提供非常方便的校验方法，学习简单，使用方便 |
 
@@ -40,7 +40,7 @@
   ```
     [dependencies]
         // CJFinal依赖
-        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.2.2", output-type = "static"}
+        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.3.0", output-type = "static"}
 
     [package]
         ... // 以下内容省略
@@ -218,7 +218,15 @@ public func configInterceptor(me: Interceptors): Unit{
 全局拦截器可配置多个，按配置顺序链式执行。关于如何实现拦截器，请移步后面的 `AOP` 章节
 
 ## 2.5 configPlugin(..)
-此方法用来配置 CJFinal 的插件。
+此方法用来配置CJFinal的Plugin，如下代码配置了Datasource数据库连接池插件与ActiveRecord数据库访问插件。通过以下的配置，可以在应用中使用ActiveRecord非常方便地操作数据库。
+```
+ public func configPlugin(me: Plugins): Unit{
+    let dp = DatasourcePlugin("mysql://127.0.0.1:3306", "database", "username", "password")
+    me.add(dp)
+    let arp = ActiveRecordPlugin(dp)
+    me.add(arp)
+}
+```
 
 CJFinal插件架构是其主要扩展方式之一，可以方便地创建插件并应用到项目中去。
 
@@ -402,8 +410,10 @@ renderText("Hello CJFianl")
 // 渲染HTML，传入的是HTML格式的字符串
 renderHtml("<p></p>")
 
-// 渲染Json，传入的是可被转化成json的对象，关于Json转换的方式，请看后面的“Json转换”部分
-renderJson(obj)
+// 渲染Json，T 类型必须为实现 Serializable<T> 接口的类
+// 对于大多数普通类，可通过 @Json 宏为其自动添加实现 Serializable<T> 接口的能力，使用方法见“Json转换“部分
+renderJson(obj: T)
+renderJson(arr: ArrayList<T>)
 
 // 渲染下载文件，参数为表示文件名称的字符串，可包含目录，如：path/path2/avatar.jpg，目录必须用“/”分隔
 // 也可是绝对目录，如果是绝对目录请确定是否有访问权限
@@ -512,8 +522,169 @@ public class RootController <: Controller{
 }
 ```
 
-# 5. Db + Record
-待实现...
+# 5. ActiveRecordPlugin
+
+## 5.1 概述
+ActiveRecordPlugin 是 CJFinal 最核心的组成部分之一，提供了 Db + Record 模式，通过这种方式操作数据库，将极大地减少代码量，极大地提升开发效率。
+
+该插件需要搭配 DatasourcePlugin 使用。DatasourcePlugin 是数据库连接池插件，目前仅支持 MySQL 数据库，并且使用时，需要依赖第三方 MySQL 驱动。因此需要在 `cjpm.toml` 中添加如下依赖：
+```
+[dependencies]
+  # mysql驱动
+  mysqlclient4cj = {git = "https://gitcode.com/weixin_64400442/mysqlclient4cj.git", branch="master"}
+```
+## 5.2 使用ActiveRecordPlugin
+ActiveRecordPlugin 作为 CJFinal 的插件而存在，所以使用时需要在 CJFinalConfig 中配置该插件。
+
+以下是示例代码：
+```
+// import part
+import cjfinal.plugin.database.DatasourcePlugin
+import cjfinal.plugin.activerecord.ActiveRecordPlugin
+
+// configPlugin(..) part
+public func configPlugin(me: Plugins): Unit{
+
+    // 创建DatasourcePlugin插件实例dp
+    let dp = DatasourcePlugin("mysql://127.0.0.1:3306", "database", "username", "password")
+
+    // 将dp插件加入到CJFinal配置中
+    me.add(dp)
+
+    // 创建ActiveRecordPlugin插件实例arp，注意，需要传入dp
+    let arp = ActiveRecordPlugin(dp)
+
+    // 将arp插件加入到CJFinal配置中
+    me.add(arp)
+}
+```
+添加好插件以后，便可在项目中使用 Db + Record 模式操作数据库了。
+
+## 5.3 Db + Record模式
+### 5.3.1 常见用法
+Db + Record 模式无需对数据库表进行映射，Record相当于一个通用的 Model。以下为 Db + Record 模式的一些常见用法：
+```
+// import part
+import cjfinal.plugin.activerecord.{Record, Db, Page}
+
+// 创建name为Jay,age为18的record对象，并添加到数据表user中
+let user = Record().set("name", "Jay").set("age", 18);
+Db.save("user", user)
+
+// 如果数据库字段允许为null，可以这样添加空值
+user.set("name", Option<String>.None)
+user.set("age", Option<Int>.None)
+
+// 删除时，会将record中的所有属性以 and 连接，做为判断条件
+// 比如目前user中有name=Jay, age=18，将生成以下sql语句
+// delete from user where name=Jay and age=18
+Db.delete("user", user)
+
+// 查询所有年龄大于18岁的user
+let userList: ArrayList<Record> = Db.find("select * from user where age > ?", 18)
+// 查询名字叫Jay的user
+let user: Record = Db.findFirst("select * from user where name=?", "Jay")
+
+// 分页查询年龄大于18的user，当前页码为1，每页10个user
+let page: Page = Db.paginate(1, 10, "select *", "from user where age > ?", 18)
+
+// 查询Jay的年龄
+let age: Int = Db.query<Int>("select age from user where name=?", "Jay")
+let age: ?Int = Db.queryNullable<Int>("select age from user where name=?", "Jay")
+// 查询年龄大于18的所有人名
+let nameList: ArrayList<String> = Db.queryList<String>("select name from user where age>?", 18)
+
+// 从 record 中获取值
+let name: String = user.get<String>("name")
+let age: Int = user.get<Int>("age")
+
+// 如果数据库字段允许为null，可通过以下方式获取值
+let name: ?String = user.getNullable<String>("name")
+let age: ?Int = user.getNullable<Int>("age")
+
+// 更新数据，update以主键为条件对数据进行更新
+Db.update("user", user)
+// CJFinal默认表中的主键名称为"id"，如果不是，需要手动指定主键名称
+Db.update("user", "primaryKey", user)
+```
+
+### 5.3.2 Db.query()和Db.find()区别
+Db.find()系列方法一律将从数据库获取到的值封装成Record对象。
+
+Db.query()系列方法只将数据原样返回，需要注意的是，Db.query()只支持单列查询，即 `select name from user` 这样，如果写成多列查询，如 `select name, age from user`， 将抛出 `IllegalArgumentException` 异常
+
+### 5.3.3 渲染Json
+`Record` 和 `Page` 类都已实现 `Serializable` 接口，可通过 `Controller` 的 `renderJson()` 方法，直接返回给前端，体验极度舒爽。
+```
+let user = Db.findFirst("select * from user where name=?", "Jay")
+renderJson(user)
+
+let page = Db.paginate(1, 10, "select *", "from user")
+renderJson(page)
+
+let userList = Db.find("select * from user")
+renderJson(userList)
+```
+
+## 5.4 数据库事务处理
+通过 Db.tx() 可轻松实现事务处理
+```
+Db.tx({ => 
+    Db.update("update user set age=? where name=?", 12, "Jay")
+    let user = Record().set("name", "Jolin").set("age", 18)
+    Db.save("user", user)
+    // 返回 true 提交，返回 false 回滚
+    return true
+})
+
+// 还可以设置事务级别，函数原型如下
+Db.tx(level: TransactionIsoLevel, () -> Bool)
+```
+
+## 5.5 多数据源支持
+ActiveRecordPlugin支持多数据源。即在configPlugin()中可配置多个ActiveRecordPlugin，如下所示：
+```
+public func configPlugin(me: Plugins): Unit{
+    let dp1 = DatasourcePlugin(..)
+    me.add(dp1)
+    // 不传入名称，将做为主要的数据源
+    let arp1 = ActiveRecordPlugin(dp1)
+    me.add(arp1)
+
+    let dp2 = DatasourcePlugin(..)
+    me.add(dp2)
+    // 传入名称dp2，使用时必须先Db.use()
+    let arp2 = ActiveRecordPlugin("dp2", dp2)
+    me.add(arp2)
+}
+
+// 此时使用主源时，和上面介绍的方法一样，没有任何区别，但要使用dp2时，只需要use()一下，切换到另一数据源上去
+let user = Record().set(..)
+Db.use("dp2").save()
+```
+## 5.6 独立使用ActiveRecordPlugin
+ActiveRecordPlugin可以独立于Web环境，在任何普通的仓颉程序中使用，使用方法极简单。以下是示例代码：
+```
+import encoding.json.{ToJson}
+import cjfinal.plugin.database.DatasourcePlugin
+import cjfinal.plugin.activerecord.ActiveRecordPlugin
+
+main(){
+    let dp = DatasourcePlugin("mysql://127.0.0.1:3306", "database", "username", "password")
+    let arp = ActiveRecordPlugin(dp)
+
+    // 与Web环境不同点在于，需要手动启动插件
+    dp.start()
+    arp.start()
+
+    // 然后就可以使用了
+    let user = Db.findFirst(..)
+    println(user.serialize().toJson().asObject().toString())
+
+    return 0
+}
+```
+注意：ActiveRecordPlugin所依赖的其它插件也必须手动调用一下start()方法，如上例中的dp.start()。
 
 # 6. RedisPlugin
 待实现...
