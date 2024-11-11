@@ -50,7 +50,7 @@ public abstract class Controller{
     protected func renderJson<T>(obj: Serializable<T>): Unit{
         this.setContentType(ContentType.Json)
             .setStatus(HttpStatusCode.STATUS_OK)
-            .body(obj.serialize().toJson().asObject().toJsonString())
+            .body(obj.serialize().toJson().asObject().toString())
     }
 
     protected func renderJson<T>(list: ArrayList<T>): Unit where T <: Serializable<T>{

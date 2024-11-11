@@ -127,4 +127,11 @@ public class UserController <: Controller{
         })
         this.renderText("Db.tx()..${result}")
     }
+
+    public func page(){
+        let pageNumber = this.getParamTo<Int>(0)
+        let pageSize = this.getParamTo<Int>(1)
+        let page = Db.paginate(pageNumber, pageSize, "select *", "from simple")
+        this.renderJson(page)
+    }
 }

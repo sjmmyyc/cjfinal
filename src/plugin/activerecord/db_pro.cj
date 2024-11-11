@@ -15,7 +15,7 @@
  */
 package cjfinal.plugin.activerecord
 import std.collection.ArrayList
-import std.database.sql.{SqlDbType, UpdateResult, Connection, TransactionIsoLevel}
+import std.database.sql.{SqlDbType, UpdateResult, Connection, TransactionIsoLevel, SqlNullableBigInt}
 import std.reflect.TypeInfo
 
 /**
@@ -159,6 +159,42 @@ public class DbPro{
         return value
     }
 
+    public func paginate(pageNumber: Int, pageSize: Int, select: String, sqlExceptSelect: String, params: ArrayList<Any>): Page{
+        let paramList = DbKit.getSqlDbTypeList(params)
+        let conn = _config.connect()
+        // get totalRow
+        var sql = "select count(*) ${sqlExceptSelect}"
+        autoShowSql(sql)
+        var stmt = conn.prepareStatement(sql)
+        var result = stmt.query()
+        let totalRowSqlDbType = SqlNullableBigInt(None)
+        result.next([totalRowSqlDbType])
+        let totalRow = totalRowSqlDbType.value.getOrThrow()
+        // calculate totalPage
+        var totalPage = totalRow / pageSize
+        if(totalRow % pageSize > 0){
+            totalPage++
+        }
+        // get record list
+        sql = "${select} ${sqlExceptSelect} limit ${(pageNumber - 1) * pageSize}, ${pageSize}"
+        autoShowSql(sql)
+        stmt = conn.prepareStatement(sql)
+        result = stmt.query(paramList.toArray())
+        let list = ArrayList<Record>()
+        var results = DbKit.getSqlDbTypeList(result.columnInfos)
+        while(result.next(results)){
+            var record = Record()
+            for((index, columnInfo) in result.columnInfos.iterator().enumerate()){
+                record.set(columnInfo.name, results.get(index).getOrThrow())
+            }
+            list.append(record)
+            results = DbKit.getSqlDbTypeList(result.columnInfos)
+        }
+        let page = Page(list, pageNumber, pageSize, totalPage, totalRow)
+        autoClose(conn)
+        return page
+    }
+
     public func tx(level: TransactionIsoLevel, trans: () -> Bool): Bool{
         let conn = _config.connect()
         let transaction = conn.createTransaction()
@@ -191,7 +227,7 @@ public class DbPro{
     }
 
     /**
-     * 自动关闭连接，用于对事务的支持
+     * 自动判断是否真正关闭连接，用于对事务的支持
      */
     private func autoClose(conn: Connection): Unit{
         if(!_config.isTransaction){

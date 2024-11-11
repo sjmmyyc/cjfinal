@@ -136,6 +136,7 @@ public class DbKit{
         match(sqlDbType){
             case v: SqlVarchar => v.value as T
             case v: SqlByte => v.value as T
+            case v: SqlBool => v.value as T
             case v: SqlSmallInt => v.value as T
             case v: SqlInteger => v.value as T
             case v: SqlBigInt => v.value as T
@@ -147,20 +148,8 @@ public class DbKit{
             case v: SqlDate => v.value as T
 
             case v: SqlNullableVarchar => if(let Some(val) <- v.value){(val as T).getOrThrow()}else{None}
-            case v: SqlNullableByte =>
-                if(let Some(val) <- v.value){
-                    if(TypeInfo.of<T>().name == "Bool"){
-                        if(val == 0){
-                            false as T
-                        }else{
-                            true as T
-                        }
-                    }else{
-                        val as T
-                    }
-                }else{
-                    None
-                }
+            case v: SqlNullableByte => if(let Some(val) <- v.value){val as T}else{None}
+            case v: SqlNullableBool => if(let Some(val) <- v.value){val as T}else{None}
             case v: SqlNullableSmallInt => if(let Some(val) <- v.value){val as T}else{None}
             case v: SqlNullableInteger => if(let Some(val) <- v.value){val as T}else{None}
             case v: SqlNullableBigInt => if(let Some(val) <- v.value){val as T}else{None}

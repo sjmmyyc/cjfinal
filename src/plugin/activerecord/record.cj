@@ -62,7 +62,6 @@ public class Record <: Serializable<Record>{
 
     public func serialize(): DataModel {
         var dms = DataModelStruct()
-        
         for((name, sqlDbType) in _columns.toArray()){
             match(sqlDbType){
                 case v: SqlNullableBigInt => dms.add(field<?Int>(name, v.value))
@@ -128,13 +127,7 @@ public class Record <: Serializable<Record>{
                 case v: SqlVarchar => dms.add(field<String>(name, v.value))
                 case _ => ()
             }
-            // dms.add(field<String>(key, _columns.get(key).getOrDefault({ => "None"})))
         }
-        // dms.add(field < String >("name", name))
-        // dms.add(field < Int64 >("age", age))
-        // dms.add(field < Float64 >("total", total))
-        // dms.add(field < Bool >("isStudent", isStudent))
-        // dms.add(field < Array < String >>("auths", auths))
         return dms
     }
        

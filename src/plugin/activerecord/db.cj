@@ -126,6 +126,15 @@ public class Db{
         return MAIN.getOrThrow().query(sql, paramList)
     }
 
+    public static func paginate(pageNumber: Int, pageSize: Int, select: String, sqlExceptSelect: String): Page{
+        return paginate(pageNumber, pageSize, select, sqlExceptSelect, [])
+    }
+
+    public static func paginate(pageNumber: Int, pageSize: Int, select: String, sqlExceptSelect: String, params: Array<Any>): Page{
+        let paramList = ArrayList<Any>(params)
+        return MAIN.getOrThrow().paginate(pageNumber, pageSize, select, sqlExceptSelect, paramList)
+    }
+
     public static func tx(trans: () -> Bool): Bool{
         return MAIN.getOrThrow().tx(TransactionIsoLevel.RepeatableRead, trans)
     }
