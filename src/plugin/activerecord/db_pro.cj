@@ -40,9 +40,7 @@ public class DbPro{
         let sql = StringBuilder()
         let params = ArrayList<SqlDbType>()
         _config.dialect.forDbSave(sql, table, record, params)
-        if(_config.showSql){
-            println(sql)
-        }
+        autoShowSql(sql.toString())
         let stmt = conn.prepareStatement(sql.toString())
         let result = stmt.update(params.toArray())
         autoClose(conn)
@@ -54,9 +52,7 @@ public class DbPro{
         let sql = StringBuilder()
         let params = ArrayList<SqlDbType>()
         _config.dialect.forDbDelete(sql, table, record, params)
-        if(_config.showSql){
-            println(sql)
-        }
+        autoShowSql(sql.toString())
         let stmt = conn.prepareStatement(sql.toString())
         let result = stmt.update(params.toArray())
         autoClose(conn)
@@ -73,9 +69,7 @@ public class DbPro{
         let params = ArrayList<SqlDbType>()
         let pKeys = toArray(primaryKeys)
         _config.dialect.forDbUpdate(sql, table, pKeys, record, params)
-        if(_config.showSql){
-            println(sql)
-        }
+        autoShowSql(sql.toString())
         let stmt = conn.prepareStatement(sql.toString())
         let result = stmt.update(params.toArray())
         autoClose(conn)
@@ -95,14 +89,13 @@ public class DbPro{
         let paramList = DbKit.getSqlDbTypeList(params)
         let record = Record()
         let conn = _config.connect()
+        autoShowSql(sql)
         let stmt = conn.prepareStatement(sql)
         let result = stmt.query(paramList.toArray())
         let results = DbKit.getSqlDbTypeList(result.columnInfos)
         result.next(results)
-        var i = 0
-        for(columnInfo in result.columnInfos){
+        for((i, columnInfo) in result.columnInfos.iterator().enumerate()){
             record.set(columnInfo.name, results.get(i).getOrThrow())
-            i++
         }
         autoClose(conn)
         return record
@@ -112,17 +105,17 @@ public class DbPro{
         let list = ArrayList<Record>()
         let paramList = DbKit.getSqlDbTypeList(params)
         let conn = _config.connect()
+        autoShowSql(sql)
         let stmt = conn.prepareStatement(sql)
         let result = stmt.query(paramList.toArray())
-        let results = DbKit.getSqlDbTypeList(result.columnInfos)
+        var results = DbKit.getSqlDbTypeList(result.columnInfos)
         while(result.next(results)){
-            var i = 0
             var record = Record()
-            for(columnInfo in result.columnInfos){
-                record.set(columnInfo.name, results.get(i).getOrThrow())
-                i++
+            for((index, columnInfo) in result.columnInfos.iterator().enumerate()){
+                record.set(columnInfo.name, results.get(index).getOrThrow())
             }
             list.append(record)
+            results = DbKit.getSqlDbTypeList(result.columnInfos)
         }
         autoClose(conn)
         return list
@@ -132,15 +125,17 @@ public class DbPro{
         let list = ArrayList<?T>()
         let paramList = DbKit.getSqlDbTypeList(params)
         let conn = _config.connect()
+        autoShowSql(sql)
         let stmt = conn.prepareStatement(sql)
         let result = stmt.query(paramList.toArray())
         if(result.columnInfos.size != 1){
             conn.close()
             throw IllegalArgumentException("Db.query(..) only supports single column queries.")
         }
-        let results = DbKit.getSqlDbTypeList(result.columnInfos)
+        var results = DbKit.getSqlDbTypeList(result.columnInfos)
         while(result.next(results)){
             list.append(DbKit.getValue<T>(results.get(0).getOrThrow()))
+            results = DbKit.getSqlDbTypeList(result.columnInfos)
         }
         autoClose(conn)
         return list
@@ -151,6 +146,7 @@ public class DbPro{
         let paramList = DbKit.getSqlDbTypeList(params)
         let conn = _config.connect()
         let stmt = conn.prepareStatement(sql)
+        autoShowSql(sql)
         let result = stmt.query(paramList.toArray())
         if(result.columnInfos.size != 1){
             conn.close()
@@ -200,6 +196,12 @@ public class DbPro{
     private func autoClose(conn: Connection): Unit{
         if(!_config.isTransaction){
             conn.close()
+        }
+    }
+
+    private func autoShowSql(sql: String): Unit{
+        if(_config.showSql){
+            println(sql)
         }
     }
 }

@@ -16,7 +16,7 @@
 package cjfinal.core
 
 import net.http.{HttpContext, HttpStatusCode, HttpResponseBuilder}
-import encoding.json.ToJson
+import encoding.json.{ToJson, JsonArray}
 import encoding.url.{URL, Form}
 import serialization.serialization.Serializable
 import std.convert.Parsable
@@ -51,6 +51,16 @@ public abstract class Controller{
         this.setContentType(ContentType.Json)
             .setStatus(HttpStatusCode.STATUS_OK)
             .body(obj.serialize().toJson().asObject().toJsonString())
+    }
+
+    protected func renderJson<T>(list: ArrayList<T>): Unit where T <: Serializable<T>{
+        let obj = JsonArray()
+        for(item in list){
+            obj.add(item.serialize().toJson().asObject())
+        }
+        this.setContentType(ContentType.Json)
+            .setStatus(HttpStatusCode.STATUS_OK)
+            .body(obj.toString())
     }
 
     protected func renderFile(filepath: String): Unit{

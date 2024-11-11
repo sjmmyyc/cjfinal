@@ -74,35 +74,37 @@ public class UserController <: Controller{
     public func get(){
         let idVal = this.getParamTo<Int>(0)
         let record = Db.findFirst("select * from simple where id=?", idVal)
-        let id = record.get<Int32>("id")
-        let varcharCol = record.get<String>("varcharCol")
-        let intCol = record.get<Int32>("intCol")
-        let doubleCol = record.get<Float64>("doubleCol")
-        let decimalCol = record.get<Decimal>("decimalCol")
-        let dataCol = record.get<DateTime>("dataCol").toString("yyyy-MM-dd")
-        let timeCol = record.get<DateTime>("timeCol").toString("HH:mm:ss")
-        let datatimeCol = record.get<DateTime>("datatimeCol").toString("yyyy-MM-dd HH:mm:ss")
-        let boolCol = record.get<Bool>("boolCol")
-        this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}\ndoubleCol: ${doubleCol}\ndecimalCol: ${decimalCol}\ndataCol: ${dataCol}\ntimeCol: ${timeCol}\ndatatimeCol: ${datatimeCol}\nboolCol: ${boolCol}")
+        // let id = record.get<Int32>("id")
+        // let varcharCol = record.get<String>("varcharCol")
+        // let intCol = record.get<Int32>("intCol")
+        // let doubleCol = record.get<Float64>("doubleCol")
+        // let decimalCol = record.get<Decimal>("decimalCol")
+        // let dataCol = record.get<DateTime>("dataCol").toString("yyyy-MM-dd")
+        // let timeCol = record.get<DateTime>("timeCol").toString("HH:mm:ss")
+        // let datatimeCol = record.get<DateTime>("datatimeCol").toString("yyyy-MM-dd HH:mm:ss")
+        // let boolCol = record.get<Bool>("boolCol")
+        // this.renderText("id: ${id}\nvarcharCol: ${varcharCol}\nintCol: ${intCol}\ndoubleCol: ${doubleCol}\ndecimalCol: ${decimalCol}\ndataCol: ${dataCol}\ntimeCol: ${timeCol}\ndatatimeCol: ${datatimeCol}\nboolCol: ${boolCol}")
+        this.renderJson(record)
     }
 
     @Clear[""]
     public func list(){
-        let recordList = Db.find("select * from simple where varcharCol=?", "Test")
-        let result = StringBuilder()
-        for(record in recordList){
-            let id = record.get<Int32>("id")
-            let varcharCol = record.get<String>("varcharCol")
-            let intCol = record.get<Int32>("intCol")
-            let doubleCol = record.get<Float64>("doubleCol")
-            let decimalCol = record.get<Decimal>("decimalCol")
-            let dataCol = record.get<DateTime>("dataCol")
-            let timeCol = record.get<DateTime>("timeCol")
-            let datatimeCol = record.get<DateTime>("datatimeCol")
-            let boolCol = record.get<Bool>("boolCol")
-            result.append("id: ${id}\tvarcharCol: ${varcharCol}\tintCol: ${intCol}\tdoubleCol: ${doubleCol}\tdecimalCol: ${decimalCol}\tdataCol: ${dataCol}\ttimeCol: ${timeCol}\tdatatimeCol: ${datatimeCol}\tboolCol: ${boolCol}\n")
-        }
-        this.renderText(result.toString())
+        let recordList = Db.find("select * from simple")
+        // let result = StringBuilder()
+        // for(record in recordList){
+        //     let id = record.get<Int32>("id")
+        //     let varcharCol = record.get<String>("varcharCol")
+        //     let intCol = record.get<Int32>("intCol")
+        //     let doubleCol = record.get<Float64>("doubleCol")
+        //     let decimalCol = record.get<Decimal>("decimalCol")
+        //     let dataCol = record.get<DateTime>("dataCol")
+        //     let timeCol = record.get<DateTime>("timeCol")
+        //     let datatimeCol = record.get<DateTime>("datatimeCol")
+        //     let boolCol = record.get<Bool>("boolCol")
+        //     result.append("id: ${id}\tvarcharCol: ${varcharCol}\tintCol: ${intCol}\tdoubleCol: ${doubleCol}\tdecimalCol: ${decimalCol}\tdataCol: ${dataCol}\ttimeCol: ${timeCol}\tdatatimeCol: ${datatimeCol}\tboolCol: ${boolCol}\n")
+        // }
+        // this.renderText(result.toString())
+        this.renderJson(recordList)
     }
 
     @Clear[""]
