@@ -2,7 +2,7 @@
 <h1>CJFinal</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.2.2-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.3.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-100%25-brightgreen" style="display: inline-block;" />
@@ -726,6 +726,3 @@ public class RootController <: Controller{
     }
 }
 ```
-
-# 10. CJFinal架构扩展
-实验验证中，敬请期待...
