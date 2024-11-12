@@ -47,11 +47,6 @@ public class TestConfig <: CJFinalConfig{
         me.add(dp)
         let arp = ActiveRecordPlugin(dp)
         me.add(arp)
-
-        let dp2 = DatasourcePlugin("mysql://192.168.1.9:3306", "cjtest", "root", "sjmmyyc1658")
-        me.add(dp2)
-        let arp2 = ActiveRecordPlugin("dp2", dp2)
-        me.add(arp2)
     }
 
     public func configHandler(me: Handlers): Unit{

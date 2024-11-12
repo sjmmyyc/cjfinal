@@ -533,6 +533,14 @@ ActiveRecordPlugin 是 CJFinal 最核心的组成部分之一，提供了 Db + R
   # mysql驱动
   mysqlclient4cj = {git = "https://gitcode.com/weixin_64400442/mysqlclient4cj.git", branch="master"}
 ```
+另外，使用该库还需要确定已安装OpenSSL 3.x以上版本，请自行查阅安装方法。Ubuntu 安装方法如下：
+```
+// 安装
+$ sudo apt install libssl-dev
+
+// 查看版本
+$ openssl version
+```
 ## 5.2 使用ActiveRecordPlugin
 ActiveRecordPlugin 作为 CJFinal 的插件而存在，所以使用时需要在 CJFinalConfig 中配置该插件。
 
