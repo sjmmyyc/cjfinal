@@ -15,6 +15,8 @@
  */
 package cjfinal.config
 
+import log.LogLevel
+
 /**
  * CJFinal运行时配置信息
  */
@@ -31,4 +33,7 @@ public class Config{
 
     // 上传文件时的BufferedInputStream缓冲区大小，默认为64K，下限为128字节
     protected static var UPLOAD_BUFFER_CAPACITY = 64 * 1024
+
+    // Log级别，默认为LogLevel.ALL
+    protected static var LOG_LEVEL = LogLevel.ALL
 }

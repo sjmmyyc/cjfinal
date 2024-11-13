@@ -15,15 +15,18 @@
  */
 package cjfinal.core
 
-import cjfinal.config.Config
+import cjfinal.config.{Config, CmdColor}
+import cjfinal.logger.CJFinalLogger
+import log.setGlobalLogger
 import net.http.{Server, ServerBuilder, HttpContext}
-import log.LogLevel
+import log.{LogLevel, getGlobalLogger, Logger}
 import std.time.MonoTime
 import std.process.Process
 import std.fs.{File, OpenOption}
 import std.console.Console
 import std.posix.SIGINT
 import std.reflect.TypeInfo
+import std.fs.{exists, Directory}
 
 // void (*signal(int sig, CFunc<(Int32) -> Unit>))(int)
 type SignalHandler = CFunc<(Int32) -> Unit>
@@ -35,9 +38,11 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.3.0"
+    public static let version = "0.3.1"
 
     public static let me: CJFinal = CJFinal()
+
+    private let logger = getGlobalLogger([("name", "main")])
 
     private var _config: ?CJFinalConfig = None
     private var _constants = Constants()
@@ -61,9 +66,11 @@ public class CJFinal{
         unsafe{
             signal(SIGINT, { _ => isRun = false})
         }
-        println("Welcom to use \u{1b}[32mCJFinal\u{1b}[0m Web Framework, current version is: \u{1b}[32m${version}\u{1b}[0m")
+        
         me.config = config
         me.config.configConstants(me.constants)
+        let logger = initGlobalLogger()
+        logger.info("Welcom to use ${CmdColor.green}CJFinal${CmdColor.white} Web Framework, current version is: ${CmdColor.green}${version}${CmdColor.white}")
         me.config.configInterceptor(me._interceptors)
         me.config.configRoute(me._routes)
         me.config.configPlugin(me._plugins)
@@ -73,13 +80,31 @@ public class CJFinal{
         me.server?.onShutdown({ => me.config.onStop()})
         me.startPlugins()
         let endTime = MonoTime.now()
-        println("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1e9}s")
+        logger.info("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1e9}s")
         spawn{
             me.server?.serve()
         }
         while(isRun){}
         me.server?.closeGracefully()
         me.stopPlugins()
+    }
+
+    /**
+     * 初始化全局Logger
+     */
+    private static func initGlobalLogger(): Logger{
+         let logger: CJFinalLogger = if(Config.DEV_MODE){
+            CJFinalLogger(Console.stdOut)
+        }else{
+            if(!exists("logs")){
+                Directory.create("logs")
+            }
+            CJFinalLogger(File("logs/log.txt", OpenOption.CreateOrAppend))
+        }
+        logger.level = Config.LOG_LEVEL
+        // 注册为全局Logger,在需要用到的地方仅需getGlobalLogger([("nae", "main")])获取logger对象即可
+        setGlobalLogger(logger)
+        return logger
     }
 
     /**
@@ -92,7 +117,7 @@ public class CJFinal{
             .distributor(RequestDistributor())
             .maxRequestBodySize(Config.MAX_UPLOAD_SIZE)
             .build()
-        println("\u{1b}[32mListen: http://127.0.0.1:${port}\u{1b}[0m")
+        logger.info("${CmdColor.green}Listen: http://127.0.0.1:${port}${CmdColor.white}")
         // 关闭默认日志
         this.server?.logger.level = LogLevel.OFF
         this.server?.distributor.register("/", globalHandler)
@@ -100,11 +125,10 @@ public class CJFinal{
 
     private func startPlugins(): Unit{
         for(plugin in me._plugins.pluginList){
-            print("Plugin: start ${TypeInfo.of(plugin).name}...")
             if(plugin.start()){
-                println("\u{1b}[32mSuccess\u{1b}[0m")
+                logger.info("Plugin: start ${TypeInfo.of(plugin).name}...${CmdColor.green}Success${CmdColor.white}")
             }else{
-                println("\u{1b}[31mFailed\u{1b}[0m")
+                logger.info("Plugin: start ${TypeInfo.of(plugin).name}...${CmdColor.red}Failed${CmdColor.white}")
             }
         }
     }
@@ -113,11 +137,10 @@ public class CJFinal{
         let reversePlugins = me._plugins.pluginList.toArray()
         reversePlugins.reverse()
         for(plugin in reversePlugins){
-            print("Plugin: stop ${TypeInfo.of(plugin).name}...")
             if(plugin.stop()){
-                println("\u{1b}[32mSuccess\u{1b}[0m")
+                logger.info("Plugin: stop ${TypeInfo.of(plugin).name}...${CmdColor.green}Success${CmdColor.white}")
             }else{
-                println("\u{1b}[31mFailed\u{1b}[0m")
+                logger.info("Plugin: stop ${TypeInfo.of(plugin).name}...${CmdColor.red}Failed${CmdColor.white}")
             }
         }
     }

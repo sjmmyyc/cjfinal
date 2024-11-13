@@ -16,6 +16,7 @@
 package cjfinal.core
 
 import cjfinal.config.Config
+import log.{LogLevel}
 
 /**
  * CJFinal运行时常量
@@ -26,7 +27,6 @@ public class Constants{
     public mut prop devMode: Bool{
         set(value){
             Config.DEV_MODE = value
-            println("Set \u{1b}[32mdevMode\u{1b}[0m = \u{1b}[32m${Config.DEV_MODE}\u{1b}[0m")
         }
         get(){
             return Config.DEV_MODE
@@ -36,7 +36,6 @@ public class Constants{
     public mut prop uploadPath: String{
         set(value){
             Config.UPLOAD_PATH = value
-            println("Set \u{1b}[32muploadPath\u{1b}[0m = \u{1b}[32m${Config.UPLOAD_PATH}\u{1b}[0m")
         }
         get(){
             return Config.UPLOAD_PATH
@@ -47,7 +46,6 @@ public class Constants{
     public mut prop maxUploadSize: Int {
         set(value){
             Config.MAX_UPLOAD_SIZE = value
-            println("Set \u{1b}[32mmaxUploadSize\u{1b}[0m = \u{1b}[32m${Config.MAX_UPLOAD_SIZE / 1024 / 1024}MB\u{1b}[0m")
         }
         get(){
             return Config.MAX_UPLOAD_SIZE
@@ -62,10 +60,18 @@ public class Constants{
                 v = 128
             }
             Config.UPLOAD_BUFFER_CAPACITY = v
-            println("Set \u{1b}[32muploadBufferCapacity\u{1b}[0m = \u{1b}[32m${Config.UPLOAD_BUFFER_CAPACITY / 1024}KB\u{1b}[0m")
         }
         get(){
             return Config.UPLOAD_BUFFER_CAPACITY
+        }
+    }
+
+    public mut prop logLevel: LogLevel{
+        set(value){
+            Config.LOG_LEVEL = value
+        }
+        get(){
+            return Config.LOG_LEVEL
         }
     }
 }

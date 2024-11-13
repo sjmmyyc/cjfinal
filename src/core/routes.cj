@@ -16,17 +16,19 @@
 package cjfinal.core
 
 import cjfinal.exception.AlreadyExistException
-
+import cjfinal.config.CmdColor
 import std.collection.HashMap
 import std.reflect.TypeInfo
 import encoding.url.URL
 import std.collection.ArrayList
+import log.getGlobalLogger
 
 /**
  * 路由
  */
 public class Routes{
 
+    private let logger = getGlobalLogger([("name", "main")])
     private static let routesMap = HashMap<String, Controller>()
 
     public init(){}
@@ -41,9 +43,7 @@ public class Routes{
         match(routesMap.get(path)){
             case None =>
                 // path不存在，添加到routesMap中
-                if(CJFinal.me.constants.devMode){
-                    println("\u{1b}[35mAdd route: ${path} -> ${TypeInfo.of(controller).name}\u{1b}[0m")
-                }
+                logger.info("${CmdColor.purple}Add route: ${path} -> ${TypeInfo.of(controller).name}${CmdColor.white}")
                 routesMap.put(path, controller)
             case _ => 
                 // path已存在，抛出AlreadyExistException

@@ -22,8 +22,11 @@ import cjfinal.plugin.activerecord.ActiveRecordPlugin
 import cjfinal.test.controller.{RootController, UserController}
 import cjfinal.test.interceptor.GlobalInterceptor
 import cjfinal.test.handler.{CORSHandler, TestHandler}
+import log.{LogLevel, getGlobalLogger}
 
 public class TestConfig <: CJFinalConfig{
+
+    private let logger = getGlobalLogger([("name", "main")])
 
     public func configConstants(me: Constants): Unit{
         PropKit.use("./configs/config").appendIfExist("./configs/config-pro")
@@ -31,6 +34,7 @@ public class TestConfig <: CJFinalConfig{
         // me.uploadPath = "upload/image"
         // me.maxUploadSize = 50 * 1024 * 1024
         // me.uploadBufferCapacity = 64 * 1024
+        // me.logLevel = LogLevel.INFO
     }
 
     public func configRoute(me: Routes): Unit{
@@ -55,10 +59,10 @@ public class TestConfig <: CJFinalConfig{
     }
 
     public func onStart(): Unit{
-        println("on server start...")
+        logger.info("on server start...")
     }
 
     public func onStop(): Unit{
-        println("before server stop...")
+        logger.info("before server stop...")
     }
 }

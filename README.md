@@ -179,6 +179,8 @@ public class TestConfig <: CJFinalConfig{
 ## 2.2 configConstants(..)
 此方法用来配置CJFinal常量值，如下代码是一些常用的配置：
 ```
+import log.LogLevel
+
 public func configConstants(me: Constants): Unit{
 
 	// 配置开发模式，true为开发模式，默认为false
@@ -192,6 +194,11 @@ public func configConstants(me: Constants): Unit{
 
     // 配置上传Buff管道大小，默认为64KB
     me.uploadBufferCapacity = 64 * 1024
+
+    // 配置Log级别，默认为LogLevel.ALL
+    // 日志打印的七个级别，级别从低到高分别为 OFF、 FATAL、ERROR、WARN、INFO、DEBUG、TRACE、ALL。
+    // 只有级别小于等于指定打印级别的日志条目会被打印到输出流中
+    me.logLevel = LogLevel.INFO
 }
 ```
 在开发模式下，CJFinal会对每次请求输出报告，如输出本次请求的URL、Controller、Method、Interceptor以及请求所携带的参数。
@@ -734,3 +741,34 @@ public class RootController <: Controller{
     }
 }
 ```
+
+# 10. Logger
+在 CJFinal 中使用 Logger 功能非常简单，底层由仓颉SDK实现，无需依赖第三方包。看代码：
+```
+import log.getGlobalLogger
+
+// 在任何需要使用log的地方getGlobalLogger()
+// 固定写法，照抄即可
+let logger = getGlobalLogger([("name", "main")])
+
+// 然后就可像这样记录日志了
+logger.info("info")
+logger.debug("debug info")
+logger.error("err info")
+logger.fatal("fatal info")
+logger.warn("warn info")
+logger.trace("trace info")
+```
+需要说明一点的是，`devMode` 为 `true` 时，日志被打印到 `Console` 中，否则会被记录到 `logs/log.txt` 文件中。
+
+另外，有时我们想对打印的内容设置不同的颜色，可以这么写：
+```
+import cjfinal.config.CmdColor
+
+// 建议在变色信息后写上${CmdColor.white}，否则之后打印的信息颜色都会被改变
+println("${CmdColor.red}message${CmdColor.white}")
+
+logger.info("${CmdColor.green}message${CmdColor.white}")
+```
+
+使用 CJFinal 提供的 `CmdColor` 类来改变输出信息的颜色的好处是，在日志被写到文件时，不会带颜色信息，因为颜色信息只针对 Console 有效。这样，日志文件中将不会出现奇怪的字符。
