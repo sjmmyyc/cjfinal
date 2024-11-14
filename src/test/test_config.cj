@@ -15,6 +15,7 @@
  */
 package cjfinal.test
 
+import cjfinal.test.task.{MyTask, SecondTask}
 import cjfinal.core.{CJFinalConfig, Constants, Routes, Interceptors, Handlers, Plugins}
 import cjfinal.kit.PropKit
 import cjfinal.plugin.database.DatasourcePlugin
@@ -23,6 +24,7 @@ import cjfinal.test.controller.{RootController, UserController}
 import cjfinal.test.interceptor.GlobalInterceptor
 import cjfinal.test.handler.{CORSHandler, TestHandler}
 import log.{LogLevel, getGlobalLogger}
+import cjfinal.plugin.cron.{CronPlugin}
 
 public class TestConfig <: CJFinalConfig{
 
@@ -34,7 +36,7 @@ public class TestConfig <: CJFinalConfig{
         // me.uploadPath = "upload/image"
         // me.maxUploadSize = 50 * 1024 * 1024
         // me.uploadBufferCapacity = 64 * 1024
-        // me.logLevel = LogLevel.INFO
+        me.logLevel = PropKit.get("logLevel")
     }
 
     public func configRoute(me: Routes): Unit{
@@ -51,6 +53,11 @@ public class TestConfig <: CJFinalConfig{
         me.add(dp)
         let arp = ActiveRecordPlugin(dp)
         me.add(arp)
+
+        let cp = CronPlugin();
+        cp.addTask("* * * * *", MyTask());
+        cp.addTask("*/2 * * * *", SecondTask())
+        me.add(cp);
     }
 
     public func configHandler(me: Handlers): Unit{

@@ -1,2 +1,7 @@
 // 开发模式
 devMode = true
+
+// 日志级别
+// 日志打印的七个级别，级别从低到高分别为 OFF、 FATAL、ERROR、WARN、INFO、DEBUG、TRACE、ALL
+// 只有级别小于等于指定打印级别的日志条目会被打印到输出流中
+logLevel = info

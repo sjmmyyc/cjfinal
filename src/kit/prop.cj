@@ -66,8 +66,8 @@ public class Prop{
         try(file = File.openRead(path)){
             let reader = StringReader(file)
             while(let Some(line) <- reader.readln()){
-                // 只有当不是以“//”开始的行，才进行处理
-                if(!line.startsWith("//")){
+                // 只有当不是空白行，且以“//”开始的行，才进行处理
+                if(line.trimAscii().size != 0 && !line.startsWith("//")){
                     // 将line以“=”分割
                     let list = line.split("=")
                     this.kv.put(list[0].trimAscii(), list[1].trimAscii())

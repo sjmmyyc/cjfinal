@@ -16,7 +16,7 @@
 package cjfinal.logger
 
 import log.{Logger, LogLevel, Attr, LogRecord, setGlobalLogger}
-import std.sync.{AtomicBool}
+import std.sync.{AtomicBool, ReentrantMutex}
 import std.time.DateTime
 import std.io.{OutputStream, BufferedOutputStream}
 import std.collection.ArrayList
@@ -32,6 +32,7 @@ public class CJFinalLogger <: Logger{
     private var _closed = AtomicBool(false)
     private let _bo: BufferedOutputStream<OutputStream>
     private let _attrs = ArrayList<Attr>()
+    private let _mtx = ReentrantMutex()
 
     public mut prop level: LogLevel{
         set(value){
@@ -75,39 +76,41 @@ public class CJFinalLogger <: Logger{
     }
 
     public func log(record: LogRecord): Unit{
-        // write level
-        // _w.writeKey("level")
-        match(record.level.name){
-            case "INFO" => _w.writeString("${CmdColor.white}[ INFO]")
-            case "DEBUG" => _w.writeString("${CmdColor.cyan}[DEBUG]")
-            case "ERROR" => _w.writeString("${CmdColor.red}[ERROR]")
-            case "WARN" => _w.writeString("${CmdColor.yellow}[ WARN]")
-            case "TRACE" => _w.writeString("${CmdColor.blue}[TRACE]")
-            case "FATAL" => _w.writeString("${CmdColor.purple}[FATAL]")
-            case _ => ()
-        }
-        _w.writeString(" ")
-        // write time
-        // _w.writeKey("time")
-        _w.writeString("[${record.time.toString("yyyy-MM-dd HH:mm:ss.S")}]")
-        _w.writeString(" ")
-        // write message
-        // _w.writeKey("msg")
-        _w.writeString(record.message)
-        _w.writeString(" ")
-        // write source
-
-        // write attrs
-        for (i in 0..record.attrs.size) {
-            let attr = record.attrs[i]
-            _w.writeKey(attr[0])
-            _w.writeValue(attr[1])
-            if (i < record.attrs.size - 1) {
-                _w.writeString(" ")
+        synchronized(_mtx){
+            // write level
+            // _w.writeKey("level")
+            match(record.level.name){
+                case "INFO" => _w.writeString("${CmdColor.white}[ INFO]")
+                case "DEBUG" => _w.writeString("${CmdColor.cyan}[DEBUG]")
+                case "ERROR" => _w.writeString("${CmdColor.red}[ERROR]")
+                case "WARN" => _w.writeString("${CmdColor.yellow}[ WARN]")
+                case "TRACE" => _w.writeString("${CmdColor.blue}[TRACE]")
+                case "FATAL" => _w.writeString("${CmdColor.purple}[FATAL]")
+                case _ => ()
             }
+            _w.writeString(" ")
+            // write time
+            // _w.writeKey("time")
+            _w.writeString("[${record.time.toString("yyyy-MM-dd HH:mm:ss.S")}]")
+            _w.writeString(" ")
+            // write message
+            // _w.writeKey("msg")
+            _w.writeString(record.message)
+            _w.writeString(" ")
+            // write source
+
+            // write attrs
+            for (i in 0..record.attrs.size) {
+                let attr = record.attrs[i]
+                _w.writeKey(attr[0])
+                _w.writeValue(attr[1])
+                if (i < record.attrs.size - 1) {
+                    _w.writeString(" ")
+                }
+            }
+            _w.writeString("${CmdColor.white}\n")
+            _bo.flush()
         }
-        _w.writeString("${CmdColor.white}\n")
-        _bo.flush()
     }
 
     public func isClosed(): Bool{

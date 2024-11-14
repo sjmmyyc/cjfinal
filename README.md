@@ -2,7 +2,7 @@
 <h1>CJFinal</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.3.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.4.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-100%25-brightgreen" style="display: inline-block;" />
@@ -30,8 +30,8 @@
 | 插件化 | <font color=green>[√] 已完成</font> | CJFinal支持采用插件化的方式进行扩展 |
 | DatasourcePlugin | <font color=green>[√] 已完成</font> | 数据库插件，支持仓颉官方PooledDatacource连接池，暂仅支持MySQL数据库 |
 | ActiveRecordPlugin | <font color=green>[√] 已完成</font> | 延续 JFinal 的 Db+Record 模式，作为 CJFinal 操作数据库的核心模块 |
-| CronPlugin | <font color=red>[▶] 进行中</font> | 将以插件的形式提供定时任务功能 |
-| RedisPlugin| [×] 待完成 | 将以插件的形式提供对Redis的支持 |
+| CronPlugin | <font color=green>[√] 已完成</font> | 以插件的形式提供定时任务功能 |
+| RedisPlugin| <font color=red>[▶] 进行中</font> | 将以插件的形式提供对Redis的支持 |
 | Validator | [×] 待完成 | 校验组件，在Validator类中将提供非常方便的校验方法，学习简单，使用方便 |
 
 # 添加依赖
@@ -40,7 +40,7 @@
   ```
     [dependencies]
         // CJFinal依赖
-        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.3.1", output-type = "static"}
+        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.4.0", output-type = "static"}
 
     [package]
         ... // 以下内容省略
@@ -198,7 +198,8 @@ public func configConstants(me: Constants): Unit{
     // 配置Log级别，默认为LogLevel.ALL
     // 日志打印的七个级别，级别从低到高分别为 OFF、 FATAL、ERROR、WARN、INFO、DEBUG、TRACE、ALL。
     // 只有级别小于等于指定打印级别的日志条目会被打印到输出流中
-    me.logLevel = LogLevel.INFO
+    // 日志级别字符串不区分大小写
+    me.logLevel = "info"
 }
 ```
 在开发模式下，CJFinal会对每次请求输出报告，如输出本次请求的URL、Controller、Method、Interceptor以及请求所携带的参数。
@@ -292,6 +293,12 @@ PropKit工具类用来读取外部键值对配置文件，PropKit可以极度方
 userName = Kevin
 email = abc@qq.com
 devMode = true
+
+// 日志级别
+// 日志打印的七个级别，级别从低到高分别为 OFF、 FATAL、ERROR、WARN、INFO、DEBUG、TRACE、ALL
+// 只有级别小于等于指定打印级别的日志条目会被打印到输出流中
+// 日志级别值不区分大小写
+logLevel = info
 ```
 如下是 PropKit 代码示例：
 ```
@@ -705,10 +712,34 @@ main(){
 待实现...
 
 # 7. CronPlugin
-## 7.1 CronPlugin
-CronPlugin作为CJFinal的插件而存在，所以使用时需要在CJFinalConfig中配置，如下是配置代码：
+## 7.1 概述
+CronPlugin是JFinal内置的任务调度插件，通过使用CronPlugin可以使用通用的cron表达式极为便利的实现任务调度功能。
+
+由于CronPlugin是作为CJFinal的插件而存在的，所以使用时需要在CJFinalConfig中配置，如下是配置代码：
 ```
-正在开发中...敬请期待
+let cp = CronPlugin();
+// 每分钟执行一次，关于cron表达式详解，请看后面章节介绍
+cp.addTask("* * * * *", MyTask());
+me.add(cp);
+```
+以下是 `MyTask` 类的定义：
+```
+package cjfinal.test.task
+
+import cjfinal.plugin.cron.Task
+import log.getGlobalLogger
+
+/**
+ * MyTask需要继承自 cjfinal.plugin.cron.Task 抽象类，并且实现其抽象方法 run()
+ */
+public class MyTask <: Task{
+
+    let logger = getGlobalLogger([("name", "main")])
+
+    public func run(): Unit{
+        logger.info("MyTask running...")
+    }
+}
 ```
 ## 7.2 cron表达式
 cron 表达式用于定制调度规则。与 quartz 的 cron 表达式不同，CronPlugin 的 cron 表达式最多只允许五部分，每部分用空格分隔开来，这五部分从左到右依次表示分、时、天、月、周，其具体规则如下：
