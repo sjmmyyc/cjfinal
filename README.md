@@ -780,7 +780,7 @@ cron 表达式用于定制调度规则。与 quartz 的 cron 表达式不同，C
 ```
 
 ## 7.3测试cron表达式
-建议使用 `CronExpr` 对象的 `test(..)` 方法对 cron 表达式进行测试，使用方法如下：
+可以使用 `CronExpr` 对象的 `test(..)` 方法对 cron 表达式进行测试，使用方法如下：
 ```
 import cjfinal.plugin.cron.CronExpr
 import std.time.DateTime
@@ -791,7 +791,7 @@ main(): Int64 {
     let now = DateTime.now()
     let formatStr = "yyyy-MM-dd HH:mm:ss.S"
     println("now:  ${now.toString(formatStr)}")
-    // 将当时时间传递给test()，它会返回最近5次匹配时间
+    // 将当前时间传递给test()，它会返回最近5次匹配时间，可方便开发者验证表达式是否正确
     let list = cronExpr.test(now)
     for((i, date) in list.iterator().enumerate()){
         println("${i+1}: ${date.toString(formatStr)}")
