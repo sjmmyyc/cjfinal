@@ -133,7 +133,7 @@ public class Action{
      * 根据传入的InstanceFunctionInfo获取套在其上的拦截器列表
      */
     private static func findInterceptors(funcInfo: InstanceFunctionInfo): Array<Interceptor>{
-        let list = ArrayList<Interceptor>()
+        let list = ArrayList<Interceptor>()      
         if(let Some(anno) <- funcInfo.findAnnotation<Before>()){
             for(str in anno.get()){
                 if(let Some(intcept) <- (ObjectKit.new(str) as Interceptor)){

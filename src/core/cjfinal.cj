@@ -22,7 +22,7 @@ import net.http.{Server, ServerBuilder, HttpContext}
 import log.{LogLevel, getGlobalLogger, Logger}
 import std.time.MonoTime
 import std.process.Process
-import std.fs.{File, OpenOption}
+import std.fs.{File, OpenMode}
 import std.console.Console
 import std.posix.SIGINT
 import std.reflect.TypeInfo
@@ -38,7 +38,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.4.0"
+    public static let version = "0.4.1"
 
     public static let me: CJFinal = CJFinal()
 
@@ -99,7 +99,7 @@ public class CJFinal{
             if(!exists("logs")){
                 Directory.create("logs")
             }
-            CJFinalLogger(File("logs/log.txt", OpenOption.CreateOrAppend))
+            CJFinalLogger(File("logs/log.txt", OpenMode.Append))
         }
         logger.level = Config.LOG_LEVEL
         // 注册为全局Logger,在需要用到的地方仅需getGlobalLogger([("nae", "main")])获取logger对象即可

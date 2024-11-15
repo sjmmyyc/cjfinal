@@ -16,14 +16,17 @@
 package cjfinal.test.controller
 
 import cjfinal.core.Controller
-import cjfinal.aop.Clear
+import cjfinal.aop.{Clear, None}
 import cjfinal.plugin.activerecord.{Record, Db}
 import std.time.DateTime
 import std.database.sql.{SqlNullableDouble, SqlNullableDecimal, SqlNullableDate, SqlNullableTime, SqlNullableTimestamp}
 import std.math.numeric.Decimal
 import std.collection.ArrayList
 
+@None
 public class UserController <: Controller{
+
+    @None
     public func index(){
         this.renderText("user index...")
     }
@@ -128,6 +131,7 @@ public class UserController <: Controller{
         this.renderText("Db.tx()..${result}")
     }
 
+    @None
     public func page(){
         let pageNumber = this.getParamTo<Int>(0)
         let pageSize = this.getParamTo<Int>(1)

@@ -17,7 +17,7 @@ package cjfinal.core
 
 import encoding.url.{URL, Form}
 import net.http.{Server, ServerBuilder, HttpContext, HttpStatusCode}
-import std.collection.{Map, HashMap, HashSet}
+import std.collection.{Map, HashMap, HashSet, ArrayList}
 import std.reflect.TypeInfo
 import cjfinal.config.Config
 

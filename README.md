@@ -2,12 +2,14 @@
 <h1>CJFinal</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.4.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.4.1-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.56.4-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v0.57.3-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-100%25-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/license-MulanPSL2.0-brightgreen" style="display: inline-block;" />
 </p>
+
+<font color=red size="14px">cjc 0.57.3注意了，这个版本在处理注解时，有严重BUG，当你发现一发送请求，程序就崩溃的现象时，请稳步到AOP章节的“4.5 ＠None”小节查看临时性的解决方案</font>
 
 	文档与框架本身，有任何问题，请加QQ群：247445547。另招募合作伙伴一起完善框架，欢迎小伙伴加入^_^
 
@@ -40,7 +42,7 @@
   ```
     [dependencies]
         // CJFinal依赖
-        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.4.0", output-type = "static"}
+        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.4.1", output-type = "static"}
 
     [package]
         ... // 以下内容省略
@@ -532,6 +534,37 @@ public class RootController <: Controller{
     public func index(){
         let obj = User()
         this.renderJson(obj)
+    }
+}
+```
+
+## 4.5 @None
+
+在 `cjc 0.57.3` 版本中，如果 Controller 及其内部的方法前，没有配置任何注解，Http请求一旦进来，程序会立即崩溃，现已确定这是编译器的 BUG，并已向官方提交 Issue。为此，我们准备了一个临时的解决方案，就是在不需要添加 `@Before` 或 `@Clear` 注解的地方，配置上 `@None` 注解，即可规避此BUG。
+
+```
+import cjfinal.aop.{Before, Clear, None}
+
+// 这里没有配置@Before或@Clear，因此加上@None
+@None
+public class RootController <: Controller{
+
+    // 这里配置了拦截器，因此不需要添加＠None
+    @Before["cjfinal.test.interceptor.MethodInterceptor"]
+    public func index(){
+        // ...
+    }
+
+    // 这里没有配置＠Before或＠Clear，因此加上＠None
+    @None
+    public func login(){
+        // ...
+    }
+
+    // 这里需要清除拦截器，已配置了@Clear，因此不需要添加＠None
+    @Clear[""]
+    public func down(){
+        // ...
     }
 }
 ```

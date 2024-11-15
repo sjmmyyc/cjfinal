@@ -19,7 +19,7 @@ import cjfinal.exception.NotFoundException
 
 import std.collection.HashMap
 import std.io.StringReader
-import std.fs.{File, exists}
+import std.fs.{File, exists, OpenMode}
 
 /**
  * Prop用于读取配置文件
@@ -63,7 +63,7 @@ public class Prop{
      */
     private func read(path: String){
         // try-with-resource块，结束时自动释放文件
-        try(file = File.openRead(path)){
+        try(file = File(path, OpenMode.Read)){
             let reader = StringReader(file)
             while(let Some(line) <- reader.readln()){
                 // 只有当不是空白行，且以“//”开始的行，才进行处理

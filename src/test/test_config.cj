@@ -49,7 +49,7 @@ public class TestConfig <: CJFinalConfig{
     }
 
     public func configPlugin(me: Plugins): Unit{
-        let dp = DatasourcePlugin("mysql://192.168.1.9:3306", "cjtest", "root", "sjmmyyc1658")
+        let dp = DatasourcePlugin("mysql://192.168.1.8:3306", "cjtest", "root", "sjmmyyc1658")
         me.add(dp)
         let arp = ActiveRecordPlugin(dp)
         me.add(arp)

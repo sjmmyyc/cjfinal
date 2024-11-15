@@ -16,8 +16,7 @@
 package cjfinal.upload
 
 import cjfinal.config.Config
-import std.unicode.UnicodeExtension
-import std.fs.{exists, File, OpenOption, Directory, removeIfExists}
+import std.fs.{exists, File, Directory, removeIfExists}
 import std.io.BufferedInputStream
 import std.collection.ArrayList
 import std.random.Random
@@ -44,7 +43,7 @@ public class FormDataItem{
 
     private func getName(): String{
         let arr = this._header.split(";")
-        let nameField = arr[1].trim()
+        let nameField = arr[1].trimAscii()
         return nameField[6..nameField.size-1]
     }
 
@@ -56,7 +55,7 @@ public class FormDataItem{
         var arr = this._header.split("\r\n")
         arr = arr[0].split(";")
         if(arr.size == 3){
-            let filename = arr[2].trim()
+            let filename = arr[2].trimAscii()
             result = filename[10..filename.size - 1]
         }
         return result

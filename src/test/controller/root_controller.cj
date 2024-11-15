@@ -16,13 +16,12 @@
 package cjfinal.test.controller
 
 import cjfinal.core.Controller
-import cjfinal.aop.{Before, Clear}
+import cjfinal.aop.{Before, Clear, None}
 import cjfinal.test.model.User
 import cjfinal.upload.ExceedingLimitException
-import std.fs.{FSException, File, OpenOption}
+import std.fs.{FSException, File, OpenMode}
 
 @Before["cjfinal.test.interceptor.ControllerInterceptor"]
-@Clear[""]
 public class RootController <: Controller{
 
     @Before["cjfinal.test.interceptor.MethodInterceptor"]
@@ -31,8 +30,8 @@ public class RootController <: Controller{
         this.renderJson(obj)
     }
 
+    @None
     public func login(){
-        println(this.get("phone"))
         let user = User()
         this.renderJson(user)
     }
@@ -58,6 +57,6 @@ public class RootController <: Controller{
 
     @Clear[""]
     public func down(){
-        this.renderFile(File("html/upload.html", OpenOption.Open(true, false)), "test.html")
+        this.renderFile(File("html/upload.html", OpenMode.Read), "test.html")
     }
 }

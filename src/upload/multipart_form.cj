@@ -20,9 +20,11 @@ import encoding.url.Form
 import std.convert.Parsable
 import std.collection.{ArrayList, LinkedList}
 import std.io.{BufferedInputStream, BufferedOutputStream}
-import std.fs.{File, OpenOption, FSException, Directory, exists}
+import std.core.Resource
+import std.fs.{File, FSException, Directory, exists, OpenMode}
 import std.random.Random
 import cjfinal.config.Config
+
 
 /**
  * MultipartForm.
@@ -112,7 +114,7 @@ public class MultipartForm{
                                 }
                                 currentFile?.close()
                                 let filename = "${Random().nextUInt64()}${item.extName}"
-                                currentFile = File(path + filename, OpenOption.Create(false))
+                                currentFile = File(path + filename, OpenMode.Append)
                                 item.uploadFile = UploadFile(item.name, this._uploadPath, filename, item.value, item.getContentType())
                             }
                         }
@@ -192,9 +194,6 @@ public class MultipartForm{
             // println("remining: ${lastRemining.size}， Start enter next fragment...")
             // println("----------------------------------------------------------------------")
         }
-
-        // cjc 0.56.4版本无法访问此方法，待cjc升级后再看情况吧
-        // buffer.close()
     }
 
     /**

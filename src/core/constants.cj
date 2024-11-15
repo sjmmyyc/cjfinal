@@ -17,7 +17,6 @@ package cjfinal.core
 
 import cjfinal.config.Config
 import log.{LogLevel}
-import std.unicode.UnicodeExtension
 
 /**
  * CJFinal运行时常量
@@ -73,7 +72,7 @@ public class Constants{
      */
     public mut prop logLevel: String{
         set(value){
-            let v = value.toLower()
+            let v = value.toAsciiLower()
             match(v){
                 case "all" => Config.LOG_LEVEL = LogLevel.ALL
                 case "trace" => Config.LOG_LEVEL = LogLevel.TRACE
