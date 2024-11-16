@@ -9,32 +9,16 @@
 <img alt="" src="https://img.shields.io/badge/license-MulanPSL2.0-brightgreen" style="display: inline-block;" />
 </p>
 
-**<font color=red>cjc 0.57.3注意了，这个版本在处理注解时，有严重BUG，当你发现一发送请求，程序就崩溃的现象时，请移步到AOP章节的“4.5 ＠None”小节查看临时性的解决方案</font>**
+<font color=red>cjc 0.57.3注意了，这个版本在处理注解时，有严重BUG，当你发现一发送请求，程序就崩溃的现象时，请移步到AOP章节的“4.5 ＠None”小节查看临时性的解决方案</font>
 
-	文档与框架本身，有任何问题，请加QQ群：247445547。另招募合作伙伴一起完善框架，欢迎小伙伴加入^_^
+	文档与框架本身，有任何问题或Bug，请尽情提Issue，或加QQ群：247445547。
 
 # CJFinal极速Web框架
 
 为什么叫**极速框架**？因为**学习成本非常低**，**3分钟**上手，**2小时**干项目，**1天**精通Web服务开发。
 
-<font color=red>**特别鸣谢**</font>[**JFinal**](https://www.jfinal.com)，采用**仓颉**来临摹一款类似的框架。考虑到**前后端分离**已成现下最流行的方式，因此**CJFinal**不会实现渲染HTML页面及相关功能，是的，**CJFinal**只适合写**API**（一切都以**返回Json为目的**）。**CJFinal**目前仍处于探索开发阶段，欢迎大家体验。
+<font color=red>**特别鸣谢**</font>[**JFinal**](https://www.jfinal.com)，采用**仓颉**来临摹一款类似的框架。考虑到**前后端分离**已成现下最流行的方式，因此**CJFinal**不会实现渲染HTML页面及相关功能，是的，**CJFinal**只适合写**API**（一切都以**返回Json为目的**）。**CJFinal**目前已基本成型，欢迎大家体验。
 
-# 模块划分及进度
-
-| 模块名称| 完成度 | 描述 |
-|:-:|:-:|:-|
-| CJFinalConfig |  <font color=green>[√] 已完成</font>  | 通过继承CJFinalConfig类，对整个Web项目进行配置 |
-| Handler | <font color=green>[√] 已完成</font> | 服务器接收到的所有请求，都先交由Handler来处理。<br/>CJFinal自身也是基于Handler的子类ActionHander来完成框架主要功能的 |
-| Controller | <font color=green>[√] 已完成</font> | 通过继承Controller类，其中的public方法将通过URL请求直接驱动，完成业务逻辑 |
-| AOP | <font color=green>[√] 已完成</font> | CJFinal专注AOP最核心的目标，将概念减少到极致<br/>仅有三个概念：Interceptor、Before、Clear，并且无需引入IOC也无需使用啰嗦的XML |
-| Json转换 | <font color=green>[√] 已完成</font> | CJFinal通过在class或struct定义前加上@Json宏，使其具备可被自动解析成Json的功能 |
-| 上传/下载 | <font color=green>[√] 已完成</font> | 文件上传用getFiles(..)/getFile(..)系列方法<br/>文件下载用renderFile(..)系列方法 |
-| 插件化 | <font color=green>[√] 已完成</font> | CJFinal支持采用插件化的方式进行扩展 |
-| DatasourcePlugin | <font color=green>[√] 已完成</font> | 数据库插件，支持仓颉官方PooledDatacource连接池，暂仅支持MySQL数据库 |
-| ActiveRecordPlugin | <font color=green>[√] 已完成</font> | 延续 JFinal 的 Db+Record 模式，作为 CJFinal 操作数据库的核心模块 |
-| CronPlugin | <font color=green>[√] 已完成</font> | 以插件的形式提供定时任务功能 |
-| RedisPlugin| <font color=red>[▶] 进行中</font> | 将以插件的形式提供对Redis的支持 |
-| Validator | [×] 待完成 | 校验组件，在Validator类中将提供非常方便的校验方法，学习简单，使用方便 |
 
 # 添加依赖
 
@@ -741,11 +725,8 @@ main(){
 ```
 注意：ActiveRecordPlugin所依赖的其它插件也必须手动调用一下start()方法，如上例中的dp.start()。
 
-# 6. RedisPlugin
-待实现...
-
-# 7. CronPlugin
-## 7.1 概述
+# 6. CronPlugin
+## 6.1 概述
 CronPlugin是JFinal内置的任务调度插件，通过使用CronPlugin可以使用通用的cron表达式极为便利的实现任务调度功能。
 
 由于CronPlugin是作为CJFinal的插件而存在的，所以使用时需要在CJFinalConfig中配置，如下是配置代码：
@@ -774,7 +755,7 @@ public class MyTask <: Task{
     }
 }
 ```
-## 7.2 cron表达式
+## 6.2 cron表达式
 cron 表达式用于定制调度规则。与 quartz 的 cron 表达式不同，CronPlugin 的 cron 表达式最多只允许五部分，每部分用空格分隔开来，这五部分从左到右依次表示分、时、天、月、周，其具体规则如下：
 
 * 分 ：从 0 到 59
@@ -812,7 +793,7 @@ cron 表达式用于定制调度规则。与 quartz 的 cron 表达式不同，C
 0 0 25-L/2 * *  // 每用25号到最后一天之间，每隔2天执行一次 
 ```
 
-## 7.3测试cron表达式
+## 6.3测试cron表达式
 可以使用 `CronExpr` 对象的 `test(..)` 方法对 cron 表达式进行测试，使用方法如下：
 ```
 import cjfinal.plugin.cron.CronExpr
@@ -842,10 +823,7 @@ main(): Int64 {
     5: 2025-03-31 09:00:00.000
 ```
 
-# 8. Validator
-待实现...
-
-# 9. Json转换
+# 7. Json转换
 得益于仓颉本身的特性，CJFinal 实现了一个 `@Json` 非属性宏， 可以非常轻松的将 class 或 struct 对象转换成 Json，例如我们有个 `User` 类，除了正常声明类属性和类方法外，只需要再引入三个包和为类添加 `@Json` 宏，这个 `User` 类的对象便可轻松的被转换成 Json，或者从 Json 格式转换成 `User` 对象了。
 
 注意：`@Json` 宏只能加在 class 或 struct 前
@@ -877,7 +855,7 @@ public class RootController <: Controller{
 }
 ```
 
-# 10. Logger
+# 8. Logger
 在 CJFinal 中使用 Logger 功能非常简单，底层由仓颉SDK实现，无需依赖第三方包。看代码：
 ```
 import log.getGlobalLogger
@@ -907,3 +885,6 @@ logger.info("${CmdColor.green}message${CmdColor.white}")
 ```
 
 使用 CJFinal 提供的 `CmdColor` 类来改变输出信息的颜色的好处是，在日志被写到文件时，不会带颜色信息，因为颜色信息只针对 Console 有效。这样，日志文件中将不会出现奇怪的字符。
+
+# 9. Validator
+待实现...
