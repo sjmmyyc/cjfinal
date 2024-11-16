@@ -21,6 +21,16 @@ package cjfinal.config
  */
 public class CmdColor{
 
+    public static prop gray: String{
+        get(){
+            if(Config.DEV_MODE){
+                return "\u{1b}[30m"
+            }else{
+                return ""
+            }
+        }
+    }
+
     public static prop red: String{
         get(){
             if(Config.DEV_MODE){
@@ -75,6 +85,16 @@ public class CmdColor{
         get(){
             if(Config.DEV_MODE){
                 return "\u{1b}[36m"
+            }else{
+                return ""
+            }
+        }
+    }
+
+    public static prop lightGray: String{
+        get(){
+            if(Config.DEV_MODE){
+                return "\u{1b}[37m"
             }else{
                 return ""
             }

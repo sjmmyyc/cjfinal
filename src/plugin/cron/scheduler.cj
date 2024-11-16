@@ -114,7 +114,7 @@ public class Scheduler{
      * 打印调试信息
      */
     private func debugInfo(): Unit{
-        logger.debug("task num: ${_taskList.size}")
+        logger.debug("Task count: ${_taskList.size}")
         for(node in _taskList.firstNode().getOrThrow().backward()){
             logger.debug("Task time: ${node.nextTime.toString(dateFormat)}")
         }
