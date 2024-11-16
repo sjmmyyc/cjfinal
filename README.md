@@ -9,7 +9,7 @@
 <img alt="" src="https://img.shields.io/badge/license-MulanPSL2.0-brightgreen" style="display: inline-block;" />
 </p>
 
-**<font color=red>cjc 0.57.3注意了，这个版本在处理注解时，有严重BUG，当你发现一发送请求，程序就崩溃的现象时，请稳步到AOP章节的“4.5 ＠None”小节查看临时性的解决方案</font>**
+**<font color=red>cjc 0.57.3注意了，这个版本在处理注解时，有严重BUG，当你发现一发送请求，程序就崩溃的现象时，请移步到AOP章节的“4.5 ＠None”小节查看临时性的解决方案</font>**
 
 	文档与框架本身，有任何问题，请加QQ群：247445547。另招募合作伙伴一起完善框架，欢迎小伙伴加入^_^
 
