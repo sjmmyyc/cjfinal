@@ -26,16 +26,17 @@ public class TimeKit{
      * 将传入的纳秒转换成直观记数，以纳秒、微秒、毫秒、秒来显示
      */
     public static func intuitive(nanoseconds: Int): String{
+        var result = ""
         if(nanoseconds < 1000){
-            return nanoseconds.format(".2") + "ns"
+            result = nanoseconds.format(".2") + "ns"
         }else if(nanoseconds < 1000000){
-            return (Float64(nanoseconds) / 1e3).format(".2") + "μs"
+            result = (Float64(nanoseconds) / 1e3).format(".2") + "μs"
         }else if(nanoseconds < 1000000000){
-            return (Float64(nanoseconds) / 1e6).format(".2") + "ms"
+            result = (Float64(nanoseconds) / 1e6).format(".2") + "ms"
         }else{
-            return (Float64(nanoseconds) / 1e9).format(".2") + "s"
+            result = (Float64(nanoseconds) / 1e9).format(".2") + "s"
         }
-        return ""
+        return result
     }
 
     /**
