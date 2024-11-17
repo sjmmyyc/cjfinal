@@ -17,6 +17,7 @@ package cjfinal.core
 
 import cjfinal.config.{Config, CmdColor}
 import cjfinal.logger.CJFinalLogger
+import cjfinal.kit.TimeKit
 import log.setGlobalLogger
 import net.http.{Server, ServerBuilder, HttpContext}
 import log.{LogLevel, getGlobalLogger, Logger}
@@ -38,7 +39,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.4.1"
+    public static let version = "0.4.2"
 
     public static let me: CJFinal = CJFinal()
 
@@ -80,7 +81,7 @@ public class CJFinal{
         me.server?.onShutdown({ => me.config.onStop()})
         me.startPlugins()
         let endTime = MonoTime.now()
-        logger.info("Total cost: ${Float64((endTime - startTime).toNanoseconds()) / 1e9}s")
+        logger.info("Total cost: ${TimeKit.intuitive(endTime - startTime)}")
         spawn{
             me.server?.serve()
         }
