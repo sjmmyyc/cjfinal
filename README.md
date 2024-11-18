@@ -2,7 +2,7 @@
     <h1>CJFinal</h1>
 </div>
 <p align="center">
-    <img alt="" src="https://img.shields.io/badge/release-v0.4.2-brightgreen" style="display: inline-block;" />
+    <img alt="" src="https://img.shields.io/badge/release-v0.4.3-brightgreen" style="display: inline-block;" />
     <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
     <img alt="" src="https://img.shields.io/badge/cjc-v0.53.13-brightgreen" style="display: inline-block;" />
     <img alt="" src="https://img.shields.io/badge/cjcov-100%25-brightgreen" style="display: inline-block;" />
@@ -24,7 +24,7 @@
   ```
     [dependencies]
         // CJFinal依赖
-        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.4.2", output-type = "static"}
+        cjfinal = { git = "https://gitee.com/centmagic/cjfinal.git", tag = "v0.4.3", output-type = "static"}
 
     [package]
         ... // 以下内容省略
