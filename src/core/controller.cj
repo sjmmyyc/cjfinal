@@ -22,7 +22,7 @@ import serialization.serialization.{Serializable, DataModel}
 import std.convert.Parsable
 import std.collection.ArrayList
 import std.reflect.TypeInfo
-import std.fs.{File, OpenMode}
+import std.fs.{File, OpenOption}
 import std.io.{InputStream, BufferedInputStream}
 import cjfinal.upload.{MultipartForm, UploadFile, ExceedingLimitException}
 import cjfinal.config.Config
@@ -65,8 +65,8 @@ public abstract class Controller{
 
     protected func renderFile(filepath: String): Unit{
         var arr = filepath.split("/")
-        var filename = arr.last.getOrDefault({ => "download"})
-        this.renderFile(File(filepath, OpenMode.Read), filename)
+        var filename = arr[arr.size-1]
+        this.renderFile(File(filepath, OpenOption.Open(true, false)), filename)
     }
 
     protected func renderFile(inputStream: InputStream, filename: String): Unit{

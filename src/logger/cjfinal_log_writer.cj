@@ -16,7 +16,7 @@
 package cjfinal.logger
 
 import log.{LogWriter, LogValue}
-import std.time.DateTime
+import std.time.{DateTime, Duration}
 import std.io.OutputStream
 
 /**

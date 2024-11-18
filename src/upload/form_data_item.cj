@@ -16,7 +16,7 @@
 package cjfinal.upload
 
 import cjfinal.config.Config
-import std.fs.{exists, File, Directory, removeIfExists}
+import std.fs.{File, Directory}
 import std.io.BufferedInputStream
 import std.collection.ArrayList
 import std.random.Random

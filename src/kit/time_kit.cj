@@ -16,6 +16,7 @@
 package cjfinal.kit
 
 import std.format.Formatter
+import std.time.Duration
 
 /**
  * TimeKit.

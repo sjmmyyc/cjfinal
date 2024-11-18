@@ -21,7 +21,7 @@ import std.convert.Parsable
 import std.collection.{ArrayList, LinkedList}
 import std.io.{BufferedInputStream, BufferedOutputStream}
 import std.core.Resource
-import std.fs.{File, FSException, Directory, exists, OpenMode}
+import std.fs.{File, FSException, Directory, OpenOption}
 import std.random.Random
 import cjfinal.config.Config
 
@@ -65,7 +65,7 @@ public class MultipartForm{
         let buffLength = this.calcBufferedLength(capacity: Config.UPLOAD_BUFFER_CAPACITY)
         // println(buffLength)
         let buffer = BufferedInputStream(this._request.body, buffLength)
-        var fragment = Array<Byte>(buffLength, repeat: 0)
+        var fragment = Array<Byte>(buffLength, item: 0)
         // 记录是否是第一次查询
         var isStart = true
         // 记录上当前操作的索引起始位置
@@ -109,12 +109,12 @@ public class MultipartForm{
                                 if(!path.endsWith("/")){
                                     path = path + "/"
                                 }
-                                if(!exists(path)){
+                                if(!Directory.exists(path)){
                                     Directory.create(path, recursive: true)
                                 }
                                 currentFile?.close()
                                 let filename = "${Random().nextUInt64()}${item.extName}"
-                                currentFile = File(path + filename, OpenMode.Append)
+                                currentFile = File(path + filename, OpenOption.CreateOrAppend)
                                 item.uploadFile = UploadFile(item.name, this._uploadPath, filename, item.value, item.getContentType())
                             }
                         }

@@ -14,15 +14,14 @@
  * January 2020 http://license.coscl.org.cn/MulanPSL2
  */
 
-import std.process.*
-// import std.process.{getArgs, currentDir}
-import std.fs.{Path, copy}
+import std.os.process.*
+import std.fs.{Path, Directory}
 
 func stagePostBuild(): Int64{
     // 将config目录下的文件复制到打包目录中
     let source = Path("./configs")
     let target = Path("./target/release/bin/configs")
-    copy(source, to: target, overwrite: true)
+    Directory.copy(source, target, true)
     return 0
 }
 

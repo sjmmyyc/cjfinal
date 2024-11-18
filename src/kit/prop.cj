@@ -19,7 +19,7 @@ import cjfinal.exception.NotFoundException
 
 import std.collection.HashMap
 import std.io.StringReader
-import std.fs.{File, exists, OpenMode}
+import std.fs.{File, OpenOption}
 
 /**
  * Prop用于读取配置文件
@@ -34,7 +34,7 @@ public class Prop{
      * @param path 配置文件的相对路径，相对于当前运行目录
      */
     public init(path: String){
-        if(exists(path)){
+        if(File.exists(path)){
             read(path)
         }else{
             throw NotFoundException('File "${path}" not found!')
@@ -45,7 +45,7 @@ public class Prop{
      * 追加配置文件，方便在开发模式和生产模式中使用不同的配置文件
      */
     public func appendIfExist(path: String): Prop{
-        if(exists(path)){
+        if(File.exists(path)){
             read(path)
         }
         return this
@@ -63,7 +63,7 @@ public class Prop{
      */
     private func read(path: String){
         // try-with-resource块，结束时自动释放文件
-        try(file = File(path, OpenMode.Read)){
+        try(file = File(path, OpenOption.Open(true, false))){
             let reader = StringReader(file)
             while(let Some(line) <- reader.readln()){
                 // 只有当不是空白行，且以“//”开始的行，才进行处理

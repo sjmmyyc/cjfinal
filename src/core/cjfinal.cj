@@ -20,14 +20,14 @@ import cjfinal.logger.CJFinalLogger
 import cjfinal.kit.TimeKit
 import log.setGlobalLogger
 import net.http.{Server, ServerBuilder, HttpContext}
-import log.{LogLevel, getGlobalLogger, Logger}
+import log.{getGlobalLogger, Logger}
+import std.log.LogLevel
 import std.time.MonoTime
-import std.process.Process
-import std.fs.{File, OpenMode}
+import std.fs.{File, OpenOption}
 import std.console.Console
-import std.posix.SIGINT
+import std.os.posix.SIGINT
 import std.reflect.TypeInfo
-import std.fs.{exists, Directory}
+import std.fs.Directory
 
 // void (*signal(int sig, CFunc<(Int32) -> Unit>))(int)
 type SignalHandler = CFunc<(Int32) -> Unit>
@@ -39,7 +39,7 @@ foreign func signal(signum: Int32, handler: SignalHandler): SignalHandler
  */
 public class CJFinal{
     // 注意，修改版本号时，应将cjpm.toml文件中的版本号一并修改
-    public static let version = "0.4.2"
+    public static let version = "0.4.3"
 
     public static let me: CJFinal = CJFinal()
 
@@ -97,10 +97,10 @@ public class CJFinal{
          let logger: CJFinalLogger = if(Config.DEV_MODE){
             CJFinalLogger(Console.stdOut)
         }else{
-            if(!exists("logs")){
+            if(!Directory.exists("logs")){
                 Directory.create("logs")
             }
-            CJFinalLogger(File("logs/log.txt", OpenMode.Append))
+            CJFinalLogger(File("logs/log.txt", OpenOption.CreateOrAppend))
         }
         logger.level = Config.LOG_LEVEL
         // 注册为全局Logger,在需要用到的地方仅需getGlobalLogger([("nae", "main")])获取logger对象即可
